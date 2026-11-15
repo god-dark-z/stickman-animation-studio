@@ -1,0 +1,11 @@
+# engine build/test outputs
+engine/node_modules/
+engine/out/
+engine/public/sfx/
+engine/public/music/
+engine/public/voice/
+engine/remotion/
+engine/__pycache__/
+*.log
+*.pyc
+.DS_Store

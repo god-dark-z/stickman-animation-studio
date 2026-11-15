@@ -1,0 +1,175 @@
+{
+  "title": "Why Does Your Phone Get Hot When Signal Is Weak",
+  "music": "curious",
+  "cast": {
+    "sam": { "color": "#ff8a2a", "outfit": "hoodie", "hair": "messy", "hairColor": "#4a2c14", "build": "normal" },
+    "friend": { "color": "#3a8ad6", "outfit": "tshirt", "hat": "cap", "hatColor": "#24507a", "hair": "short", "hairColor": "#1a1a1a", "build": "big" }
+  },
+  "shots": [
+    {
+      "say": "Your phone loses signal, and it gets hot.",
+      "bg": "bedroom", "framing": "close", "camera": "pushIn",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "holdUp", "expression": "surprised", "holding": "phone" }],
+      "fx": ["glow"]
+    },
+    {
+      "say": "Not warm — hot enough to worry you.",
+      "bg": "bedroom", "framing": "extreme", "camera": "static",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "holdUp", "expression": "shocked", "holding": "phone" }],
+      "fx": ["sweat"]
+    },
+    {
+      "say": "That backwards detail is real, and it has a name.",
+      "bg": "bedroom", "framing": "medium", "camera": "drift",
+      "actors": [{ "id": "sam", "x": 0.45, "z": 0.5, "pose": "think", "expression": "suspicious" }],
+      "transition": "dissolve"
+    },
+    {
+      "say": "Meet Sam.",
+      "bg": "bedroom", "framing": "full", "camera": "pushIn",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "wave", "expression": "happy", "enter": "pop" }],
+      "fx": ["sparkle"], "transition": "iris"
+    },
+    {
+      "say": "He drives into a canyon to take one quick call.",
+      "location": "desert", "framing": "wide", "camera": "panRight", "focus": "sam",
+      "actors": [{ "id": "sam", "x": 0.35, "z": 0.5, "pose": "walk", "expression": "neutral", "moveTo": 0.55 }],
+      "props": [{ "type": "car", "x": 0.2, "z": 0.2, "scale": 1 }],
+      "fx": ["dust"]
+    },
+    {
+      "say": "One bar.",
+      "location": "desert", "framing": "medium", "camera": "pushIn",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "holdUp", "expression": "worried", "holding": "phone" }],
+      "props": [{ "type": "car", "x": 0.2, "z": 0.2, "scale": 1 }]
+    },
+    {
+      "say": "Four minutes.",
+      "location": "desert", "framing": "close", "camera": "static",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "phone", "expression": "neutral" }],
+      "props": [{ "type": "car", "x": 0.2, "z": 0.2, "scale": 1 }]
+    },
+    {
+      "say": "His phone goes from cool to cooking,",
+      "location": "desert", "framing": "close", "camera": "pushIn",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "holdUp", "expression": "shocked", "holding": "phone" }],
+      "props": [{ "type": "car", "x": 0.2, "z": 0.2, "scale": 1 }],
+      "fx": ["sweat"],
+      "beats": [{ "at": "cooking", "expression": "shocked", "fx": "exclaim" }],
+      "transition": "cut"
+    },
+    {
+      "say": "and the battery drops twenty percent on a call that normally costs five.",
+      "location": "desert", "framing": "medium", "camera": "static",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "holdUp", "expression": "worried", "holding": "phone" }],
+      "props": [{ "type": "car", "x": 0.2, "z": 0.2, "scale": 1 }],
+      "insert": { "type": "counter", "title": "BATTERY", "value": 80, "from": 100, "suffix": "%", "color": "#ff4a4a" }
+    },
+    {
+      "say": "His friend laughs.",
+      "location": "street", "framing": "full", "camera": "pushIn",
+      "actors": [
+        { "id": "friend", "x": 0.42, "z": 0.5, "pose": "talk", "expression": "laugh", "enter": "left" },
+        { "id": "sam", "x": 0.72, "z": 0.45, "pose": "crossed", "expression": "angry", "facing": "left" }
+      ],
+      "sfx": ["laugh"], "transition": "cut"
+    },
+    {
+      "say": "'It did nothing. Phones don't run marathons.'",
+      "location": "street", "framing": "medium", "camera": "pushIn", "quote": "friend",
+      "actors": [
+        { "id": "friend", "x": 0.38, "z": 0.5, "pose": "talk", "expression": "smug" },
+        { "id": "sam", "x": 0.72, "z": 0.45, "pose": "crossed", "expression": "suspicious", "facing": "left", "holding": "phone" }
+      ],
+      "beats": [{ "at": "marathons", "actor": "friend", "expression": "laugh", "fx": "exclaim" }],
+      "transition": "cut"
+    },
+    {
+      "say": "But wait — how can doing less cost more?",
+      "location": "street", "framing": "close", "camera": "crashZoom",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "shrug", "expression": "surprised" }],
+      "fx": ["question"], "transition": "iris"
+    },
+    {
+      "say": "You see, your phone is always talking to a tower, even with the screen off.",
+      "bg": "void", "framing": "medium", "camera": "static",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "talk", "expression": "determined" }],
+      "insert": { "type": "phone", "title": "Signal", "lines": ["Searching…", "No service…", "Searching…", "Still nothing…"] },
+      "transition": "zoom"
+    },
+    {
+      "say": "Near the tower, it whispers.",
+      "bg": "street", "framing": "medium", "camera": "pushIn",
+      "actors": [{ "id": "sam", "x": 0.45, "z": 0.5, "pose": "phone", "expression": "happy" }],
+      "props": [{ "type": "tower", "x": 0.8, "z": 0.05, "scale": 1.4 }]
+    },
+    {
+      "say": "In a dead zone, it screams.",
+      "bg": "desert", "framing": "medium", "camera": "crashZoom",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "armsUp", "expression": "furious" }],
+      "fx": ["speedlines", "rage"],
+      "beats": [{ "at": "screams", "fx": "exclaim", "zoom": 1.2 }],
+      "insert": { "type": "bigtext", "title": "SCREAM!", "color": "#ff4a4a" },
+      "transition": "flash"
+    },
+    {
+      "say": "The radio climbs to maximum power",
+      "bg": "void", "wall": "#3d4d6e", "framing": "medium", "camera": "crashZoom",
+      "actors": [],
+      "insert": { "type": "bigtext", "title": "MAX POWER", "color": "#ff4a4a" },
+      "transition": "zoom"
+    },
+    {
+      "say": "and shouts 'can you hear me now?' hundreds of times every second,",
+      "bg": "void", "framing": "medium", "camera": "static",
+      "actors": [],
+      "insert": { "type": "versus", "title": "TO THE TOWER", "lines": ["whisper", "SCREAM!"], "color": "#d8342c" },
+      "sfx": ["zap"]
+    },
+    {
+      "say": "just to keep one call alive.",
+      "location": "desert", "framing": "close", "camera": "pushIn",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "phone", "expression": "determined" }],
+      "fx": ["dust"]
+    },
+    {
+      "say": "It's the same as talking in a loud room.",
+      "location": "street", "framing": "full", "camera": "pushIn",
+      "actors": [
+        { "id": "friend", "x": 0.35, "z": 0.5, "pose": "talk", "expression": "furious" },
+        { "id": "sam", "x": 0.7, "z": 0.45, "pose": "phone", "expression": "worried", "facing": "left" }
+      ],
+      "sfx": ["crowd"], "transition": "whip"
+    },
+    {
+      "say": "To be heard over the noise, you raise your voice.",
+      "location": "street", "framing": "medium", "camera": "pushIn", "quote": "friend",
+      "actors": [
+        { "id": "friend", "x": 0.42, "z": 0.5, "pose": "point", "expression": "determined" },
+        { "id": "sam", "x": 0.75, "z": 0.45, "pose": "cower", "expression": "scared", "facing": "left" }
+      ],
+      "transition": "cut"
+    },
+    {
+      "say": "Shouting burns energy, and energy turns into heat — right there in your hand.",
+      "bg": "bedroom", "time": "night", "framing": "close", "camera": "pushIn",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "holdUp", "expression": "shocked", "holding": "phone" }],
+      "fx": ["fire", "glow"], "sfx": ["fire"],
+      "beats": [{ "at": "heat", "fx": "exclaim", "zoom": 1.15 }]
+    },
+    {
+      "say": "The sleeping modem burns extra power too, holding a connection that keeps failing.",
+      "bg": "bedroom", "time": "night", "framing": "full", "camera": "drift",
+      "actors": [{ "id": "sam", "x": 0.3, "z": 0.4, "pose": "lie", "expression": "sleepy" }],
+      "props": [{ "type": "phone", "x": 0.68, "z": 0.5, "y": 230, "glow": true }],
+      "fx": ["zzz"]
+    },
+    {
+      "say": "So remember: the quieter the world gets for your phone, the harder it screams.",
+      "bg": "stage", "framing": "close", "camera": "pushIn",
+      "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "holdUp", "expression": "wink", "holding": "phone" }],
+      "fx": ["spotlight"],
+      "beats": [{ "at": "screams", "fx": "exclaim", "zoom": 1.12 }]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+node_modules/
+out/
+public/sfx/
+public/music/
+public/voice/
+remotion/
+*.log
+__pycache__/
+*.pyc
