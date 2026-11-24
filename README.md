@@ -6,7 +6,7 @@
 ![Node](https://img.shields.io/badge/Node-18%2B-3a8ad6.svg?style=flat-square)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3a8ad6.svg?style=flat-square)
 ![Engine](https://img.shields.io/badge/Engine-Remotion%204%20%2B%20three.js-9fe8a8.svg?style=flat-square)
-![QA](https://img.shields.io/badge/QA-4%20executable%20gates-ff8a2a.svg?style=flat-square)
+![QA](https://img.shields.io/badge/QA-7%20executable%20gates-ff8a2a.svg?style=flat-square)
 ![AI images](https://img.shields.io/badge/AI%20images-0-c9d4e8.svg?style=flat-square)
 ![AI video](https://img.shields.io/badge/AI%20video-0-c9d4e8.svg?style=flat-square)
 ![Paid APIs](https://img.shields.io/badge/Paid%20APIs-0-c9d4e8.svg?style=flat-square)
@@ -21,15 +21,30 @@ English-narrated, narration-synced, every frame and every sound produced by code
 
 ## 🎬 The demo — real output from this repo
 
-The video below was rendered by the actual pipeline in this repository —
-no external tools, no image or video models. It is the `--preview` pass (540×960) of the shipped
-example storyboard; a full run renders the same thing at 1080×1920.
+The video below was rendered by the actual pipeline in this repository (v3, regenerated
+2026-11-24) — no external tools, no image or video models. It is the `draft` tier (540×960) of the
+shipped example storyboard, run through every gate; `--tier standard` renders the same thing at
+1080×1920.
+
+### Seating and sleeping, proven
+
+These are the cases that used to pass the old gates with a wrong picture — a character “sleeping”
+drawn on the floor beside the bed, a character “sitting” sunk into the chair. Now the engine
+resolves the body onto the prop's anchors and a geometry gate checks the drawing.
+
+<div align="center">
+<img src="docs/showcase/chair-seated.png" width="32%" alt="stickman visibly seated on a chair at a desk"/>
+<img src="docs/showcase/bed-sleeping.png" width="32%" alt="stickman lying in bed, head on the pillow, under the blanket"/>
+<img src="docs/showcase/demo-contact-sheet.png" width="32%" alt="contact sheet of every shot in the demo"/>
+
+*full-body seated · asleep in bed, head on pillow · every demo shot at a glance*
+</div>
 
 <div align="center">
 
 <video src="docs/demo/demo.mp4" controls muted playsinline width="400"></video>
 
-**`/make-video Why Does Your Phone Get Hot When Signal Is Weak?`** · 56 s · 23 shots · H.264 + AAC · −14.7 LUFS
+**`/make-video Why Does Your Phone Get Hot When Signal Is Weak?`** · 56.5 s · 23 shots · H.264 + AAC · −14.7 LUFS · rendered in 108 s on a CPU-only machine
 
 <br/>
 
@@ -83,25 +98,40 @@ flowchart LR
     J -- pass --> K["📦 MP4 + script + fact-check + sync map"]
 ```
 
-## The four executable QA gates
+## The executable QA gates
 
 | Gate | Command | Enforces |
 |---|---|---|
-| **Sync** | `npx tsx scripts/qa_sync.ts stories/x.json` | narration ↔ visual contract: places, time-of-day, actions as poses/beats, objects on screen, quoted lines with animated mouths, continuity, no repeated shot grammar — **0 errors required** |
-| **Stills** | `npm run make -- … --stills` → `python scripts/qa_stills.py …` | one still per shot; exposure / black-frame / saturation pixel gate + agent visual inspection |
-| **Video** | `ffprobe` + frame pulls | codec, fps, resolution, duration ≈ narration + 0.6 s; no dead frames |
-| **Audio** | `python scripts/qa_audio.py out/slug.mp4` | −14 LUFS ±1.5, true peak ≤ −1.0 dBTP (pipeline targets −1.5 to survive AAC), voice presence — no clipping, no harsh spikes |
+| **Validate** | `npx tsx scripts/validate.ts stories/x.json` | schema, cast ids, prop ids, 3D locations, quote actors — before anything expensive runs |
+| **Sync** | `npx tsx scripts/qa_sync.ts stories/x.json` | narration ↔ visual contract: places, time-of-day, actions as poses/beats, objects, quoted lines with animated mouths, continuity, shot-grammar repetition |
+| **Geometry** | `npx tsx scripts/qa_geometry.ts stories/x.json` | **the scene graph**: hip inside the seat, body on the mattress, head on the pillow, no sinking/floating, scale, draw order, face occlusion, framing, facing, seated→standing continuity. Runs the same placement code as the renderer |
+| **Stills** | `npm run make -- … --stills` → `python scripts/qa_stills.py …` | exposure / dead-frame / saturation pixel gate |
+| **Timing** | `python scripts/qa_timing.py out/slug/words.json out/…mp3` | per-word timing is real (not sentence-level), monotonic, and each sampled word lands on audible speech |
+| **Video** | `python scripts/qa_video.py out/slug.mp4` | codec, fps, resolution, duration ≈ timeline, dead frames |
+| **Audio** | `python scripts/qa_audio.py out/slug.mp4` | −14 LUFS ±1.5, true peak ≤ −1.0 dBTP, voice presence |
+| **Visual** | `python scripts/qa_visual_report.py story.json out/slug/stills` | contact sheet + per-shot claim checklist; a vision agent records PASS/FAIL, a vision-less agent states that QA was geometric only |
 
-Repairs loop per gate (≤ 3 rounds each); nothing ships with a silently failed gate.
+`npm run studio -- <story> --tier draft` runs them all in order and refuses to advance past a
+failure. Repairs loop per gate; nothing ships with a silently failed gate.
 
 ## Install
 
 ```bash
-git clone https://github.com/<you>/stickman-animation-studio
+git clone https://github.com/god-dark-z/stickman-animation-studio
 cd your-project
 ../stickman-animation-studio/install/install.sh --with-engine     # Windows: install.ps1 -WithEngine
 
-cd engine && npm install && pip install edge-tts imageio-ffmpeg numpy scipy pillow
+cd engine
+npm ci                                   # exact versions from package-lock.json
+python -m pip install -r requirements.txt   # pinned Python deps
+npm run doctor                           # PASS/WARN/FAIL before you render anything
+```
+
+Then one command per video:
+
+```bash
+npm run studio -- stories/tests/chair-office.json --tier draft   # fast, half-size
+npm run studio -- stories/my-story.json --tier standard          # 1080x1920
 ```
 
 The installer places the skill files, `/make-video` command adapters for every supported agent,
@@ -161,20 +191,61 @@ templates/                   sync-map.md · fact-check-table.md
 docs/                        banner.svg (drawn in code) · demo/ (video, GIFs, QA stills)
 ```
 
-## Verified — this build, 2026-11-15
+## Verified — v3, measured on a CPU-only machine (2026-11-24)
 
-- [x] `tsc --noEmit` clean · **14/14** unit tests
-- [x] Sync gate on the shipped story: **0 errors, 0 warnings** (caught and fixed 2 real contradictions during development)
-- [x] Stills gate: **23/23** pixel gate + **23/23** offline CV
-- [x] Rendered end-to-end with real TTS (188 words → 55.8 s narration)
-- [x] Audio gate: **PASS** — −14.7 LUFS, −1.5 dBTP (the gate caught and fixed an AAC overshoot)
-- [x] Installer exercised into a clean project, twice (idempotent)
+Machine: Windows 11, 16 cores, **~15 GB RAM, no discrete GPU**, CPU-only. Every number below was
+produced by a command in `docs/dev/VERIFY-*.md`; nothing here is self-reported from a build day.
+
+- [x] `tsc --noEmit` clean · **22/22** unit tests (incl. numeric contact tests for chair and bed)
+- [x] **Full 23-shot demo** (`--tier draft`, 3D locations, software WebGL via ANGLE): timeline 56.4 s,
+      **108 s wall clock**, 3.8 MB MP4, **all gates PASS**
+- [x] Sync gate **0 errors, 0 warnings** · geometry gate **0 errors, 0 warnings** on the demo
+- [x] Timing audit: 188 words, median word 205 ms, mean distance to a speech onset **55 ms**
+- [x] Video gate PASS: 540×960, 30.00 fps, h264 + aac, 56.5 s, 0 dead-frame runs ≥ 0.6 s
+- [x] Audio gate PASS: **−14.7 LUFS**, **−1.5 dBTP**
+- [x] Seating and sleeping fixtures: character **visibly and numerically** on the chair / in the bed
+      (see `docs/showcase/`)
+- [x] `npm run doctor` → **15 checks, 0 fail, 0 warn** on the reference machine (an earlier probe hit
+the provider's intermittent `NoAudioReceived`; the probe retries and narrates the hint instead of
+failing)
+
+### Measured render times (this machine)
+
+| Work | Tier | Output | Wall clock |
+|---|---|---|---|
+| 1-shot silent edge case | draft | 540×960, 1.6 s | **18 s** total (6 s encode) |
+| 4-shot bed scene, real TTS | draft | 540×960, 9.2 s | **~60 s** total (19 s after narration) |
+| 23-shot demo, 3D, real TTS | draft | 540×960, 56.5 s | **108 s** total |
+| 1080×1920 full quality | standard | — | not measured on this machine; see `docs/dev/BLOCKERS.md` |
+
+The renderer caps concurrency by **free RAM as well as cores** (a 1080×1920 three.js frame costs
+~250–350 MB per tab) and drops to 2 workers when a shot uses a 3D location.
 
 ## Requirements
 
-Node 18+ · Python 3.10+ · ~1 GB disk. Remotion downloads its own headless Chromium.
-Narration uses free Microsoft edge-tts (needs internet; `--no-tts` works fully offline).
+Node 18+ (tested on 24.19) · Python 3.10+ (tested on 3.12) · ~3 GB disk · full FFmpeg on PATH for
+the video gate. Remotion downloads its own headless Chromium on first render. Narration uses free
+Microsoft edge-tts (needs internet; `--no-tts` works fully offline). Software WebGL is the
+supported path — **no GPU required**.
+
 **English-only production. No AI image/video generation, no image services, no paid APIs — ever.**
+
+## What this cannot do (honest limits)
+
+- **Anchor actions are 2D-only.** `sitOn` / `lieOn` / `sleepOn` resolve against 2D prop anchors. In a
+  3D location the gate raises `ANCHOR-3D` instead of misplacing a body; use a 2D background for
+  those shots.
+- **The rig is a 2D cut-out.** A seated silhouette is correct in contact and scale but the legs are
+  a single curve — there is no separate thigh, so extreme close-ups of a seated pose read less well
+  than a wide or medium shot.
+- **Anchor tables are measured by hand** from `Props.tsx` and currently cover chair, stool, bench,
+  couch, bed, desk, table and the vehicles. A new piece of furniture needs its anchors added before
+  a character can sit on it.
+- **No lip-sync phonemes.** Mouth flaps are amplitude-driven from the narration audio, not visemes.
+- **No pathological content**: crowds, crowds-of-hands, cloth, hair physics and liquid are out of
+  scope for a code-drawn stickman engine.
+- **Per-agent installs were not executed** for Claude Code / Antigravity / ZCode in this build; see
+  `install/INSTALL.md` for which routes are convention-only.
 
 ## License & credits
 

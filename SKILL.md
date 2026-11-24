@@ -44,6 +44,25 @@ assume; check. One minute here saves a broken render later.
 Whatever the environment, the quality gates (steps 4, 5, 7) are **not optional** — a weaker
 workflow must still pass the same executable checks.
 
+## 0.5 Use the orchestrator, not eight commands
+
+The pipeline is a state machine. Call it once; it runs every stage, refuses to advance when
+a gate fails, and tells you the exact command to resume.
+
+```bash
+npx tsx scripts/studio.ts <story.json|slug> --tier draft        # fast half-size pass
+npx tsx scripts/studio.ts <story.json> --tier standard          # 1080x1920 delivery
+npx tsx scripts/studio.ts <story.json> --tier studio            # highest bitrate
+npx tsx scripts/studio.ts <story.json> --from geometry --resume  # continue after a fix
+```
+
+State is written to `stories/<slug>/.state.json`, the full log to `out/<slug>/run.log`.
+Stages: `validate → narration → timeline → sync → geometry → stills → pixels → timing →
+render → video → audio → visual`. `--no-tts` skips narration/timing/audio and renders silent.
+
+Before the first run on a new machine: `npm run doctor` (prints PASS/WARN/FAIL and the fix
+for each). Do not render until it is green or you understand every WARN.
+
 ## 0.5 Resolve the engine
 
 The engine is a self-contained Remotion project. Find it in this order:
@@ -76,7 +95,12 @@ no licenses, no third-party audio). Narration needs internet for edge-tts (free,
 
 ## 2. Write the script + choose the voice
 
-Aim for **190–210 words ≈ 60–75 s**. Structure (follow it exactly):
+Measured speech rate on the reference machine (edge-tts, `+22%`, `en-US-AndrewMultilingualNeural`):
+**≈3.8–4.0 words per second of audio**, so **190–210 words ≈ 50–57 s**. Do not estimate from a
+fixed 60–75 s: the real duration comes from the synthesized audio. Slower presets (`+6…10%`)
+read at ≈3.2–3.4 w/s; `AriaNeural @ +12%` ≈3.6 w/s.
+
+Structure (follow it exactly):
 
 1. **Line 1: paradox hook stated as plain fact.** No greetings, no "Did you know".
 2. **Setup and stakes** — hero, place, want.
@@ -105,6 +129,29 @@ calm documentary reads slower). Test the hook line with a quick synthesis if uns
 Write `stories/<kebab-title>.json`. Schema + ids: `references/09-schema-reference.md`,
 `engine/src/catalog.ts`. Craft rules: `references/05-storyboard-craft.md`.
 
+**Say WHAT happens; let the engine decide WHERE the body goes.** Use the semantic action layer
+first — it is what keeps quality independent of the agent writing the JSON:
+
+```json
+{ "id": "worker", "action": "sitOn", "on": "chair", "facing": "right" }
+```
+
+The engine looks up the chair's `seat` anchor, puts the hip joint on it, chooses the pose,
+draws the body in front of the chair back and reports the contact to the geometry gate. You do
+not write `x`, `z`, `pose` or a `y` lift for this.
+
+| action | needs a prop with | example |
+|---|---|---|
+| `sitOn` | `seat` anchor | chair, stool, bench, couch, bed edge, car |
+| `lieOn` / `sleepOn` | `mattress` anchor | bed, hospital bed |
+| `standAt` | `top` anchor | desk, table, counter |
+
+Hand-written `x`/`z`/`pose` still work (advanced override) but the geometry gate will flag a
+`pose: "sit"` that is drawn at floor level next to a chair.
+
+**Declare the prop you interact with in that shot's `props`.** If the background already has
+the same furniture at the same x/z, the shot's declaration replaces it (no double bed).
+
 **Narration-to-visual synchronization is mandatory and machine-checked.** Every narration segment
 (a shot's `say`) must visibly show what it says: right place, right time of day, the described
 action as a pose/beat/prop, mentioned objects on screen, quoted lines bound to a `quote` actor,
@@ -116,6 +163,7 @@ Run the executable gate and iterate to zero errors:
 ```bash
 npx tsx scripts/qa_sync.ts stories/<file>.json            # place/time/action/object/dialogue/continuity checks
 npx tsx scripts/qa_sync.ts stories/<file>.json --map      # print the shot-by-shot sync contract table
+npx tsx scripts/qa_geometry.ts stories/<file>.json        # the scene-graph gate (see below)
 ```
 
 - All ERRORs must be fixed (change the shot's world/time/pose/props, or rephrase the narration).
@@ -124,15 +172,40 @@ npx tsx scripts/qa_sync.ts stories/<file>.json --map      # print the shot-by-sh
 - A story-specific lexicon (idioms, invented nouns) goes in `stories/<slug>/sync-lexicon.json` —
   see the template.
 
+## 4.5 Geometry gate — does the picture actually contain the claim?
+
+The sync gate reads text. This one reads the scene graph: contact (hip inside the seat, body on
+the mattress, head on the pillow), no sinking/floating, character-vs-prop scale, draw order,
+face occlusion by props drawn in front, framing, facing in dialogue, and seated→standing
+continuity. It runs the **same placement code as the renderer**, so a pass means the drawn
+scene really touches the surface.
+
+```bash
+npx tsx scripts/qa_geometry.ts stories/<file>.json
+```
+
+Every ERROR names the shot and the fix. Typical repairs: add the semantic action, declare the
+prop in that shot, move a desk/monitor aside in x, or widen the framing.
+
 ## 5. Stills gate (never skip)
 
 ```bash
 npm run make -- stories/<file>.json --stills        # one QA still per shot → out/<slug>/stills/
 python scripts/qa_stills.py out/<slug>/stills       # exposure/dead-frame gate (exit 1 on fail)
+python scripts/qa_visual_report.py stories/<file>.json out/<slug>/stills
 ```
 
-Then inspect every still for framing, faces, floating props, readability, consistency — with your
-own vision if you have it, else `agentvision check <file>` per still plus the pixel gate above.
+The last command writes `out/<slug>/contact-sheet.png` and `out/<slug>/visual-review.md`: a
+per-shot checklist of what the narration claims, next to what the scene declares and the offline
+CV measurements.
+
+- **If you can see images:** open the contact sheet, compare each still to its claim column, and
+  write `PASS` or `FAIL` in the verdict column. Re-running the script reads your verdicts and
+exits 1 on any FAIL.
+- **If you cannot see images:** rely on `qa_geometry` plus the CV numbers, and say
+  "visual QA was geometric only" in the delivery report. Never claim you looked at a frame you
+  did not look at.
+
 Fix and re-run until clean. **Never render video before this gate passes.**
 
 ## 6. Render

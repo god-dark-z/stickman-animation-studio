@@ -89,4 +89,28 @@ All have built-in reveal animations and auto-sfx.
 `fps: 30` · every shot gets `from` (absolute frame), `duration`, `words[]` (TTS timestamps),
 `beatsResolved[]` (frames), auto-sfx cues, voice-aware ducking envelope, −14 LUFS master.
 Duration = last word + 0.6 s tail. Composition id: `Story` (also `EnvTest`, `SheetCast/Expr/Pose`,
-`LocationsPreview` in `npm run studio`).
+`LocationsPreview` in `npm run remotion`).
+
+## Actor fields added in v3 (semantic actions)
+
+| Field | Type | Default | Meaning |
+|---|---|---|---|
+| `action` | `none` \| `sitOn` \| `lieOn` \| `sleepOn` \| `standAt` \| `hold` \| `use` \| `face` \| `pointAt` \| `react` \| `handOver` | `none` | high-level behaviour; placement actions override `x`, `z` and `pose` |
+| `on` | string | — | the prop the action uses: a prop `type` declared in this shot, or `prop:<index>` |
+| `underBlanket` | boolean | `false` | sleeping: draw the bed's blanket over the body, head above the edge |
+| `inside` | boolean | `false` | driving/riding: draw the body behind the vehicle body |
+
+Placement actions resolve against `src/scene/anchors.ts`:
+
+```ts
+chair: { seat: { x: 0, y: -108, w: 124, h: 22 } }
+bed:   { mattress: { …, y: -108, w: 436 }, pillow: { x: -145, y: -116 }, seat: { x: 176, … } }
+desk:  { top: { y: -194, w: 336 } }
+```
+
+A prop without the anchor the action needs is an **error**, never a guess. To make new furniture
+interactive, add its surface in `anchors.ts` (measure it from `Props.tsx` — origin is bottom-centre,
+y grows negative upward) and run the geometry gate.
+
+`pose: "sit"` / `"lie"` remain valid as low-level values, but using them next to a chair/bed
+without an `action` is a `MISSING-ACTION` error: the body would be drawn on the floor line.

@@ -98,3 +98,39 @@ WARNs are recorded in `stories/<slug>/sync-map.md` (template: `templates/sync-ma
 Timing inside a shot is bound to words: `beats[].at` = a word of that shot's `say` (or seconds).
 If the narration describes an action that happens mid-line, put the beat on that exact word —
 the engine resolves it to the spoken frame.
+
+---
+
+## The semantic action layer (write this first)
+
+You describe **what happens**. The engine decides **where the body is drawn**, which surface it
+touches and how it is layered — and then proves it with `qa_geometry.ts`.
+
+```json
+{ "id": "worker", "action": "sitOn", "on": "chair", "facing": "right", "expression": "bored" }
+```
+
+| action | prop needs | resolves to |
+|---|---|---|
+| `sitOn` | `seat` anchor | hip joint on the seat surface, body in front of the backrest, feet on/near the floor |
+| `lieOn` | `mattress` anchor | body flat on the mattress, head on the pillow when one exists |
+| `sleepOn` | `mattress` anchor | as `lieOn`; pair with `underBlanket: true` |
+| `standAt` | `top` anchor | body beside the desk/table/counter |
+| `hold` / `use` / `face` / `pointAt` / `react` / `handOver` | — | acting only; placement stays as authored |
+
+Rules that keep you out of the gate's error list:
+
+1. **Declare the prop you interact with in that shot's `props`.** If the background already has the
+   same furniture at the same x/z, your declaration *replaces* it — you will not get two beds.
+2. **Do not compute `x`/`z`/`y` for an interaction shot.** `action` overrides them. Writing
+   `pose: "sit"` with a chair on screen is an error on purpose: that is the shot that draws the
+   body at floor level.
+3. **Leave room for the prop.** A desk or monitor at a *nearer* z can cover the face; the gate
+   reports `FACE-OCCLUDED`. Move big props to one side in x, or send them behind.
+4. **Framing matters.** A `close` shot crops the seat. Establish the contact in `full`/`medium`,
+   then move in — that is ordinary shot grammar, and the gate only warns about it.
+5. **Anchor actions are 2D only.** In a 3D `location` the gate raises `ANCHOR-3D`; use a 2D `bg`.
+
+What stays hand-authored: staging of non-interaction shots, camera choice, beats, expressions,
+props that are not touched, and `x`/`z` when you deliberately want a mark. The semantic layer
+removes the coordinates you would otherwise get wrong.
