@@ -11,7 +11,8 @@ show exactly what the narration communicates.
 ## Gate results
 
 - `qa_sync`: N errors, M warnings (date)
-- `qa_stills`: pass/fail (method: vision / pixel-stats / agentvision)
+- `qa_geometry`: pass/fail (contact, layering, framing — numeric)
+- `qa_stills`: pass/fail (method: vision on the contact sheet / pixel-stats only)
 - `qa_audio`: values (LUFS / true peak / mean volume)
 
 ## Accepted warnings

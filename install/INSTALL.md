@@ -69,7 +69,7 @@ Re-running is safe (idempotent). `--dir` targets another project directory.
 
 ```text
 Install the Stickman Animation Studio skill:
-  git clone https://github.com/<you>/stickman-animation-studio .skill-tmp
+  git clone https://github.com/god-dark-z/stickman-animation-studio .skill-tmp
   .skill-tmp/install/install.sh --with-engine
 Then run: /make-video Why Does Your Phone Get Hot When Signal Is Weak?
 ```
@@ -101,3 +101,35 @@ npm run make -- stories/demo.json --stills --no-tts
 
 Then: `/make-video Why Does Your Phone Get Hot When Signal Is Weak?` — the fully worked example
 ships at `engine/stories/why-phone-gets-hot.json`.
+
+---
+
+## Which routes were actually run
+
+Do not read a tick you did not earn. This build executed the installer into a temp project and
+verified the files it writes; it did **not** install into the real Claude Code, Antigravity or ZCode
+products, because those are not present on the machine this was verified on.
+
+| Route | Files written | Verified how |
+|---|---|---|
+| Claude Code skill + `/make-video` | `.claude/skills/stickman-animation-studio/`, `.claude/commands/` | file layout + command body checked |
+| OpenCode / Cursor / Copilot / Gemini CLI | `.opencode/command/`, `.cursor/commands/`, `.github/prompts/`, `.gemini/commands/` | file layout checked |
+| Codex CLI / AGENTS.md readers / Antigravity / ZCode | `AGENTS.md` pointer + skill folder | pointer text checked; **native discovery not tested** |
+| Windsurf / Aider | rules / conventions pointer | text checked |
+| Chat-only agents | `install/PASTE-THIS-PROMPT.md` | content checked |
+
+If an agent's native skill or command location has changed since this file was written, the pointer
+routes still work: the agent reads `SKILL.md`, which is the whole pipeline.
+
+## After installing, before the first video
+
+```bash
+cd engine
+npm ci
+python -m pip install -r requirements.txt
+npm run doctor                      # PASS/WARN/FAIL + the fix for each
+npm run studio -- stories/tests/chair-office.json --tier draft
+```
+
+`--tier draft` is half-size and finishes in under a minute on a CPU-only laptop. Move to
+`--tier standard` (1080×1920) once the draft is clean.

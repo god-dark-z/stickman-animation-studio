@@ -142,7 +142,16 @@ function checkShot(story: Story, s: ResolvedShot, i: number, lex: Lexicon): Find
   const worldIs = (...ids: string[]) => ids.some((id) => world === id);
   const states = () => {
     const st = new Set<string>();
-    for (const a of s.actors) { st.add(a.pose); st.add(a.expression); if (a.moveTo !== undefined) st.add("moveTo"); if (a.holding) st.add(a.holding); }
+    // a semantic action implies its pose, otherwise the gate cannot see a seated actor
+    const ACTION_POSE: Record<string, string> = { sitOn: "sit", lieOn: "lie", sleepOn: "lie", standAt: "stand" };
+    for (const a of s.actors) {
+      st.add(a.pose); st.add(a.expression);
+      if (a.action && ACTION_POSE[a.action]) st.add(ACTION_POSE[a.action]);
+      if (a.moveTo !== undefined) st.add("moveTo");
+      if (a.holding) st.add(a.holding);
+      const ch = story.cast[a.id];
+      if (ch) st.add(`${ch.outfit}outfit`);
+    }
     for (const b of s.beatsResolved) { if (b.pose) st.add(b.pose); if (b.expression) st.add(b.expression); if (b.fx) st.add(b.fx); }
     for (const p of s.props) st.add(p.type);
     if (s.insert) st.add(s.insert.type);

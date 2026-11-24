@@ -11,6 +11,9 @@ import assert from "node:assert/strict";
 import { StorySchema } from "../src/schema";
 import { buildTimeline, tokenize } from "../src/timeline";
 import { chunkWords } from "../src/captions/Captions";
+import { anchorWorld } from "../src/scene/layout";
+import { poseMetrics, resolvePlacement, stageOf } from "../src/scene/layout";
+import { checkShot } from "./qa_geometry";
 
 let passed = 0;
 const test = (name: string, fn: () => void) => {
@@ -190,6 +193,107 @@ test("silent shot marker parses and contributes no words", () => {
   ], null, null);
   assert.equal(tl.shots[1].words.length, 0, "silent shot owns no words");
   assert.equal(tl.durationInFrames, Math.ceil((3.8 + 0.6) * 30));
+});
+
+// ------------------------------------------------------------------ geometry / contact
+const ENV = { horizon: 1180 };
+
+const chairStory = StorySchema.parse({
+  title: "chair", cast: { w: { color: "#ffffff" } },
+  shots: [{
+    say: "He sits at the desk.", bg: "office",
+    actors: [{ id: "w", action: "sitOn", on: "chair" }],
+    props: [{ type: "chair", x: 0.5, z: 0.4 }],
+  }],
+});
+const chairShot = chairStory.shots[0];
+
+// THE regression: a character described as sitting must be numerically on the seat.
+test("sitOn puts the hip joint on the chair seat", () => {
+  const place = resolvePlacement(chairShot.actors[0], chairShot.props, ENV)!;
+  assert.ok(place && !place.error, place?.error);
+  const seat = anchorWorld(chairShot.props[0], ENV, "seat")!;
+  assert.ok(place.contact, "a contact must be reported for a seated actor");
+  assert.ok(Math.abs(place.contact!.hip.y - seat.cy) < 1, `hip y ${place.contact!.hip.y} vs seat ${seat.cy}`);
+  assert.ok(Math.abs(place.contact!.hip.x - seat.cx) < 1, "hip must be centred on the seat");
+  assert.ok(place.z > (chairShot.props[0].z ?? 0), "the body must draw in front of the chair");
+  assert.equal(place.pose, "sit");
+});
+
+test("sitting feet stay within a foot of the floor (no dangle, no sink)", () => {
+  const place = resolvePlacement(chairShot.actors[0], chairShot.props, ENV)!;
+  const floor = stageOf(ENV).y(chairShot.props[0].z ?? 0.45);
+  assert.ok(place.y <= floor + 8, "root must not be below the floor");
+  assert.ok(floor - place.y < 40, `feet ${(floor - place.y).toFixed(1)}px above the floor`);
+});
+
+const bedStory = StorySchema.parse({
+  title: "bed", cast: { m: { color: "#ffffff" } },
+  shots: [{
+    say: "He sleeps.", bg: "bedroom", time: "night",
+    actors: [{ id: "m", action: "sleepOn", on: "bed", underBlanket: true }],
+    props: [{ type: "bed", x: 0.5, z: 0.35 }],
+  }],
+});
+const bedShot = bedStory.shots[0];
+
+// THE other regression: "sleeping in a bed" must put the body on the mattress, head on the pillow.
+test("sleepOn rests the body on the mattress with the head on the pillow", () => {
+  const place = resolvePlacement(bedShot.actors[0], bedShot.props, ENV)!;
+  assert.ok(place && !place.error, place?.error);
+  const mat = anchorWorld(bedShot.props[0], ENV, "mattress")!;
+  const pillow = anchorWorld(bedShot.props[0], ENV, "pillow")!;
+  assert.ok(Math.abs(place.contact!.bodyBottom - mat.cy) < 1, `body bottom ${place.contact!.bodyBottom} vs mattress ${mat.cy}`);
+  assert.ok(Math.abs(place.contact!.head.x - pillow.cx) < 1, `head x ${place.contact!.head.x} vs pillow ${pillow.cx}`);
+  assert.ok(place.contact!.head.x > mat.left && place.contact!.head.x < mat.right, "head must be over the mattress");
+  assert.equal(place.pose, "lie");
+});
+
+test("a lying body is horizontal: head and feet share a height", () => {
+  const m = poseMetrics("normal", "lie");
+  assert.ok(m.rotated, "lie must be the rotated pose");
+  assert.ok(Math.abs(m.bodyBottom - (m.headY + m.headR)) < 1, "the lowest point is the head's underside");
+  assert.ok(m.bodyBottom - m.bodyTop > 100, "a lying body must be a wide, flat shape");
+});
+
+// The gate must reject what the old engine happily passed: "sit" with a chair on screen.
+test("the geometry gate flags a seated pose that never touched the chair", () => {
+  const bad = StorySchema.parse({
+    title: "bad", cast: { w: { color: "#ffffff" } },
+    shots: [{
+      say: "He sits at the desk.", bg: "office",
+      actors: [{ id: "w", pose: "sit" }],
+      props: [{ type: "chair", x: 0.5, z: 0.4 }],
+    }],
+  });
+  const findings = checkShot(buildTimeline(bad, null, null, null).shots[0], bad.cast, 0);
+  assert.ok(
+    findings.some((f) => f.kind === "MISSING-ACTION" && f.sev === "ERROR"),
+    `expected a MISSING-ACTION error, got ${JSON.stringify(findings)}`,
+  );
+});
+
+test("the geometry gate passes the anchored chair story", () => {
+  const findings = checkShot(buildTimeline(chairStory, null, null, null).shots[0], chairStory.cast, 0);
+  assert.equal(findings.filter((f) => f.sev === "ERROR").length, 0, JSON.stringify(findings));
+});
+
+test("an action without a prop anchor is an error, not a silent guess", () => {
+  const s = StorySchema.parse({
+    title: "t", cast: { w: { color: "#ffffff" } },
+    shots: [{ say: "He sits on the lamp.", bg: "office", actors: [{ id: "w", action: "sitOn", on: "lamp" }], props: [{ type: "lamp", x: 0.5, z: 0.4 }] }],
+  });
+  const place = resolvePlacement(s.shots[0].actors[0], s.shots[0].props, ENV)!;
+  assert.ok(place.error, "a lamp has no seat anchor, so the resolver must refuse");
+});
+
+test("inside=true puts a driver behind the car body", () => {
+  const s = StorySchema.parse({
+    title: "t", cast: { d: { color: "#ffffff" } },
+    shots: [{ say: "He drives.", bg: "city", actors: [{ id: "d", action: "sitOn", on: "car", inside: true }], props: [{ type: "car", x: 0.5, z: 0.5 }] }],
+  });
+  const place = resolvePlacement(s.shots[0].actors[0], s.shots[0].props, ENV)!;
+  assert.ok(place.z < (s.shots[0].props[0].z ?? 0.5), "an inside actor must draw behind the vehicle");
 });
 
 console.log(`\n${passed} passed${process.exitCode ? " (with failures)" : ""}`);

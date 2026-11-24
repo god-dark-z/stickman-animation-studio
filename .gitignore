@@ -9,3 +9,6 @@ engine/__pycache__/
 *.log
 *.pyc
 .DS_Store
+
+# per-machine orchestrator state
+engine/stories/*/.state.json

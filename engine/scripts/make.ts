@@ -15,11 +15,13 @@ import { buildTimeline, tokenize } from "../src/timeline";
 import { PROPS, SFX } from "../src/catalog";
 import { loadLibrary } from "./location-lib";
 import { hashStr } from "../src/theme";
+import { resolvePaths } from "./paths";
 
-const root = path.resolve(import.meta.dirname, "..");
+const root = resolvePaths().engine;
 const args = process.argv.slice(2);
 const storyPath = args.find((a) => !a.startsWith("--"));
 const flag = (f: string) => args.includes(f);
+const opt = (f: string, d?: string) => (args.includes(f) ? args[args.indexOf(f) + 1] : d);
 if (!storyPath) {
   console.error("usage: npm run make -- stories/<story>.json [--preview] [--stills] [--no-tts]");
   process.exit(1);
@@ -54,7 +56,9 @@ for (const [i, s] of story.shots.entries()) {
     process.exit(1);
   }
 }
-const chromiumOptions = usedLocations.length ? { gl: "angle" as const } : {};
+// CPU-only machines: ANGLE over SwiftShader is the reliable path. Override with --gl or REMOTION_GL.
+const gl = (opt("--gl") ?? process.env.REMOTION_GL ?? "angle") as "angle" | "swiftshader" | "swangle" | "egl" | "swangle";
+const chromiumOptions = usedLocations.length ? { gl } : {};
 const missingSfx = SFX.filter((n) => !fs.existsSync(path.join(root, "public/sfx", `${n}.wav`)));
 const missingGrain = !fs.existsSync(path.join(root, "public/grain.png"));
 if (missingSfx.length || missingGrain) {
@@ -103,6 +107,11 @@ if (!flag("--no-tts")) {
   voiceSrc = `voice/${path.basename(audioFile)}`;
 }
 
+if (flag("--narration-only")) {
+  log(`narration ready → ${path.relative(root, outDir)}${voiceSrc ? ` (${wordTimes?.length ?? 0} words)` : " (silent)"}`);
+  process.exit(0);
+}
+
 // ---------------------------------------------------------------- 3. timeline
 const musicSrc = story.music === "none" ? null : `music/${story.music}.wav`;
 const timeline = {
@@ -111,6 +120,7 @@ const timeline = {
 };
 fs.writeFileSync(path.join(outDir, "timeline.json"), JSON.stringify(timeline, null, 1));
 log(`timeline: ${(timeline.durationInFrames / timeline.fps).toFixed(1)}s, ${timeline.sfx.length} sound cues`);
+if (flag("--timeline-only")) process.exit(0);
 for (const s of timeline.shots) {
   const len = s.duration / timeline.fps;
   if (len < 0.8) console.warn(`  ⚠ shot ${s.index} is only ${len.toFixed(2)}s — consider merging it`);
@@ -147,10 +157,17 @@ if (flag("--stills")) {
 const rawOut = path.join(outDir, "raw.mp4");
 const preview = flag("--preview");
 let last = -1;
-const concurrency = usedLocations.length ? 2 : Math.max(2, Math.min(12, (await import("node:os")).cpus().length - 2));
+const os = await import("node:os");
+const cores = os.cpus().length;
+// Memory guard: a 1080x1920 frame with three.js costs ~250-350 MB per tab. Cap by both
+// cores and free RAM so a 16 GB CPU-only machine never thrashes into an OOM kill.
+const freeGb = os.freemem() / 1e9;
+const ramCap = Math.max(1, Math.floor(freeGb / 0.9));
+const concurrency = Number(opt("--concurrency")) || (usedLocations.length ? Math.min(2, ramCap) : Math.max(2, Math.min(8, cores - 2, ramCap)));
+log(`render: ${usedLocations.length ? "3D (gl=" + gl + ") " : "2D "}concurrency ${concurrency} of ${cores} cores, ${freeGb.toFixed(1)} GB free`);
 await withRetry(() => renderMedia({
   composition, serveUrl, codec: "h264", outputLocation: rawOut, inputProps, chromiumOptions,
-  scale: preview ? 0.5 : 1, crf: preview ? 28 : 18, audioBitrate: "192k", concurrency,
+  scale: preview ? 0.5 : 1, crf: Number(opt("--crf")) || (preview ? 28 : 18), audioBitrate: "192k", concurrency,
   onProgress: ({ progress }) => {
     const p = Math.floor(progress * 20);
     if (p !== last) { last = p; process.stdout.write(`\r  rendering ${"█".repeat(p)}${"░".repeat(20 - p)} ${Math.round(progress * 100)}%`); }

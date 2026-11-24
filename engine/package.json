@@ -1,12 +1,15 @@
 {
   "name": "stickman-studio-engine",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "Procedural stickman cartoon engine: one story JSON file becomes a narrated, captioned, sound-designed vertical MP4. No AI image or video generation.",
   "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
-    "studio": "remotion studio src/index.ts",
+    "remotion": "remotion studio src/index.ts",
+    "studio": "tsx scripts/studio.ts",
+    "doctor": "python scripts/doctor.py",
+    "validate": "tsx scripts/validate.ts",
     "make": "tsx scripts/make.ts",
     "assets": "python scripts/gen_audio_assets.py",
     "still": "tsx scripts/stills.ts",
@@ -14,8 +17,12 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx scripts/test.ts",
     "qa:sync": "tsx scripts/qa_sync.ts",
+    "qa:geometry": "tsx scripts/qa_geometry.ts",
     "qa:audio": "python scripts/qa_audio.py",
-    "qa": "npm run typecheck && npm test && npx tsx scripts/qa_sync.ts stories/why-phone-gets-hot.json"
+    "qa:video": "python scripts/qa_video.py",
+    "qa:timing": "python scripts/qa_timing.py",
+    "qa:visual": "python scripts/qa_visual_report.py",
+    "qa": "npm run typecheck && npm test && npx tsx scripts/qa_sync.ts stories/why-phone-gets-hot.json && npx tsx scripts/qa_geometry.ts stories/why-phone-gets-hot.json"
   },
   "dependencies": {
     "@react-three/fiber": "9.4.0",

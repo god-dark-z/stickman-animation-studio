@@ -11,6 +11,11 @@ Exits 1 if any day scene fails the defaults, so CI/agents can gate on it.
 """
 import os
 import sys
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 
 import numpy as np
 from PIL import Image  # pip install pillow  (already a transitive dep of many toolchains)
