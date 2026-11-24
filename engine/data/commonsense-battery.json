@@ -1,0 +1,508 @@
+{
+  "version": 1,
+  "note": "60 one-sentence micro-stories across the 14 commonsense categories. Each: the sentence, what a human expects to see, a compact storyboard plan, and the machine-checkable part of that expectation. Run with `npx tsx scripts/battery.ts`.",
+  "entries": [
+    {
+      "id": "posture-01-sits-at-desk",
+      "category": "posture",
+      "sentence": "A tired office worker sits at the desk and types.",
+      "expect": "He is on the chair - hips on the seat, torso at the desk edge, hands at the keyboard - and his face reads tired.",
+      "plan": { "bg": "office", "framing": "full", "camera": "pushIn", "actors": [{ "id": "a", "action": "sitOn", "on": "chair", "expression": "bored", "facing": "right" }], "props": [{ "type": "chair", "x": 0.62, "z": 0.4 }, { "type": "desk", "x": 0.3, "z": 0.52 }, { "type": "computer", "x": 0.26, "z": 0.52, "y": 190, "scale": 0.75 }] },
+      "check": { "props": ["chair", "desk"], "actionAnyOf": ["sitOn"], "expressionAnyOf": ["bored", "sad", "sleepy"] }
+    },
+    {
+      "id": "posture-02-sits-on-sofa",
+      "category": "posture",
+      "sentence": "He sits on the sofa and sighs.",
+      "expect": "Hips on the couch cushion, back against the backrest, feet on the floor.",
+      "plan": { "bg": "livingroom", "framing": "full", "actors": [{ "id": "a", "action": "sitOn", "on": "couch", "expression": "sad", "facing": "right" }], "props": [{ "type": "couch", "x": 0.6, "z": 0.3 }] },
+      "check": { "props": ["couch"], "actionAnyOf": ["sitOn"] }
+    },
+    {
+      "id": "posture-03-lies-in-bed",
+      "category": "posture",
+      "sentence": "She lies in bed with a fever.",
+      "expect": "Body horizontal on the mattress, head on the pillow, blanket over her.",
+      "plan": { "bg": "bedroom", "time": "night", "framing": "full", "actors": [{ "id": "a", "action": "lieOn", "on": "bed", "underBlanket": true, "expression": "sad" }], "props": [{ "type": "bed", "x": 0.5, "z": 0.18 }] },
+      "check": { "props": ["bed"], "actionAnyOf": ["lieOn", "sleepOn"] }
+    },
+    {
+      "id": "posture-04-stands-by-window",
+      "category": "posture",
+      "sentence": "He stands by the window and waits.",
+      "expect": "The window is in frame and he is beside it, turned toward it, the light coming from it.",
+      "plan": { "bg": "office", "framing": "full", "actors": [{ "id": "a", "x": 0.66, "facing": "right", "expression": "worried" }], "props": [{ "type": "window", "x": 0.84, "z": 0.2 }] },
+      "check": { "props": ["window"] }
+    },
+    {
+      "id": "posture-05-floor-on-purpose",
+      "category": "posture",
+      "sentence": "He sits on the grass, too tired to go home.",
+      "expect": "Deliberately on the ground outdoors, no chair anywhere, slumped posture.",
+      "plan": { "bg": "field", "framing": "full", "actors": [{ "id": "a", "pose": "sit", "x": 0.5, "expression": "bored" }], "props": [] },
+      "check": { "poseAnyOf": ["sit"] }
+    },
+
+    {
+      "id": "location-01-other-room",
+      "category": "location",
+      "sentence": "She is asleep in the other room.",
+      "expect": "A different room from the last shot, a bed she is actually lying in, dim light.",
+      "plan": { "bg": "bedroom", "time": "night", "framing": "full", "actors": [{ "id": "a", "action": "sleepOn", "on": "bed", "underBlanket": true, "expression": "sleepy" }], "props": [{ "type": "bed", "x": 0.45, "z": 0.16 }] },
+      "check": { "props": ["bed"], "actionAnyOf": ["sleepOn", "lieOn"], "bgAnyOf": ["bedroom"] }
+    },
+    {
+      "id": "location-02-kitchen",
+      "category": "location",
+      "sentence": "He waits in the kitchen while the water boils.",
+      "expect": "Kitchen counters and cabinets behind him, a cup or plate within reach.",
+      "plan": { "bg": "kitchen", "framing": "full", "actors": [{ "id": "a", "x": 0.45, "facing": "right" }], "props": [{ "type": "cup", "x": 0.7, "z": 0.5, "y": 190 }] },
+      "check": { "bgAnyOf": ["kitchen"] }
+    },
+    {
+      "id": "location-03-upstairs",
+      "category": "location",
+      "sentence": "Upstairs, she finds the window open.",
+      "expect": "A private room interior (not the ground-floor scene), with a window in frame.",
+      "plan": { "bg": "bedroom", "framing": "full", "actors": [{ "id": "a", "x": 0.55, "facing": "right", "expression": "surprised" }], "props": [{ "type": "window", "x": 0.8, "z": 0.2 }] },
+      "check": { "bgAnyOf": ["bedroom", "room_night", "jp_bedroom"], "props": ["window"] }
+    },
+    {
+      "id": "location-04-door",
+      "category": "location",
+      "sentence": "He knocks on the door, but nobody answers.",
+      "expect": "The door is visible and he is beside it with a raised hand.",
+      "plan": { "bg": "office", "framing": "full", "actors": [{ "id": "a", "x": 0.58, "pose": "reach", "facing": "right" }], "props": [{ "type": "door", "x": 0.82, "z": 0.25 }] },
+      "check": { "props": ["door"] }
+    },
+
+    {
+      "id": "containment-01-in-car",
+      "category": "containment",
+      "sentence": "He sits in the car and drives to work.",
+      "expect": "The car body in frame, the driver inside it with head and shoulders above the door line.",
+      "plan": { "bg": "street", "framing": "full", "camera": "drift", "actors": [{ "id": "a", "action": "sitOn", "on": "car", "inside": true, "facing": "right" }], "props": [{ "type": "car", "x": 0.5, "z": 0.45 }, { "type": "steeringwheel", "x": 0.42, "z": 0.46, "y": 60 }] },
+      "check": { "props": ["car"], "actionAnyOf": ["sitOn"] }
+    },
+    {
+      "id": "containment-02-in-box",
+      "category": "containment",
+      "sentence": "She hides the key in the box.",
+      "expect": "A box drawn around the key, the key inside it, the lid state matching the sentence.",
+      "plan": { "bg": "livingroom", "framing": "medium", "actors": [{ "id": "a", "x": 0.4, "pose": "hold", "facing": "right" }], "props": [{ "type": "box", "x": 0.6, "z": 0.5 }, { "type": "key", "x": 0.6, "z": 0.5, "y": 70 }] },
+      "check": { "propsAny": ["box", "crate"] }
+    },
+    {
+      "id": "containment-03-under-blanket",
+      "category": "containment",
+      "sentence": "The child sleeps under the blanket.",
+      "expect": "Blanket over the torso, head above the edge, body on the mattress.",
+      "plan": { "bg": "bedroom", "time": "night", "framing": "medium", "actors": [{ "id": "a", "action": "sleepOn", "on": "bed", "underBlanket": true, "expression": "sleepy" }], "props": [{ "type": "bed", "x": 0.5, "z": 0.2 }] },
+      "check": { "props": ["bed"], "actionAnyOf": ["sleepOn"] }
+    },
+    {
+      "id": "containment-04-in-water",
+      "category": "containment",
+      "sentence": "They swim in the sea.",
+      "expect": "Water surface at chest height, ripples at the waterline, sea background.",
+      "plan": { "bg": "sea", "framing": "wide", "actors": [{ "id": "a", "x": 0.4, "pose": "reach" }, { "id": "b", "x": 0.6, "pose": "reach" }], "fx": ["ripples"] },
+      "check": { "bgAnyOf": ["sea", "beach"], "minActors": 2 }
+    },
+
+    {
+      "id": "held-01-cup",
+      "category": "held",
+      "sentence": "She holds a cup of coffee and looks out the window.",
+      "expect": "The cup in her hand at chest height, the window in frame, her gaze toward it.",
+      "plan": { "bg": "office", "framing": "medium", "actors": [{ "id": "a", "x": 0.5, "pose": "hold", "holding": "cup", "facing": "right" }], "props": [{ "type": "cup", "x": 0.5, "z": 0.6, "y": 120 }, { "type": "window", "x": 0.8, "z": 0.2 }] },
+      "check": { "propsAny": ["cup", "mug"], "holding": "cup" }
+    },
+    {
+      "id": "held-02-carries-box",
+      "category": "held",
+      "sentence": "He carries a box into the living room.",
+      "expect": "The box in both arms in front of the chest, body leaning back slightly.",
+      "plan": { "bg": "livingroom", "framing": "full", "actors": [{ "id": "a", "x": 0.45, "pose": "hold", "holding": "box", "facing": "right", "moveTo": 0.7 }], "props": [{ "type": "box", "x": 0.45, "z": 0.58, "y": 110 }] },
+      "check": { "propsAny": ["box", "crate"], "holding": "box" }
+    },
+    {
+      "id": "held-03-hands-over-money",
+      "category": "held",
+      "sentence": "He hands over the money.",
+      "expect": "Two people facing each other, the money moving between their hands at the spoken word.",
+      "plan": { "bg": "street", "framing": "medium", "actors": [{ "id": "a", "x": 0.4, "action": "handOver", "facing": "right", "holding": "money" }, { "id": "b", "x": 0.6, "facing": "left", "pose": "reach" }], "props": [{ "type": "money", "x": 0.5, "z": 0.55, "y": 110 }] },
+      "check": { "props": ["money"], "actionAnyOf": ["handOver"], "minActors": 2, "facingEachOther": true }
+    },
+    {
+      "id": "held-04-pull-rope",
+      "category": "held",
+      "sentence": "He pulls the rope and the bell rings.",
+      "expect": "The rope in frame, both hands on it, the body leaning away from the pull.",
+      "plan": { "bg": "field", "framing": "full", "actors": [{ "id": "a", "x": 0.4, "pose": "push", "facing": "right" }], "props": [{ "type": "rope", "x": 0.62, "z": 0.4 }, { "type": "bell", "x": 0.75, "z": 0.3, "y": 260 }] },
+      "check": { "props": ["rope"] }
+    },
+
+    {
+      "id": "use-01-typing",
+      "category": "in-use",
+      "sentence": "Typing all day, he forgets the time.",
+      "expect": "Hands at keyboard height, fingers moving, screen visible, eyes on the screen.",
+      "plan": { "bg": "office", "framing": "medium", "actors": [{ "id": "a", "x": 0.42, "pose": "type", "facing": "right" }], "props": [{ "type": "desk", "x": 0.66, "z": 0.5 }, { "type": "computer", "x": 0.66, "z": 0.5, "y": 190, "scale": 0.8 }] },
+      "check": { "propsAny": ["computer", "laptop"], "poseAnyOf": ["type"] }
+    },
+    {
+      "id": "use-02-reading",
+      "category": "in-use",
+      "sentence": "She reads the letter twice.",
+      "expect": "The letter open in both hands at chest height, head tilted down toward it.",
+      "plan": { "bg": "livingroom", "framing": "medium", "actors": [{ "id": "a", "x": 0.5, "pose": "hold", "holding": "letter", "expression": "surprised" }], "props": [{ "type": "letter", "x": 0.5, "z": 0.6, "y": 130 }] },
+      "check": { "propsAny": ["book", "letter", "paper"] }
+    },
+    {
+      "id": "use-03-phone-call",
+      "category": "in-use",
+      "sentence": "He answers the phone at midnight.",
+      "expect": "Phone at the ear, hand raised to the head, mouth animated, night grade.",
+      "plan": { "bg": "bedroom", "time": "night", "framing": "medium", "actors": [{ "id": "a", "x": 0.5, "pose": "phone", "expression": "worried" }], "props": [{ "type": "phone", "x": 0.5, "z": 0.6, "y": 120 }] },
+      "check": { "props": ["phone"], "poseAnyOf": ["phone"], "timeAnyOf": ["night"] }
+    },
+    {
+      "id": "use-04-cooking",
+      "category": "in-use",
+      "sentence": "She is cooking dinner in the kitchen.",
+      "expect": "Kitchen background, a pan or plate in hand, arms working over the counter.",
+      "plan": { "bg": "kitchen", "framing": "full", "actors": [{ "id": "a", "x": 0.45, "pose": "hold", "holding": "plate", "facing": "right" }], "props": [{ "type": "plate", "x": 0.45, "z": 0.6, "y": 120 }, { "type": "food", "x": 0.6, "z": 0.5, "y": 190 }] },
+      "check": { "bgAnyOf": ["kitchen"], "propsAny": ["food", "plate", "cup", "bottle"] }
+    },
+
+    {
+      "id": "state-01-door-open",
+      "category": "state",
+      "sentence": "The door opens before he knocks.",
+      "expect": "The door drawn ajar, a gap showing what is beyond, the light changed by it.",
+      "plan": { "bg": "office", "framing": "full", "actors": [{ "id": "a", "x": 0.55, "facing": "right", "expression": "surprised" }], "props": [{ "type": "door", "x": 0.8, "z": 0.25, "open": 1 }] },
+      "check": { "props": ["door"], "propOpen": "door" }
+    },
+    {
+      "id": "state-02-lights",
+      "category": "state",
+      "sentence": "She turns off the light and the room goes dark.",
+      "expect": "The lamp in frame with its light off, the room grade following it down.",
+      "plan": { "bg": "bedroom", "time": "night", "framing": "full", "actors": [{ "id": "a", "x": 0.5, "pose": "reach", "facing": "right" }], "props": [{ "type": "floorlamp", "x": 0.75, "z": 0.35, "lit": 0 }], "fx": ["darken"] },
+      "check": { "propsAny": ["lamp", "floorlamp", "lightbulb"], "fxAnyOf": ["darken"] }
+    },
+    {
+      "id": "state-03-empty-chair",
+      "category": "state",
+      "sentence": "The chair was empty when he came back.",
+      "expect": "The chair visible and unoccupied, framed so the emptiness is the subject.",
+      "plan": { "bg": "office", "framing": "medium", "actors": [], "props": [{ "type": "chair", "x": 0.5, "z": 0.45 }] },
+      "check": { "props": ["chair"], "maxActors": 0 }
+    },
+    {
+      "id": "state-04-broken",
+      "category": "state",
+      "sentence": "The machine was broken, so he fixed it.",
+      "expect": "Cracks or flying pieces on the machine, its silhouette visibly damaged.",
+      "plan": { "bg": "factory", "framing": "full", "actors": [{ "id": "a", "x": 0.4, "pose": "hammer", "expression": "determined", "facing": "right" }], "props": [{ "type": "gear", "x": 0.7, "z": 0.4, "scale": 1.4 }], "fx": ["debris"] },
+      "check": { "fxAnyOf": ["debris", "cracks"], "propsAny": ["gear"] }
+    },
+
+    {
+      "id": "weather-01-raining",
+      "category": "time-weather",
+      "sentence": "It was raining when she left the house.",
+      "expect": "Rain layer, wet ground reflections, darker grade, a character reacting to it.",
+      "plan": { "bg": "street", "framing": "full", "actors": [{ "id": "a", "x": 0.45, "pose": "walk", "expression": "worried", "facing": "right", "moveTo": 0.75 }], "props": [{ "type": "house", "x": 0.2, "z": 0.15, "scale": 1.6 }], "fx": ["rain"] },
+      "check": { "fxAnyOf": ["rain"] }
+    },
+    {
+      "id": "weather-02-rain-window",
+      "category": "time-weather",
+      "sentence": "Rain on the window, and nobody speaking.",
+      "expect": "Interior, window in frame, rain on the glass, no dialogue.",
+      "plan": { "bg": "bedroom", "time": "sunset", "framing": "medium", "actors": [], "props": [{ "type": "window", "x": 0.5, "z": 0.25 }], "fx": ["rain"] },
+      "check": { "props": ["window"], "fxAnyOf": ["rain"], "maxActors": 0 }
+    },
+    {
+      "id": "weather-03-snow",
+      "category": "time-weather",
+      "sentence": "It was snowing on the mountain.",
+      "expect": "Falling snow, cold blue-grey grade, snow on the ground.",
+      "plan": { "bg": "mountain", "framing": "wide", "actors": [{ "id": "a", "x": 0.5, "expression": "worried" }], "fx": ["snow"] },
+      "check": { "fxAnyOf": ["snow"] }
+    },
+    {
+      "id": "weather-04-night",
+      "category": "time-weather",
+      "sentence": "At night, the city is quiet.",
+      "expect": "Night grade, windows lit, no daylight in the sky.",
+      "plan": { "bg": "city", "time": "night", "framing": "wide", "actors": [] },
+      "check": { "timeAnyOf": ["night"] }
+    },
+
+    {
+      "id": "motion-01-runs",
+      "category": "motion",
+      "sentence": "He runs to catch the train.",
+      "expect": "Run pose, forward lean, speedlines, the train visible ahead.",
+      "plan": { "bg": "city", "framing": "full", "actors": [{ "id": "a", "x": 0.3, "pose": "run", "facing": "right", "moveTo": 0.8 }], "props": [{ "type": "train", "x": 0.92, "z": 0.3, "scale": 0.8 }], "fx": ["speedlines"] },
+      "check": { "poseAnyOf": ["run"] }
+    },
+    {
+      "id": "motion-02-walks-away",
+      "category": "motion",
+      "sentence": "She walks away without a word.",
+      "expect": "Walk pose moving toward the frame edge, an exit beat.",
+      "plan": { "bg": "street", "framing": "full", "actors": [{ "id": "a", "x": 0.35, "pose": "walk", "facing": "right", "moveTo": 0.85, "exit": "right" }] },
+      "check": { "poseAnyOf": ["walk"] }
+    },
+    {
+      "id": "motion-03-red-light",
+      "category": "motion",
+      "sentence": "The car stops at the red light.",
+      "expect": "Street background, a red signal in frame, the vehicle stopped before it.",
+      "plan": { "bg": "street", "framing": "wide", "camera": "static", "actors": [{ "id": "a", "action": "sitOn", "on": "car", "inside": true, "facing": "right" }], "props": [{ "type": "car", "x": 0.4, "z": 0.45 }, { "type": "sign", "x": 0.78, "z": 0.3, "label": "STOP" }] },
+      "check": { "propsAny": ["sign", "car"], "bgAnyOf": ["street", "city"] }
+    },
+    {
+      "id": "motion-04-falls",
+      "category": "motion",
+      "sentence": "He falls off the ladder.",
+      "expect": "Fall pose, tilted body, ground contact by the end of the shot.",
+      "plan": { "bg": "farm", "framing": "full", "actors": [{ "id": "a", "x": 0.5, "pose": "fall", "expression": "shocked", "facing": "left" }], "props": [{ "type": "ladder", "x": 0.62, "z": 0.3 }] },
+      "check": { "poseAnyOf": ["fall", "lie"] }
+    },
+
+    {
+      "id": "count-01-two-friends",
+      "category": "count-scale",
+      "sentence": "Two friends meet on the street.",
+      "expect": "Two distinct characters, both in frame, different builds or colours.",
+      "plan": { "bg": "street", "framing": "full", "actors": [{ "id": "a", "x": 0.4, "facing": "right", "expression": "happy" }, { "id": "b", "x": 0.6, "facing": "left", "expression": "happy" }] },
+      "check": { "minActors": 2 }
+    },
+    {
+      "id": "count-02-crowd",
+      "category": "count-scale",
+      "sentence": "A crowd fills the square.",
+      "expect": "At least four figures at different depths and sizes, filling the background.",
+      "plan": { "bg": "city", "framing": "wide", "actors": [{ "id": "a", "x": 0.3, "z": 0.35 }, { "id": "b", "x": 0.45, "z": 0.5 }, { "id": "c", "x": 0.6, "z": 0.42 }, { "id": "d", "x": 0.72, "z": 0.6 }, { "id": "e", "x": 0.55, "z": 0.68 }] },
+      "check": { "minActors": 4 }
+    },
+    {
+      "id": "count-03-giant",
+      "category": "count-scale",
+      "sentence": "A giant steps over the houses.",
+      "expect": "The figure scaled far above normal, head leaving the frame, houses tiny beside it.",
+      "plan": { "bg": "suburb", "framing": "wide", "actors": [{ "id": "a", "x": 0.45, "pose": "walk", "scale": 1.9, "facing": "right" }], "props": [{ "type": "house", "x": 0.75, "z": 0.2, "scale": 0.8 }] },
+      "check": { "minScale": 1.6 }
+    },
+    {
+      "id": "count-04-three-cups",
+      "category": "count-scale",
+      "sentence": "Three cups stand on the table.",
+      "expect": "Three cups visible at once, counted in one glance.",
+      "plan": { "bg": "kitchen", "framing": "medium", "actors": [], "props": [{ "type": "table", "x": 0.5, "z": 0.4 }, { "type": "cup", "x": 0.45, "z": 0.4, "y": 190, "count": 3 }] },
+      "check": { "propCount": { "type": "cup", "min": 3 } }
+    },
+
+    {
+      "id": "people-01-conversation",
+      "category": "people",
+      "sentence": "She talks with him by the door.",
+      "expect": "Two actors facing each other at conversational distance, one mouth moving, the other reacting.",
+      "plan": { "bg": "office", "framing": "medium", "actors": [{ "id": "a", "x": 0.4, "facing": "right", "pose": "talk" }, { "id": "b", "x": 0.6, "facing": "left" }], "props": [{ "type": "door", "x": 0.85, "z": 0.2 }], "quote": "a" },
+      "check": { "minActors": 2, "facingEachOther": true }
+    },
+    {
+      "id": "people-02-argument",
+      "category": "people",
+      "sentence": "They argue about the money.",
+      "expect": "Two actors facing each other with angry faces and wide gestures.",
+      "plan": { "bg": "livingroom", "framing": "medium", "actors": [{ "id": "a", "x": 0.38, "facing": "right", "expression": "angry", "pose": "talk" }, { "id": "b", "x": 0.62, "facing": "left", "expression": "furious" }], "props": [{ "type": "money", "x": 0.5, "z": 0.55, "y": 120 }], "quote": "a" },
+      "check": { "minActors": 2, "expressionAnyOf": ["angry", "furious"] }
+    },
+    {
+      "id": "people-03-hug",
+      "category": "people",
+      "sentence": "They hug at the station.",
+      "expect": "Two bodies close, arms around each other, heads tilted together.",
+      "plan": { "bg": "city", "framing": "medium", "actors": [{ "id": "a", "x": 0.47, "facing": "right", "pose": "hold", "expression": "happy" }, { "id": "b", "x": 0.53, "facing": "left", "pose": "hold", "expression": "happy" }] },
+      "check": { "minActors": 2, "poseAnyOf": ["hold", "reach"] }
+    },
+    {
+      "id": "people-04-handshake",
+      "category": "people",
+      "sentence": "A handshake ends the meeting.",
+      "expect": "Two actors facing each other, right hands meeting in the middle, eye contact.",
+      "plan": { "bg": "office", "framing": "medium", "actors": [{ "id": "a", "x": 0.42, "facing": "right", "pose": "reach" }, { "id": "b", "x": 0.58, "facing": "left", "pose": "reach" }] },
+      "check": { "minActors": 2, "poseAnyOf": ["reach", "hold"] }
+    },
+
+    {
+      "id": "emotion-01-tired",
+      "category": "emotion",
+      "sentence": "He is tired of the same screen.",
+      "expect": "Half-closed eyes, slumped shoulders, slow movement.",
+      "plan": { "bg": "office", "framing": "medium", "actors": [{ "id": "a", "x": 0.45, "expression": "bored", "pose": "type" }], "props": [{ "type": "computer", "x": 0.7, "z": 0.5, "y": 190, "scale": 0.8 }] },
+      "check": { "expressionAnyOf": ["bored", "sad", "sleepy"] }
+    },
+    {
+      "id": "emotion-02-angry",
+      "category": "emotion",
+      "sentence": "She is angry at the broken machine.",
+      "expect": "Brows down and in, narrowed eyes, clenched fists, wider stance.",
+      "plan": { "bg": "factory", "framing": "medium", "actors": [{ "id": "a", "x": 0.4, "expression": "furious", "pose": "hips", "facing": "right" }], "props": [{ "type": "gear", "x": 0.72, "z": 0.4, "scale": 1.3 }], "fx": ["debris"] },
+      "check": { "expressionAnyOf": ["angry", "furious"] }
+    },
+    {
+      "id": "emotion-03-shocked",
+      "category": "emotion",
+      "sentence": "He is shocked by the bill.",
+      "expect": "Wide round eyes, small open mouth, body pulled back.",
+      "plan": { "bg": "livingroom", "framing": "close", "actors": [{ "id": "a", "x": 0.5, "expression": "shocked", "pose": "hold", "holding": "paper" }], "props": [{ "type": "paper", "x": 0.5, "z": 0.6, "y": 130 }], "fx": ["exclaim"] },
+      "check": { "expressionAnyOf": ["shocked", "surprised"] }
+    },
+    {
+      "id": "emotion-04-scared",
+      "category": "emotion",
+      "sentence": "The child is scared of the dark.",
+      "expect": "Raised brows, sweat drop, body leaning away, hands up.",
+      "plan": { "bg": "bedroom", "time": "night", "framing": "medium", "actors": [{ "id": "a", "x": 0.45, "expression": "scared", "pose": "cower" }], "fx": ["darken"] },
+      "check": { "expressionAnyOf": ["scared", "worried"] }
+    },
+
+    {
+      "id": "negation-01-no-one-home",
+      "category": "negation",
+      "sentence": "No one was home.",
+      "expect": "An empty room, a door open onto nothing, a lamp still on.",
+      "plan": { "bg": "livingroom", "time": "sunset", "framing": "wide", "actors": [], "props": [{ "type": "door", "x": 0.2, "z": 0.25, "open": 1 }, { "type": "floorlamp", "x": 0.75, "z": 0.3, "lit": 1 }] },
+      "check": { "maxActors": 0 }
+    },
+    {
+      "id": "negation-02-empty-seat",
+      "category": "negation",
+      "sentence": "The seat was empty.",
+      "expect": "The chair or bench centred and clearly unoccupied.",
+      "plan": { "bg": "field", "framing": "medium", "actors": [], "props": [{ "type": "bench", "x": 0.5, "z": 0.4 }] },
+      "check": { "maxActors": 0, "props": ["bench"] }
+    },
+    {
+      "id": "negation-03-did-not-move",
+      "category": "negation",
+      "sentence": "He did not move.",
+      "expect": "One still figure; if anything moves, it is the camera.",
+      "plan": { "bg": "office", "framing": "medium", "camera": "pushIn", "actors": [{ "id": "a", "x": 0.5, "pose": "stand" }] },
+      "check": { "poseAnyOf": ["stand"], "maxActors": 1 }
+    },
+    {
+      "id": "negation-04-before-after",
+      "category": "negation",
+      "sentence": "At first it was slow, but now it is fast.",
+      "expect": "A before/after split or a labelled timeline so the contrast is drawn, not just said.",
+      "plan": { "bg": "void", "framing": "wide", "actors": [], "insert": { "type": "versus", "title": "BEFORE / AFTER", "lines": ["BEFORE: 2 bars", "AFTER: 5 bars"] } },
+      "check": { "insertAnyOf": ["versus", "timeline", "chart", "document"] }
+    },
+
+    {
+      "id": "cause-01-button",
+      "category": "cause",
+      "sentence": "He pressed the button and the lights went out.",
+      "expect": "The hand on the button at the spoken word, then the room grade dropping to dark.",
+      "plan": { "bg": "office", "time": "day", "framing": "full", "actors": [{ "id": "a", "x": 0.35, "pose": "reach", "facing": "right" }], "props": [{ "type": "button", "x": 0.6, "z": 0.4, "y": 150 }, { "type": "floorlamp", "x": 0.8, "z": 0.3, "lit": 0 }], "fx": ["darken"] },
+      "check": { "props": ["button"], "fxAnyOf": ["darken"] }
+    },
+    {
+      "id": "cause-02-flashback",
+      "category": "cause",
+      "sentence": "The flashback shows his childhood.",
+      "expect": "A differently graded past scene entered through a flash, iris or dissolve.",
+      "plan": { "bg": "room_warm", "time": "sunset", "framing": "full", "transition": "flash", "actors": [{ "id": "a", "x": 0.5, "expression": "happy", "build": "kid" }] },
+      "check": { "transitionAnyOf": ["flash", "iris", "dissolve"] }
+    },
+    {
+      "id": "cause-03-power-cut",
+      "category": "cause",
+      "sentence": "The power cut, so the screen died.",
+      "expect": "The screen going dark at the beat, the room grade falling with it.",
+      "plan": { "bg": "office", "time": "night", "framing": "medium", "actors": [{ "id": "a", "x": 0.4, "expression": "surprised" }], "props": [{ "type": "computer", "x": 0.7, "z": 0.5, "y": 190, "lit": 0, "scale": 0.8 }], "fx": ["darken"] },
+      "check": { "fxAnyOf": ["darken"] }
+    },
+    {
+      "id": "cause-04-result",
+      "category": "cause",
+      "sentence": "As a result, the city lost its light.",
+      "expect": "Cause and effect in separate shots, linked by a match cut or the same object.",
+      "plan": { "bg": "city", "time": "night", "framing": "wide", "transition": "cut", "actors": [], "fx": ["darken"] },
+      "check": { "fxAnyOf": ["darken"] }
+    },
+
+    {
+      "id": "abstract-01-imagine",
+      "category": "abstract",
+      "sentence": "Imagine the signal as water in a pipe.",
+      "expect": "The abstraction drawn: a labelled diagram of a pipe with water, not a talking head.",
+      "plan": { "bg": "void", "framing": "wide", "actors": [], "insert": { "type": "document", "title": "SIGNAL = WATER", "lines": ["A pipe carries water", "A wire carries signal", "A narrow pipe = weak signal"] } },
+      "check": { "insertAnyOf": ["bigtext", "document", "chart", "map", "versus", "timeline", "list", "counter"] }
+    },
+    {
+      "id": "abstract-02-chart",
+      "category": "abstract",
+      "sentence": "The chart shows usage doubling.",
+      "expect": "An animated bar chart, labelled, legible in one second.",
+      "plan": { "bg": "void", "framing": "wide", "actors": [], "insert": { "type": "chart", "title": "DATA USED PER DAY", "data": [3, 4, 6, 9, 12], "highlight": 4 } },
+      "check": { "insertAnyOf": ["chart", "counter"] }
+    },
+    {
+      "id": "abstract-03-diagram",
+      "category": "abstract",
+      "sentence": "Here is a diagram of how it works.",
+      "expect": "Labelled parts with arrows, revealed in time with the narration.",
+      "plan": { "bg": "void", "framing": "wide", "actors": [], "insert": { "type": "list", "title": "HOW IT WORKS", "lines": ["1. The tower sends a signal", "2. The phone answers", "3. More distance = more power"] } },
+      "check": { "insertAnyOf": ["document", "map", "versus", "timeline", "list", "chart"] }
+    },
+    {
+      "id": "abstract-04-metaphor",
+      "category": "abstract",
+      "sentence": "It is like a highway at rush hour.",
+      "expect": "The metaphor drawn literally and labelled as the comparison.",
+      "plan": { "bg": "void", "framing": "wide", "actors": [], "insert": { "type": "versus", "title": "HIGHWAY vs SIGNAL", "lines": ["Cars = data", "Traffic jam = slow download"] } },
+      "check": { "insertAnyOf": ["versus", "document", "chart", "bigtext", "list"] }
+    },
+
+    {
+      "id": "state-05-screen-on",
+      "category": "state",
+      "sentence": "The screen is on, but the room is empty.",
+      "expect": "A lit screen with nobody in front of it, the room's emptiness emphasised.",
+      "plan": { "bg": "office", "time": "night", "framing": "medium", "actors": [], "props": [{ "type": "computer", "x": 0.5, "z": 0.45, "y": 190, "lit": 1, "scale": 1.1 }] },
+      "check": { "maxActors": 0, "props": ["computer"] }
+    },
+    {
+      "id": "motion-05-turn",
+      "category": "motion",
+      "sentence": "She turns and walks toward the door.",
+      "expect": "A turn beat, then a walk toward the door, the door in frame.",
+      "plan": { "bg": "office", "framing": "full", "actors": [{ "id": "a", "x": 0.4, "pose": "walk", "facing": "right", "moveTo": 0.8 }], "props": [{ "type": "door", "x": 0.9, "z": 0.2 }] },
+      "check": { "props": ["door"], "poseAnyOf": ["walk"] }
+    },
+    {
+      "id": "people-05-teacher-student",
+      "category": "people",
+      "sentence": "The teacher and the student face each other.",
+      "expect": "Two clearly different characters facing each other, teacher larger or in uniform.",
+      "plan": { "bg": "classroom", "framing": "medium", "actors": [{ "id": "a", "x": 0.38, "facing": "right", "pose": "talk" }, { "id": "b", "x": 0.62, "facing": "left", "build": "kid" }] },
+      "check": { "minActors": 2, "facingEachOther": true }
+    },
+    {
+      "id": "negation-05-chair-empty-crowd",
+      "category": "negation",
+      "sentence": "The chair sat empty in the crowd.",
+      "expect": "The empty chair is the subject even though people fill the rest of the frame.",
+      "plan": { "bg": "city", "framing": "medium", "actors": [{ "id": "a", "x": 0.12, "z": 0.3 }, { "id": "b", "x": 0.28, "z": 0.45 }, { "id": "c", "x": 0.72, "z": 0.42 }, { "id": "d", "x": 0.88, "z": 0.55 }, { "id": "e", "x": 0.6, "z": 0.62 }], "props": [{ "type": "chair", "x": 0.5, "z": 0.45 }] },
+      "check": { "props": ["chair"], "minActors": 4 }
+    }
+  ]
+}

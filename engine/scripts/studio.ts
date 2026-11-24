@@ -10,6 +10,7 @@
  *   timeline   build the resolved timeline
  *   sync       sync gate  (qa_sync.ts)
  *   geometry   scene-graph gate (qa_geometry.ts)
+ *   commonsense  Director's Brief + intent glossary (qa_commonsense.ts)
  *   stills     one still per shot
  *   pixels     stills pixel gate (qa_stills.py)
  *   timing     narration timing audit (qa_timing.py)
@@ -28,7 +29,7 @@ import { StorySchema } from "../src/schema";
 import { resolvePaths, resolveStory, slugOf } from "./paths";
 
 type Tier = "draft" | "standard" | "studio";
-const STAGES = ["validate", "narration", "timeline", "sync", "geometry", "stills", "pixels", "timing", "render", "video", "audio", "visual"] as const;
+const STAGES = ["validate", "narration", "timeline", "sync", "geometry", "commonsense", "stills", "pixels", "timing", "render", "video", "audio", "visual"] as const;
 type Stage = (typeof STAGES)[number];
 
 const args = process.argv.slice(2);
@@ -87,6 +88,7 @@ const stageCmd = (stage: Stage): { cmd: string; args: string[]; skip?: string } 
     case "timeline": return { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--timeline-only"] };
     case "sync": return { cmd: "npx", args: ["tsx", "scripts/qa_sync.ts", storyPath] };
     case "geometry": return { cmd: "npx", args: ["tsx", "scripts/qa_geometry.ts", storyPath] };
+    case "commonsense": return { cmd: "npx", args: ["tsx", "scripts/qa_commonsense.ts", storyPath] };
     case "stills": return { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--stills", ...(hasTts ? [] : ["--no-tts"])] };
     case "pixels": return { cmd: python, args: ["scripts/qa_stills.py", path.join(paths.out, slug, "stills")] };
     case "timing": return hasTts
@@ -125,6 +127,7 @@ const FIX: Record<Stage, string> = {
   timeline: "fix the story (see the error above)",
   sync: "change the shot's world/time/pose/props, or rephrase the narration, until 0 errors",
   geometry: "add the semantic action + declare the prop in that shot's props (see the error), or widen the framing",
+  commonsense: "draw what the sentence implies: the error prints the GOOD and BAD renderings — fix props/action/time/bg or rephrase",
   stills: "fix the render error above (missing prop, bad 3D location)",
   pixels: "a still is black/blank/desaturated — check that shot's bg/location and lighting",
   timing: "re-synthesize narration (delete out/<slug>/narration.key) or use forced alignment",

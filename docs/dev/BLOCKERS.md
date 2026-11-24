@@ -54,6 +54,27 @@ honest about being amplitude flaps.
 The renderer is single-composition. A 5-minute story would hold the whole timeline in one render;
 the RAM guard caps concurrency but does not chunk scenes and concatenate. Not attempted.
 
+## B5b — Cross-model commonsense pass rates — NOT MEASURED
+
+The brief asks for the 61-intent battery to be run by the largest, a mid-size and the smallest
+available model, to show that the skill carries the result. **Only one model is reachable in this
+environment**, and the harness would need a paid API key for the others, which the product rules
+forbid. What *is* measured is the engine-side floor: every one of the 61 entries resolves and draws
+as a human would picture it (`61/61`), so any failure in a weaker model's run is a *storyboard or
+spec-writing* failure, not an engine gap — which is exactly what the SKILL decision tables and
+`spec_check` are there to catch.
+
+**To finish it:**
+
+1. Add an `evals/` runner that, for each battery entry, asks a model for a Scene Spec + single-shot
+   storyboard, writes it to a temp story, and runs `battery.ts --only`-style checks on the output.
+2. Run it with each model adapter already configured for the user, recording pass rate per category
+   per model in `out/battery/report.md`.
+3. Tune the SKILL text (not the model choice) wherever a category lags.
+
+The mechanism is in place — `runBattery()` in `engine/scripts/battery.ts` already takes a story
+plan, checks it three ways and returns a per-category score; the missing piece is the model call.
+
 ## B6 — Golden-still SSIM suite and CI — NOT ADDED
 
 `docs/dev/VERIFY-*.md` contains the measured baselines (still luminance/saturation, gate counts,

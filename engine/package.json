@@ -1,6 +1,6 @@
 {
   "name": "stickman-studio-engine",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Procedural stickman cartoon engine: one story JSON file becomes a narrated, captioned, sound-designed vertical MP4. No AI image or video generation.",
   "license": "MIT",
   "private": true,
@@ -22,7 +22,10 @@
     "qa:video": "python scripts/qa_video.py",
     "qa:timing": "python scripts/qa_timing.py",
     "qa:visual": "python scripts/qa_visual_report.py",
-    "qa": "npm run typecheck && npm test && npx tsx scripts/qa_sync.ts stories/why-phone-gets-hot.json && npx tsx scripts/qa_geometry.ts stories/why-phone-gets-hot.json"
+    "qa": "npm run typecheck && npm test && npx tsx scripts/qa_sync.ts stories/why-phone-gets-hot.json && npx tsx scripts/qa_geometry.ts stories/why-phone-gets-hot.json && npx tsx scripts/qa_commonsense.ts stories/why-phone-gets-hot.json && npx tsx scripts/battery.ts",
+    "qa:commonsense": "tsx scripts/qa_commonsense.ts",
+    "qa:spec": "tsx scripts/spec_check.ts",
+    "battery": "tsx scripts/battery.ts"
   },
   "dependencies": {
     "@react-three/fiber": "9.4.0",

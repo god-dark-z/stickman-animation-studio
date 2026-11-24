@@ -1,0 +1,467 @@
+{
+  "version": 1,
+  "note": "Commonsense intents. Each entry: the phrase a human reads, the picture a human pictures (requires), a GOOD implementation and the BAD literal reading an agent produces without this table. Checked by scripts/qa_commonsense.ts. See references/11-commonsense-intents.md.",
+  "entries": [
+    {
+      "id": "posture-sits-at-desk",
+      "category": "posture",
+      "phrases": ["sits at the desk", "sitting at the desk", "sits at his desk", "sits at her desk"],
+      "requires": { "props": ["chair", "desk"], "actionAnyOf": ["sitOn"] },
+      "good": "hips on the chair seat, torso behind the desk edge, hands on the keyboard, feet on the floor",
+      "bad": "a stickman seated on the floor beside an empty chair, desk off to the side"
+    },
+    {
+      "id": "posture-sits-on-sofa",
+      "category": "posture",
+      "phrases": ["sits on the sofa", "sits on the couch", "sitting on the couch"],
+      "requires": { "props": ["couch"], "actionAnyOf": ["sitOn"] },
+      "good": "hips on the couch cushion, back against the backrest, feet on the floor",
+      "bad": "standing in front of the couch, or sitting on the floor in front of it"
+    },
+    {
+      "id": "posture-lies-in-bed",
+      "category": "posture",
+      "phrases": ["lies in bed", "lying in bed", "lies on the bed", "lying on the bed"],
+      "requires": { "props": ["bed"], "actionAnyOf": ["lieOn", "sleepOn"] },
+      "good": "body horizontal on the mattress, head on the pillow",
+      "bad": "body horizontal on the floor next to the bed"
+    },
+    {
+      "id": "posture-stands-by-window",
+      "category": "posture",
+      "phrases": ["stands by the window", "standing by the window", "looks out the window", "looks out of the window"],
+      "requires": { "props": ["window"] },
+      "good": "the window clearly in frame, the character beside it, turned toward it, light falling from it onto the face",
+      "bad": "character standing in the middle of the room with no window in frame"
+    },
+
+    {
+      "id": "location-asleep-other-room",
+      "category": "location",
+      "phrases": ["asleep in the other room", "sleeping in the other room", "asleep in the next room", "sleeping in the next room"],
+      "requires": { "props": ["bed"], "actionAnyOf": ["sleepOn", "lieOn"] },
+      "good": "a bedroom (different from the previous shot), a bed with mattress + pillow + blanket, body on the mattress, eyes closed, dim light, an establishing shot or a cut on a door proving the change of room",
+      "bad": "the same background as the previous room, a man lying on the bare floor while the bed stands in the corner"
+    },
+    {
+      "id": "location-in-kitchen",
+      "category": "location",
+      "phrases": ["in the kitchen", "at the counter", "at the stove", "in the kitchenette"],
+      "requires": { "bgAnyOf": ["kitchen"] },
+      "good": "the kitchen background: counters, cabinets, fridge visible behind the character",
+      "bad": "the office or void background reused because the shot was already staged"
+    },
+    {
+      "id": "location-upstairs",
+      "category": "location",
+      "phrases": ["upstairs", "in his room", "in her room", "in the bedroom"],
+      "requires": { "bgAnyOf": ["bedroom", "room_night", "jp_bedroom", "livingroom", "office", "hospital"] },
+      "good": "a room interior that is not the ground-floor scene, with a bed or furniture that reads as a private room",
+      "bad": "the same street or office background as the shot before, unchanged"
+    },
+    {
+      "id": "location-at-the-door",
+      "category": "location",
+      "phrases": ["at the door", "outside the door", "behind the door", "opens the door", "knocks on the door"],
+      "requires": { "props": ["door"] },
+      "good": "the door in frame (closed, opening, or ajar), the character beside it, the door's state matching the sentence",
+      "bad": "a character gesturing at empty wall space where a door should be"
+    },
+
+    {
+      "id": "containment-in-car",
+      "category": "containment",
+      "phrases": ["in the car", "inside the car", "drives the car", "driving the car", "in his car", "in her car"],
+      "requires": { "props": ["car"], "actionAnyOf": ["sitOn"] },
+      "good": "the car body in frame, the driver seated inside it (body behind the car body, head and shoulders visible), hands on the steering wheel",
+      "bad": "a stickman standing next to a car, or seated in the air in front of it"
+    },
+    {
+      "id": "containment-in-the-box",
+      "category": "containment",
+      "phrases": ["in the box", "inside the box", "in the crate", "inside the crate"],
+      "requires": { "propsAny": ["box", "crate"] },
+      "good": "the box drawn around the object, the object partly or fully inside it, lid state matching the sentence",
+      "bad": "the object floating beside a closed box"
+    },
+    {
+      "id": "containment-under-blanket",
+      "category": "containment",
+      "phrases": ["under the blanket", "under the covers", "pulls up the blanket"],
+      "requires": { "props": ["bed"], "actionAnyOf": ["sleepOn", "lieOn"] },
+      "good": "the blanket drawn over the torso, head above the edge, body on the mattress",
+      "bad": "the blanket drawn below the body, or the character on the floor under nothing"
+    },
+    {
+      "id": "containment-in-water",
+      "category": "containment",
+      "phrases": ["in the water", "in the sea", "in the river", "swims", "swimming", "in the pond"],
+      "requires": { "bgAnyOf": ["sea", "beach", "pond_bank"] },
+      "good": "water surface at the character's waist or chest, ripples at the waterline, water background",
+      "bad": "a character standing on dry grass talking about water"
+    },
+
+    {
+      "id": "held-holds-cup",
+      "category": "held",
+      "phrases": ["holds a cup", "holding a cup", "holds a mug", "cup of tea", "cup of coffee", "holds his coffee"],
+      "requires": { "propsAny": ["cup", "mug"], "holding": "cup" },
+      "good": "the cup in the hand, fingers overlapping the handle, cup moving with the arm, cup sized to the hand",
+      "bad": "the cup floating a hand's width away from the palm"
+    },
+    {
+      "id": "held-carries-box",
+      "category": "held",
+      "phrases": ["carries a box", "carrying a box", "carries the box", "carrying a crate"],
+      "requires": { "propsAny": ["box", "crate"], "holding": "box" },
+      "good": "the box in both arms in front of the chest, arms bent around it, body leaning back a little under the weight",
+      "bad": "a box beside the character with empty hands"
+    },
+    {
+      "id": "held-hands-over-money",
+      "category": "held",
+      "phrases": ["hands over the money", "handed the money", "pays the money", "gives him the money", "gives her the money"],
+      "requires": { "props": ["money"], "actionAnyOf": ["handOver"] },
+      "good": "two characters facing each other, the money moving from one hand to the other at the spoken word",
+      "bad": "money floating between two characters who never reach for it"
+    },
+    {
+      "id": "held-pulls-the-rope",
+      "category": "held",
+      "phrases": ["pulls the rope", "pulling the rope", "pulls on the rope", "climbs the rope"],
+      "requires": { "props": ["rope"] },
+      "good": "the rope in frame, both hands wrapped around it, the body leaning away from the pull",
+      "bad": "a rope hanging behind a character whose hands are empty"
+    },
+
+    {
+      "id": "use-typing",
+      "category": "in-use",
+      "phrases": ["typing", "types on the keyboard", "typing on the laptop", "types at the computer"],
+      "requires": { "propsAny": ["computer", "laptop"], "poseAnyOf": ["type"] },
+      "good": "hands at keyboard height, fingers moving, screen visible, eyes toward the screen",
+      "bad": "the character standing with arms down while the narration says typing"
+    },
+    {
+      "id": "use-reading",
+      "category": "in-use",
+      "phrases": ["reads the book", "reading a book", "reads the letter", "reading the letter", "reads the paper"],
+      "requires": { "propsAny": ["book", "letter", "paper"] },
+      "good": "the book open in both hands at chest height, head tilted down toward it",
+      "bad": "a closed book on a table and a character looking at the camera"
+    },
+    {
+      "id": "use-phone-call",
+      "category": "in-use",
+      "phrases": ["on the phone", "answers the phone", "phone call", "calls his", "calls her", "picks up the phone"],
+      "requires": { "props": ["phone"], "poseAnyOf": ["phone"] },
+      "good": "the phone at the ear, hand raised to the head, mouth animated for the line",
+      "bad": "a phone lying on the desk and a character talking to nobody"
+    },
+    {
+      "id": "use-cooking",
+      "category": "in-use",
+      "phrases": ["is cooking", "cooking dinner", "cooking in the kitchen", "cooks dinner", "stirs the pot", "makes dinner", "in the pan"],
+      "requires": { "bgAnyOf": ["kitchen"], "propsAny": ["food", "plate", "cup", "bottle"] },
+      "good": "the kitchen background, a pan or plate in hand, arms working over the counter",
+      "bad": "an empty void background with a character miming stirring"
+    },
+
+    {
+      "id": "state-door-open",
+      "category": "state",
+      "phrases": ["the door opens", "opens the door", "the door was open", "door swings open"],
+      "requires": { "props": ["door"], "propOpen": "door" },
+      "good": "the door drawn ajar or open, a gap showing what is beyond, the handle on the side the character reaches",
+      "bad": "a closed door while the narration says it opens"
+    },
+    {
+      "id": "state-lights",
+      "category": "state",
+      "phrases": ["turns on the light", "turns off the light", "the lights went out", "switches on the lamp"],
+      "requires": { "propsAny": ["lamp", "floorlamp", "lightbulb"] },
+      "good": "the lamp in frame with its light state matching the sentence, the room grade following it",
+      "bad": "a pitch-black frame with no lamp to explain it"
+    },
+    {
+      "id": "state-empty-chair",
+      "category": "state",
+      "phrases": ["the chair was empty", "empty chair", "nobody sat in the chair", "the seat was empty"],
+      "requires": { "propsAny": ["chair", "bench", "stool", "couch"], "noActorOnAny": ["chair", "bench", "stool", "couch"] },
+      "good": "the chair (or bench/sofa, whatever the seat is) visible and unoccupied, framed so the emptiness is the subject",
+      "bad": "a character seated in the 'empty' chair"
+    },
+    {
+      "id": "state-broken",
+      "category": "state",
+      "phrases": ["it was broken", "the machine broke", "smashed", "in pieces"],
+      "requires": { "fxAnyOf": ["debris", "cracks"] },
+      "good": "cracks or flying pieces on the object, the object's silhouette visibly damaged",
+      "bad": "an intact object while the narration says it broke"
+    },
+
+    {
+      "id": "weather-raining",
+      "category": "time-weather",
+      "phrases": ["it was raining", "it is raining", "in the rain", "the rain", "raining hard"],
+      "requires": { "fxAnyOf": ["rain"] },
+      "good": "rain layer over the scene, wet ground reflections, a darker grade, characters under cover or reacting",
+      "bad": "dry ground, bright grade, nobody reacting, while rain is described"
+    },
+    {
+      "id": "weather-rain-on-window",
+      "category": "time-weather",
+      "phrases": ["rain on the window", "rain against the window", "watches the rain"],
+      "requires": { "props": ["window"], "bgNotAnyOf": ["street", "field", "forest", "beach", "sea", "desert", "mountain", "city", "suburb", "farm", "western"] },
+      "good": "an interior with the window in frame, rain drawn on the glass, the character looking at it",
+      "bad": "rain falling inside the room, or a windowless wall"
+    },
+    {
+      "id": "weather-snowing",
+      "category": "time-weather",
+      "phrases": ["it was snowing", "in the snow", "snow fell", "snowing"],
+      "requires": { "fxAnyOf": ["snow"] },
+      "good": "falling snow, cold blue-grey grade, breath or coats if the character is outside",
+      "bad": "a warm sunny palette with no snow"
+    },
+    {
+      "id": "time-at-night",
+      "category": "time-weather",
+      "phrases": ["at night", "that night", "midnight", "night fell", "in the dark"],
+      "requires": { "timeAnyOf": ["night"] },
+      "good": "night grade, moon or lamp as the light source, windows reading dark outside",
+      "bad": "a bright noon sky while the narration says night"
+    },
+
+    {
+      "id": "motion-runs",
+      "category": "motion",
+      "phrases": ["he runs", "she runs", "runs away", "running away", "running down"],
+      "requires": { "poseAnyOf": ["run"] },
+      "good": "the run pose with speedlines, leaning forward, feet off the ground on some frames",
+      "bad": "a standing stickman sliding sideways"
+    },
+    {
+      "id": "motion-walks-away",
+      "category": "motion",
+      "phrases": ["walks away", "walks out", "leaves the room", "walks off"],
+      "requires": { "poseAnyOf": ["walk"] },
+      "good": "walk pose, moving toward the frame edge, an exit beat or a cut on the door",
+      "bad": "the character standing still while the narration says he leaves"
+    },
+    {
+      "id": "motion-stops-at-light",
+      "category": "motion",
+      "phrases": ["stops at the red light", "red light", "traffic light", "waits at the light"],
+      "requires": { "propsAny": ["sign", "car", "truck"], "bgAnyOf": ["street", "city", "suburb", "western", "jp_street"] },
+      "good": "a street background, the red light visible as a signal (a `sign` prop with a red label), the vehicle stopped",
+      "bad": "a car driving through a street with no signal anywhere in frame"
+    },
+    {
+      "id": "motion-falls",
+      "category": "motion",
+      "phrases": ["he falls", "she falls", "falling", "trips and falls"],
+      "requires": { "poseAnyOf": ["fall", "lie"] },
+      "good": "the fall pose, tilted body, ground contact by the end of the shot",
+      "bad": "an upright stickman standing calmly while the narration says he falls"
+    },
+
+    {
+      "id": "count-two-people",
+      "category": "count-scale",
+      "phrases": ["two friends", "two of them", "the two men", "the two women", "both of them"],
+      "requires": { "minActors": 2 },
+      "good": "two distinct characters with different colours/builds, both in frame",
+      "bad": "one character drawn twice by accident, or only one on screen"
+    },
+    {
+      "id": "count-crowd",
+      "category": "count-scale",
+      "phrases": ["a crowd", "the crowd", "dozens of people", "a crowd of people", "hundreds of people"],
+      "requires": { "minActors": 4 },
+      "good": "at least four figures at different depths and sizes, filling the background",
+      "bad": "two people standing in an empty street called a crowd"
+    },
+    {
+      "id": "count-giant",
+      "category": "count-scale",
+      "phrases": ["a giant", "the giant", "giant man", "towering"],
+      "requires": { "minScale": 1.6 },
+      "good": "the giant scaled up so their head leaves the normal frame, normal characters tiny beside them",
+      "bad": "a normal-sized character described as a giant"
+    },
+    {
+      "id": "count-three-things",
+      "category": "count-scale",
+      "phrases": ["three cups", "three coins", "three boxes", "three keys"],
+      "requires": { "propCount": { "type": "cup", "min": 3 } },
+      "good": "three distinct props with visible spacing, counted in one glance",
+      "bad": "one prop while the narration counts three"
+    },
+
+    {
+      "id": "people-conversation",
+      "category": "people",
+      "phrases": ["talks with", "talks to", "conversation", "chatting with", "speaks to him", "speaks to her"],
+      "requires": { "minActors": 2, "facingEachOther": true },
+      "good": "two actors facing each other at conversational distance, only the speaker's mouth moving, listener reacting",
+      "bad": "two actors both facing the camera, or one actor talking to empty space"
+    },
+    {
+      "id": "people-argument",
+      "category": "people",
+      "phrases": ["they argue", "argument", "yelling at", "shouts at", "screams at"],
+      "requires": { "minActors": 2, "expressionAnyOf": ["angry", "furious"] },
+      "good": "two actors facing each other, angry faces, wide gestures, tighter framing",
+      "bad": "two calm neutral faces while the narration says they argue"
+    },
+    {
+      "id": "people-hug",
+      "category": "people",
+      "phrases": ["they hug", "hugs him", "hugs her", "embrace"],
+      "requires": { "minActors": 2, "poseAnyOf": ["hold", "reach"] },
+      "good": "the two bodies close, arms around each other, heads tilted together",
+      "bad": "two characters standing a metre apart with arms down"
+    },
+    {
+      "id": "people-handshake",
+      "category": "people",
+      "phrases": ["handshake", "shakes hands", "shakes his hand", "shakes her hand"],
+      "requires": { "minActors": 2, "poseAnyOf": ["reach", "hold"] },
+      "good": "two actors facing each other, right hands meeting in the middle, eye contact",
+      "bad": "two actors facing the camera with hands at their sides"
+    },
+
+    {
+      "id": "emotion-tired",
+      "category": "emotion",
+      "phrases": ["he is tired", "she is tired", "exhausted", "worn out", "dead tired"],
+      "requires": { "expressionAnyOf": ["bored", "sad", "sleepy"] },
+      "good": "half-closed eyes, slumped shoulders, slow breathing",
+      "bad": "a bright smiling face while the narration says tired"
+    },
+    {
+      "id": "emotion-angry",
+      "category": "emotion",
+      "phrases": ["he is angry", "she is angry", "furious", "rage", "angry"],
+      "requires": { "expressionAnyOf": ["angry", "furious"] },
+      "good": "brows down and in, narrowed eyes, clenched hands, wider stance",
+      "bad": "a neutral face with the word 'angry' in the narration"
+    },
+    {
+      "id": "emotion-shocked",
+      "category": "emotion",
+      "phrases": ["shocked", "stunned", "can't believe", "cannot believe", "freezes"],
+      "requires": { "expressionAnyOf": ["shocked", "surprised"] },
+      "good": "wide round eyes, small open mouth, body pulled back, an exclaim mark",
+      "bad": "the same neutral face held through the reveal"
+    },
+    {
+      "id": "emotion-scared",
+      "category": "emotion",
+      "phrases": ["scared", "afraid", "terrified", "frightened"],
+      "requires": { "expressionAnyOf": ["scared", "worried"] },
+      "good": "raised brows, sweat drop, body leaning away, hands up",
+      "bad": "a relaxed posture in a scene the narration calls terrifying"
+    },
+
+    {
+      "id": "negation-no-one-home",
+      "category": "negation",
+      "phrases": ["no one was home", "nobody was home", "no one is home", "the house was empty", "nobody is here"],
+      "requires": { "maxActors": 0 },
+      "good": "an empty room, doors open onto nothing, a lamp still on to show it is lived in",
+      "bad": "a character standing in the middle of the 'empty' house"
+    },
+    {
+      "id": "negation-empty-seat",
+      "category": "negation",
+      "phrases": ["the seat was empty", "the chair sat empty", "nobody sat there", "no one sat there"],
+      "requires": { "propsAny": ["chair", "bench", "stool", "couch"], "noActorOnAny": ["chair", "bench", "stool", "couch"] },
+      "good": "the empty seat centred and clearly unoccupied",
+      "bad": "the chair hidden behind a character, or occupied"
+    },
+    {
+      "id": "negation-did-not-move",
+      "category": "negation",
+      "phrases": ["he did not move", "she did not move", "didn't move", "stood perfectly still", "did not move"],
+      "requires": { "poseAnyOf": ["stand"], "maxActors": 1 },
+      "good": "one still figure, camera moves instead of the character, held frame",
+      "bad": "a walk cycle while the narration says he did not move"
+    },
+    {
+      "id": "negation-before-after",
+      "category": "negation",
+      "phrases": ["before and after", "at first", "but now", "these days"],
+      "requires": { "insertAnyOf": ["versus", "timeline", "chart", "document"] },
+      "good": "a before/after split or a labelled timeline insert so the contrast is drawn",
+      "bad": "two unrelated shots with nothing marking the change"
+    },
+
+    {
+      "id": "cause-button",
+      "category": "cause",
+      "phrases": ["pressed the button", "presses the button", "pushes the button", "hits the button"],
+      "requires": { "props": ["button"] },
+      "good": "the hand on the button at the spoken word, then the effect in the next shot",
+      "bad": "a character miming a press at empty air"
+    },
+    {
+      "id": "cause-lights-out",
+      "category": "cause",
+      "phrases": ["the lights went out", "lights went out", "everything went dark", "the power cut"],
+      "requires": { "fxAnyOf": ["darken", "flash"] },
+      "good": "the room grade drops to dark at the beat, a lamp or bulb visible and dead",
+      "bad": "the scene stays bright while the narration says everything went dark"
+    },
+    {
+      "id": "cause-flashback",
+      "category": "cause",
+      "phrases": ["flashback", "years earlier", "he remembered", "she remembered", "back then"],
+      "requires": { "transitionAnyOf": ["flash", "iris", "dissolve"] },
+      "good": "a flash or iris into a differently graded past scene, sepia or desaturated",
+      "bad": "a hard cut into an identically graded scene with no signal it is the past"
+    },
+    {
+      "id": "cause-caught",
+      "category": "cause",
+      "phrases": ["because of that", "as a result", "so he", "so she", "that is why"],
+      "requires": {},
+      "good": "the cause and the effect are separate shots, with a match cut or a shared object linking them",
+      "bad": "cause and effect crammed into one shot with an arrow pointing at nothing"
+    },
+
+    {
+      "id": "abstract-imagine",
+      "category": "abstract",
+      "phrases": ["imagine", "picture this", "think of it as", "like a"],
+      "requires": { "insertAnyOf": ["bigtext", "document", "chart", "map", "versus", "timeline", "list", "counter"] },
+      "good": "the abstraction drawn as an insert graphic: labelled diagram, comparison board or counter",
+      "bad": "the narrator says 'imagine' and the screen shows an unchanged character"
+    },
+    {
+      "id": "abstract-chart",
+      "category": "abstract",
+      "phrases": ["the chart", "the graph", "the numbers", "percent", "statistics"],
+      "requires": { "insertAnyOf": ["chart", "counter"] },
+      "good": "an animated bar/line chart or a counting-up number, labelled and legible in one second",
+      "bad": "a character gesturing at empty space while the narration says 'the numbers'"
+    },
+    {
+      "id": "abstract-diagram",
+      "category": "abstract",
+      "phrases": ["diagram", "how it works", "the parts", "the process", "step by step"],
+      "requires": { "insertAnyOf": ["document", "map", "versus", "timeline", "list", "chart"] },
+      "good": "labelled parts, arrows between them, revealed in time with the narration",
+      "bad": "talking head only, with the explanation left entirely to the voice"
+    },
+    {
+      "id": "abstract-metaphor",
+      "category": "abstract",
+      "phrases": ["it is like", "like water", "like a highway", "like traffic", "as if"],
+      "requires": { "insertAnyOf": ["versus", "document", "chart", "bigtext", "list"] },
+      "good": "the metaphor drawn literally (traffic as cars, bandwidth as a pipe) with the comparison labelled",
+      "bad": "the metaphor spoken but never shown"
+    }
+  ]
+}

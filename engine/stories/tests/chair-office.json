@@ -44,7 +44,7 @@
       "say": "Later, he stands and walks to the window.",
       "bg": "office", "framing": "full", "camera": "panRight",
       "actors": [{ "id": "worker", "pose": "walk", "x": 0.5, "z": 0.45, "moveTo": 0.8, "expression": "sad", "facing": "right" }],
-      "props": [{ "type": "desk", "x": 0.34, "z": 0.52, "scale": 1.0 }, { "type": "chair", "x": 0.6, "z": 0.4 }],
+      "props": [{ "type": "desk", "x": 0.34, "z": 0.52, "scale": 1.0 }, { "type": "chair", "x": 0.6, "z": 0.4 }, { "type": "window", "x": 0.88, "z": 0.2 }],
       "beats": [{ "at": "stands", "pose": "stand" }],
       "transition": "dissolve"
     }

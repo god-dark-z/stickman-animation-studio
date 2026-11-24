@@ -6,7 +6,7 @@
 ![Node](https://img.shields.io/badge/Node-18%2B-3a8ad6.svg?style=flat-square)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3a8ad6.svg?style=flat-square)
 ![Engine](https://img.shields.io/badge/Engine-Remotion%204%20%2B%20three.js-9fe8a8.svg?style=flat-square)
-![QA](https://img.shields.io/badge/QA-7%20executable%20gates-ff8a2a.svg?style=flat-square)
+![QA](https://img.shields.io/badge/QA-9%20executable%20gates-ff8a2a.svg?style=flat-square)
 ![AI images](https://img.shields.io/badge/AI%20images-0-c9d4e8.svg?style=flat-square)
 ![AI video](https://img.shields.io/badge/AI%20video-0-c9d4e8.svg?style=flat-square)
 ![Paid APIs](https://img.shields.io/badge/Paid%20APIs-0-c9d4e8.svg?style=flat-square)
@@ -105,11 +105,14 @@ flowchart LR
 | **Validate** | `npx tsx scripts/validate.ts stories/x.json` | schema, cast ids, prop ids, 3D locations, quote actors — before anything expensive runs |
 | **Sync** | `npx tsx scripts/qa_sync.ts stories/x.json` | narration ↔ visual contract: places, time-of-day, actions as poses/beats, objects, quoted lines with animated mouths, continuity, shot-grammar repetition |
 | **Geometry** | `npx tsx scripts/qa_geometry.ts stories/x.json` | **the scene graph**: hip inside the seat, body on the mattress, head on the pillow, no sinking/floating, scale, draw order, face occlusion, framing, facing, seated→standing continuity. Runs the same placement code as the renderer |
+| **Commonsense** | `npx tsx scripts/qa_commonsense.ts stories/x.json` | what a human pictures, per sentence: 61 intents (in a bed, at the desk, in the other room, holding a cup, raining, a crowd, no one home…) and a **Scene Spec** per shot — every body's support, every implied prop, every stated relation, every negation |
+| **Spec** | `npx tsx scripts/spec_check.ts stories/x.json` | the Director's Brief alone: a body with no support, a required prop that never appears, an "empty chair" with someone in it, an "other room" with no transition, a false relation |
 | **Stills** | `npm run make -- … --stills` → `python scripts/qa_stills.py …` | exposure / dead-frame / saturation pixel gate |
 | **Timing** | `python scripts/qa_timing.py out/slug/words.json out/…mp3` | per-word timing is real (not sentence-level), monotonic, and each sampled word lands on audible speech |
 | **Video** | `python scripts/qa_video.py out/slug.mp4` | codec, fps, resolution, duration ≈ timeline, dead frames |
 | **Audio** | `python scripts/qa_audio.py out/slug.mp4` | −14 LUFS ±1.5, true peak ≤ −1.0 dBTP, voice presence |
 | **Visual** | `python scripts/qa_visual_report.py story.json out/slug/stills` | contact sheet + per-shot claim checklist; a vision agent records PASS/FAIL, a vision-less agent states that QA was geometric only |
+| **Battery** | `npx tsx scripts/battery.ts` | the regression score: 61 one-sentence micro-stories across 14 commonsense categories, each resolved and checked against what a human would expect to see |
 
 `npm run studio -- <story> --tier draft` runs them all in order and refuses to advance past a
 failure. Repairs loop per gate; nothing ships with a silently failed gate.
@@ -196,7 +199,11 @@ docs/                        banner.svg (drawn in code) · demo/ (video, GIFs, Q
 Machine: Windows 11, 16 cores, **~15 GB RAM, no discrete GPU**, CPU-only. Every number below was
 produced by a command in `docs/dev/VERIFY-*.md`; nothing here is self-reported from a build day.
 
-- [x] `tsc --noEmit` clean · **22/22** unit tests (incl. numeric contact tests for chair and bed)
+- [x] `tsc --noEmit` clean · **27/27** unit tests (incl. numeric contact tests for chair and bed,
+      glossary accept/reject, the relation graph and the spec's support check)
+- [x] **Commonsense battery: 61/61** micro-stories across 14 categories drawn as a human would
+      picture them (`out/battery/report.md`)
+- [x] **Scene Spec: 0 errors** on both contact fixtures (support, props, relations, negation)
 - [x] **Full 23-shot demo** (`--tier draft`, 3D locations, software WebGL via ANGLE): timeline 56.4 s,
       **108 s wall clock**, 3.8 MB MP4, **all gates PASS**
 - [x] Sync gate **0 errors, 0 warnings** · geometry gate **0 errors, 0 warnings** on the demo

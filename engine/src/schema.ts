@@ -156,6 +156,7 @@ export type ResolvedStory = {
   rate: string;
   music: (typeof MUSIC)[number];
   mix: { music: number; sfx: number; duck: number; autoSfx: boolean };
+  intentExempt: { shot: number; id: string; reason: string }[];
   cast: Record<string, Character>;
   shots: Shot[];
 };
@@ -175,6 +176,18 @@ export const StorySchema = z
     }).default({}),
     cast: z.record(z.string(), CharacterSchema),
     shots: z.array(ShotSchema).min(1),
+    // A metaphor can trip the commonsense glossary: "his phone goes from cool to cooking"
+    // matches the kitchen intent. Exempt it explicitly, per shot, with a reason — never silently.
+    intentExempt: z
+      .array(
+        z.object({
+          shot: z.number().int().min(1).describe("1-based shot index"),
+          id: z.string().describe("glossary entry id, e.g. use-cooking"),
+          reason: z.string().min(4).describe('why this phrase is not literal, e.g. "metaphor: the phone heats up"'),
+        }),
+      )
+      .default([])
+      .describe("explicit, reasoned exemptions from commonsense glossary entries"),
   })
   .transform((s): ResolvedStory => {
     const provider: NarrationProvider = s.provider ?? "edge";
@@ -201,6 +214,7 @@ const STORY_INPUT_KEYS = z.object({
   }).optional(),
   cast: z.record(z.string(), CharacterSchema),
   shots: z.array(ShotSchema).min(1),
+  intentExempt: z.array(z.object({ shot: z.number().int().min(1), id: z.string(), reason: z.string().min(4) })).optional(),
 });
 export type StoryInput = z.input<typeof STORY_INPUT_KEYS>;
 export type Actor = z.infer<typeof ActorSchema>;

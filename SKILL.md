@@ -36,13 +36,74 @@ assume; check. One minute here saves a broken render later.
 |---|---|---|
 | Shell + file access | run `node --version` | No shell at all → this skill cannot render; fall back to `install/PASTE-THIS-PROMPT.md` handoff to a coding agent |
 | Web research | a web-search tool available? | No search → write from internal knowledge, mark every claim "unverified" in `fact-check.md`, prefer evergreen physics/history topics |
-| Vision on images | can you read image files? | No vision → rely on `engine/scripts/qa_stills.py` + `engine/scripts/qa_sync.ts` pixel/lexicon gates and say so in the delivery report |
+| Vision on images | can you read image files? | No vision → rely on `qa_geometry.ts` (contact/framing), `qa_commonsense.ts` (intent + spec), `qa_stills.py` and say so in the delivery report |
 | Background execution | can you run long commands in the background? | No → run renders in the foreground and use `--preview` first; budget for several minutes |
 | Context budget | very large context? | Tight context → read only the `references/` files the current stage names, one at a time; keep the story JSON as the single source of truth |
 | Reasoning depth | strong model → push craft further: richer staging, more beats, deeper research | Weaker model → follow the reference defaults literally; they are calibrated to produce good results without improvisation |
 
 Whatever the environment, the quality gates (steps 4, 5, 7) are **not optional** — a weaker
 workflow must still pass the same executable checks.
+
+## 0.4 The Director's Brief — write what a human would picture, first
+
+Every sentence quietly implies a picture. "He is asleep in the other room" means a bed, a
+mattress, a pillow, a blanket, a body lying on it, dim light, and a *different room* — not a man
+on the floor beside a bed. Before you write one line of story JSON, write one **Scene Spec block
+per shot** using `templates/scene-spec.md`. It is a form, not an essay: where, who, what supports
+each body, which props the sentence implies, which relations hold, the world state, the emotion,
+what the camera must make unmissable, and what must be absent.
+
+**The rule for the whole film:** if a human would assume it, the film must show it; if a human
+would never draw it, the film must not contain it.
+
+Then the engine argues with you:
+
+```bash
+npx tsx scripts/qa_commonsense.ts stories/<slug>.json   # glossary + spec
+npx tsx scripts/spec_check.ts stories/<slug>.json       # spec only
+```
+
+### Decision table — the assumptions agents get wrong
+
+| If the sentence says… | Then the shot must have | Never |
+|---|---|---|
+| sits at a desk / on a sofa / on a chair | that furniture declared + `action: "sitOn"` + `on` | a body at floor level beside an empty chair |
+| sleeps / lies in bed | `action: "sleepOn"`/`"lieOn"` on a declared `bed`, `underBlanket: true` | a body on the floor, bed as decoration |
+| stands by the window | the `window` prop in frame, the actor turned toward it | a windowless wall |
+| holds a cup / box / letter | `holding` on the actor + the prop at hand height | a prop floating beside the palm |
+| is in the other room / upstairs | a **different** `bg`/`location`, plus a transition that shows the change | the same background reused |
+| it is raining | `fx: ["rain"]` outdoors, or a `window` with rain on it indoors | rain falling inside a room |
+| at night | `time: "night"` | a daylight grade |
+| two people / a crowd / a giant | 2 / 4+ actors, or `scale` ≥ 1.6 | one figure described as many |
+| they talk / argue / shake hands | two actors facing each other, only the speaker's mouth moving | both facing camera |
+| no one was home / the chair was empty | no actors, or the empty prop framed and unoccupied | a character standing in the "empty" room |
+| imagine / the chart / a diagram | an `insert` that draws the abstraction | a talking head over "the numbers" |
+
+Full intent table (61 intents, every phrase with a GOOD and a BAD rendering):
+`references/11-commonsense-intents.md`. It is checked automatically — a matching phrase whose
+picture is missing is an **ERROR**, not a suggestion.
+
+### Self-check before storyboarding (answer all six)
+
+1. For **every actor**: what holds the body up? (floor, chair seat, mattress, ground, wall, car seat)
+2. For **every object the sentence names**: is it in `props` and visible?
+3. For **every place word**: does the background change, and does the cut show it?
+4. Is **anyone on screen the sentence did not put there**?
+5. Does **every relation** you wrote survive a stranger looking at one frame?
+6. **Sound off**: could a viewer still understand the shot?
+
+### Ambiguity and metaphors
+
+When a sentence can be read two ways, take the **most physically natural, most common human
+interpretation**, write it in the spec's `note`, continue. Never choose the odd reading unless the
+prompt says so.
+
+A figure of speech can trip the glossary ("his phone goes from cool to cooking" matches the
+kitchen intent). Do **not** weaken the gate — exempt that intent in that shot, with a reason:
+
+```json
+"intentExempt": [{ "shot": 8, "id": "use-cooking", "reason": "metaphor: the phone heats up" }]
+```
 
 ## 0.5 Use the orchestrator, not eight commands
 
@@ -57,8 +118,8 @@ npx tsx scripts/studio.ts <story.json> --from geometry --resume  # continue afte
 ```
 
 State is written to `stories/<slug>/.state.json`, the full log to `out/<slug>/run.log`.
-Stages: `validate → narration → timeline → sync → geometry → stills → pixels → timing →
-render → video → audio → visual`. `--no-tts` skips narration/timing/audio and renders silent.
+Stages: `validate → narration → timeline → sync → geometry → commonsense → stills → pixels →
+timing → render → video → audio → visual`. `--no-tts` skips narration/timing/audio and renders silent.
 
 Before the first run on a new machine: `npm run doctor` (prints PASS/WARN/FAIL and the fix
 for each). Do not render until it is green or you understand every WARN.

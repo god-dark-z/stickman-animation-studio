@@ -1,5 +1,42 @@
 # Changelog
 
+## 3.1.0 — 2026-11-24
+
+Commonsense: the film draws what the sentence implies, not only what the JSON says.
+
+### Added
+- **`engine/data/intent-glossary.json`** — 61 intents across 14 categories (posture, location,
+  containment, held, in-use, state, time-weather, motion, count-scale, people, emotion, negation,
+  cause, abstract), each with a GOOD and a BAD rendering. `qa_commonsense.ts` matches a shot's
+  narration against these and fails when the canonical picture is missing.
+- **Scene Spec / Director's Brief** — `templates/scene-spec.md`, `src/commonsense/spec.ts`,
+  `scripts/spec_check.ts`. One block per shot: place, who, **what supports each body**, implied
+  props, relations, world state, emotion, camera purpose, negations. `where.otherRoom` requires a
+  written `transitionPlan`.
+- **Numeric relation graph** — `src/commonsense/relations.ts`: `on`, `in`, `inside`, `under`,
+  `behind`, `in_front_of`, `beside`, `holding`, `facing`, `looking_at`, `touching`, `inside_room`
+  are tested against the resolved scene; `wearing`/`part_of` are reported as visual-only.
+- **The commonsense battery** — `engine/data/commonsense-battery.json` + `scripts/battery.ts`:
+  61 micro-stories, each with a plan, an expected picture and a machine-checkable requirement.
+  Runs in seconds and writes `out/battery/report.md` (per-category pass rates).
+- Spec files for the two contact fixtures: `stories/tests/{chair-office,bed-sleep}.spec.json`.
+- `references/11-commonsense-intents.md`, `templates/scene-spec.md`, SKILL.md §0.4 with the
+  decision table, the six self-check questions and the ambiguity/metaphor protocol.
+- `intentExempt` on the story: a reasoned, per-shot exemption for a metaphor, printed as a WARN.
+- 5 new unit tests (27 total): glossary accept/reject, relation graph, spec support, exemption.
+
+### Fixed
+- `qa_geometry` treated **every** action as a placement action, so `hold`/`use`/`face`/`pointAt`/
+  `react`/`handOver` were rejected as "action without `on` prop". Only `sitOn`, `lieOn`, `sleepOn`
+  and `standAt` resolve anchors now.
+- "The seat was empty" was hard-coded to `chair`; a bench failed. `noActorOnAny` + `propsAny`.
+- The chair and bed fixtures narrated a window that was never drawn; a pass of the spec gate found
+  it, and `bed-sleep` shot 4 faced the camera instead of the window. Both corrected.
+- `use-cooking` matched the metaphor "his phone goes from cool to cooking"; phrases tightened to
+  literal cooking, with the exemption mechanism for genuine metaphors.
+- Studio gains a `commonsense` stage (after `geometry`); `npm run qa` now runs the glossary and the
+  battery.
+
 ## 3.0.0 — 2026-11-24
 
 The release that makes the picture provable.

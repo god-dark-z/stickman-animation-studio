@@ -14,6 +14,11 @@ import { chunkWords } from "../src/captions/Captions";
 import { anchorWorld } from "../src/scene/layout";
 import { poseMetrics, resolvePlacement, stageOf } from "../src/scene/layout";
 import { checkShot } from "./qa_geometry";
+import { buildEnv } from "../src/scene/backgrounds/environments";
+import { checkRequirement, matches } from "../src/commonsense/glossary";
+import { checkRelation } from "../src/commonsense/relations";
+import { SpecSchema, validateSpec } from "../src/commonsense/spec";
+import { seenOf } from "./qa_commonsense";
 
 let passed = 0;
 const test = (name: string, fn: () => void) => {
@@ -294,6 +299,71 @@ test("inside=true puts a driver behind the car body", () => {
   });
   const place = resolvePlacement(s.shots[0].actors[0], s.shots[0].props, ENV)!;
   assert.ok(place.z < (s.shots[0].props[0].z ?? 0.5), "an inside actor must draw behind the vehicle");
+});
+
+// ------------------------------------------------------------------ commonsense layer
+// The failure family behind "asleep in the other room": a human fills in the bed, the mattress,
+// the pillow, a different room. The glossary turns that into a checkable requirement.
+test("the glossary accepts a body actually lying in the bed", () => {
+  const s = StorySchema.parse({
+    title: "t", cast: { m: { color: "#ffffff" } },
+    shots: [{ say: "He is asleep in the other room.", bg: "bedroom", time: "night", actors: [{ id: "m", action: "sleepOn", on: "bed", underBlanket: true }], props: [{ type: "bed", x: 0.5, z: 0.2 }] }],
+  });
+  const shot = buildTimeline(s, null, null, null).shots[0];
+  const findings = matches(shot.say).flatMap((e) => checkRequirement(e, e.requires, seenOf(shot), 1));
+  assert.equal(findings.filter((f) => f.sev === "ERROR").length, 0, JSON.stringify(findings));
+});
+
+test("the glossary rejects 'asleep' with no bed in the shot", () => {
+  const s = StorySchema.parse({
+    title: "t", cast: { m: { color: "#ffffff" } },
+    shots: [{ say: "He is asleep in the other room.", bg: "bedroom", time: "night", actors: [{ id: "m", pose: "lie" }] }],
+  });
+  const shot = buildTimeline(s, null, null, null).shots[0];
+  const findings = matches(shot.say).flatMap((e) => checkRequirement(e, e.requires, seenOf(shot), 1));
+  // the bedroom's own bed is set dressing, so it IS on screen — the lie is the body: nothing
+  // puts it on the mattress, which is exactly the demo's old "asleep on the floor" shot
+  assert.ok(findings.some((f) => f.kind === "COMMONSENSE" && f.msg.includes("sleepOn")), JSON.stringify(findings));
+});
+
+// The relation graph: "on the bed" is a numeric claim about the resolved scene.
+test("the relation graph proves 'on bed' only for a body that resolves onto the mattress", () => {
+  const mk = (action: "sleepOn" | "none") => {
+    const s = StorySchema.parse({
+      title: "t", cast: { m: { color: "#ffffff" } },
+      shots: [{ say: "He is in the bed.", bg: "bedroom", actors: [{ id: "m", action, on: action === "none" ? undefined : "bed" }], props: [{ type: "bed", x: 0.5, z: 0.2 }] }],
+    });
+    const shot = buildTimeline(s, null, null, null).shots[0];
+    const env = buildEnv(shot.bg, { time: shot.time, t: 0, wallColor: shot.wall, seed: 1 });
+    return checkRelation({ subject: "m", relation: "on", object: "bed" }, { shot, env, cast: s.cast, props: shot.props });
+  };
+  assert.equal(mk("sleepOn").ok, true, mk("sleepOn").detail);
+  assert.equal(mk("none").ok, false, "a standing man is not on the mattress");
+});
+
+// The Scene Spec argues with the agent: a declared chair support with no sitOn is an error.
+test("the spec rejects a chair support the shot never places", () => {
+  const s = StorySchema.parse({
+    title: "t", cast: { w: { color: "#ffffff" } },
+    shots: [{ say: "He sits at the desk.", bg: "office", actors: [{ id: "w", pose: "stand" }], props: [{ type: "chair", x: 0.5, z: 0.4 }] }],
+  });
+  const shot = buildTimeline(s, null, null, null).shots[0];
+  const spec = SpecSchema.parse({
+    title: "t",
+    shots: [{ shot: 1, who: [{ id: "w", support: "chair_seat" }], props: [{ type: "chair", role: "required" }], cameraPurpose: "seated" }],
+  });
+  const findings = validateSpec(spec, [shot], s.cast);
+  assert.ok(findings.some((f) => f.kind === "SPEC-SUPPORT" && f.sev === "ERROR"), JSON.stringify(findings));
+});
+
+test("a reasoned intent exemption is accepted by the schema and keeps its reason", () => {
+  const s = StorySchema.parse({
+    title: "t", cast: { m: { color: "#ffffff" } },
+    shots: [{ say: "His phone goes from cool to cooking.", bg: "street" }],
+    intentExempt: [{ shot: 1, id: "use-cooking", reason: "metaphor: the phone heats up" }],
+  });
+  assert.equal(s.intentExempt.length, 1);
+  assert.match(s.intentExempt[0].reason, /metaphor/);
 });
 
 console.log(`\n${passed} passed${process.exitCode ? " (with failures)" : ""}`);

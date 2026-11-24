@@ -138,6 +138,11 @@ agent to stop and report on a failed stage rather than route around it.
 | D12 | minor | `sit` reads as standing at some framings; no knee-forward silhouette | 2D rig has no separate thigh | stills review | wider stance + slight backward tilt; documented limit | stills |
 | D13 | minor | Stray `agentvision-render.png` | S10 | ls | removed | — |
 | D14 | minor | Monitor at nearer z covered the whole character | no occlusion check; story staging | still `shot00` before restage | `FACE-OCCLUDED` check + restaged fixture | gate now errors on it |
+| D15 | blocker (family) | The engine can only check the two poses it was tuned for; every other implied assumption is unchecked | validators were hand-written per defect | S7 evidence: 0 errors on a wrong picture | intent glossary (61 intents, 14 categories) + Scene Spec + numeric relation graph | `battery.ts` 61/61; `spec_check` on both fixtures |
+| D16 | major | `react`/`hold`/`handOver`/`use` were rejected as "action without `on` prop" | `qa_geometry` treated every action as a placement action | `action: "handOver"` on the money fixture errored | `PLACEMENT` set: only `sitOn`/`lieOn`/`sleepOn`/`standAt` resolve anchors | battery `held-03-hands-over-money` |
+| D17 | major | Narration says "stretches by the window"; no window in the shot | storyboard written from memory, nothing compared the sentence to the drawings | `spec_check` on bed-sleep: "facing window is false" | window props added to both fixtures; facing corrected | `spec_check` 0 errors |
+| D18 | minor | Metaphor "cool to cooking" demanded a kitchen | keyword glossary has no notion of figurative speech | `qa_commonsense` on the shipped demo: 2 ERRORs | literal phrases tightened + reasoned `intentExempt` | unit test "a reasoned intent exemption…" |
+| D19 | minor | "The seat was empty" failed on a bench | "seat" was hard-coded to `chair` | battery `negation-02` FAIL | `noActorOnAny` + `propsAny` | battery 61/61 |
 
 ---
 

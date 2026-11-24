@@ -47,6 +47,9 @@ type Finding = { shot: number; sev: Sev; kind: string; msg: string };
 
 const PROP_CAPABILITY: Record<string, AnchorName> = { sitOn: "seat", lieOn: "mattress", sleepOn: "mattress" };
 
+/** Actions that place a body on a prop and therefore need `on` + an anchor. */
+const PLACEMENT = new Set(["sitOn", "lieOn", "sleepOn", "standAt"]);
+
 const envFor = (shot: ResolvedShot) =>
   buildEnv(shot.bg, { time: shot.time, t: 0, wallColor: shot.wall, seed: 1 });
 
@@ -72,9 +75,9 @@ export function checkShot(shot: ResolvedShot, cast: Record<string, { build?: str
   const dur = shot.duration || 90;
   const mid = Math.floor(dur * 0.6);
 
-  if (shot.location) {
+        if (shot.location) {
     for (const a of shot.actors) {
-      if (a.action !== "none") {
+      if (a.action !== "none" && PLACEMENT.has(a.action)) {
         out.push({
           shot: i, sev: "ERROR", kind: "ANCHOR-3D",
           msg: `actor "${a.id}" uses action "${a.action}" in a 3D location — anchor actions are only implemented for 2D backgrounds. Use a 2D bg for this shot, or drop the action.`,
@@ -88,7 +91,9 @@ export function checkShot(shot: ResolvedShot, cast: Record<string, { build?: str
     const props = usableProps(shot, env);
 
     // ---- contact via the same resolver the renderer uses
-    if (a.action !== "none") {
+    // Acting-only actions (hold, use, face, pointAt, react, handOver) do not move the body,
+    // so they need no anchor. Only placement actions are resolved onto a surface.
+    if (a.action !== "none" && PLACEMENT.has(a.action)) {
       if (!a.on) {
         out.push({ shot: i, sev: "ERROR", kind: "MISSING-ACTION", msg: `actor "${a.id}" has action "${a.action}" but no \`on\` prop` });
         continue;

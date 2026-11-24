@@ -1,0 +1,59 @@
+{
+  "title": "Bed Test Sleep",
+  "shots": [
+    {
+      "shot": 1,
+      "where": { "bg": "bedroom", "note": "his own bedroom, 2 a.m." },
+      "who": [{ "id": "man", "support": "bed_mattress", "at": "center", "posture": "lying, asleep" }],
+      "props": [
+        { "type": "bed", "role": "required" }
+      ],
+      "relations": [{ "subject": "man", "relation": "on", "object": "bed" }],
+      "world": { "time": "night", "weather": "clear", "states": ["lights off", "blanket over him"] },
+      "emotion": "peaceful sleep",
+      "cameraPurpose": "a man actually in the bed, head on the pillow",
+      "negations": []
+    },
+    {
+      "shot": 2,
+      "where": { "bg": "bedroom" },
+      "who": [{ "id": "man", "support": "bed_mattress", "at": "center", "posture": "lying, asleep" }],
+      "props": [
+        { "type": "bed", "role": "required" },
+        { "type": "phone", "role": "used" }
+      ],
+      "relations": [{ "subject": "man", "relation": "on", "object": "bed" }],
+      "world": { "time": "night", "states": ["phone screen on", "alarm ringing"] },
+      "emotion": "unaware, still asleep",
+      "cameraPurpose": "the phone ringing beside a sleeping man who does not react",
+      "negations": []
+    },
+    {
+      "shot": 3,
+      "where": { "bg": "bedroom" },
+      "who": [{ "id": "man", "support": "bed_edge", "at": "center", "posture": "sitting on the edge of the mattress" }],
+      "props": [
+        { "type": "bed", "role": "required" }
+      ],
+      "relations": [{ "subject": "man", "relation": "on", "object": "bed" }],
+      "world": { "time": "night", "states": ["blanket thrown back"] },
+      "emotion": "groggy, just awake",
+      "cameraPurpose": "he is upright on the edge of the bed, not floating beside it",
+      "negations": []
+    },
+    {
+      "shot": 4,
+      "where": { "bg": "bedroom" },
+      "who": [{ "id": "man", "support": "floor", "at": "center", "posture": "standing, stretching" }],
+      "props": [
+        { "type": "window", "role": "required" },
+        { "type": "bed", "role": "background" }
+      ],
+      "relations": [{ "subject": "man", "relation": "facing", "object": "window" }],
+      "world": { "time": "day", "weather": "clear", "states": ["curtains open"] },
+      "emotion": "rested, relieved",
+      "cameraPurpose": "morning light through the window he stretches toward",
+      "negations": []
+    }
+  ]
+}

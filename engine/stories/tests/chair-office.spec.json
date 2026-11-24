@@ -1,0 +1,64 @@
+{
+  "title": "Chair Test Office",
+  "shots": [
+    {
+      "shot": 1,
+      "where": { "bg": "office", "note": "9-to-5 office, same desk all day" },
+      "who": [{ "id": "worker", "support": "chair_seat", "at": "center", "posture": "sitting, typing" }],
+      "props": [
+        { "type": "chair", "role": "required" },
+        { "type": "desk", "role": "required" },
+        { "type": "computer", "role": "used" }
+      ],
+      "relations": [{ "subject": "worker", "relation": "on", "object": "chair" }],
+      "world": { "time": "day", "weather": "clear", "states": ["screen on", "lamp on"] },
+      "emotion": "bored, worn down",
+      "cameraPurpose": "a worker visibly seated at his desk, chair under him",
+      "negations": []
+    },
+    {
+      "shot": 2,
+      "where": { "bg": "office" },
+      "who": [{ "id": "worker", "support": "chair_seat", "at": "center", "posture": "sitting, leaning back" }],
+      "props": [
+        { "type": "chair", "role": "required" },
+        { "type": "desk", "role": "required" },
+        { "type": "computer", "role": "used" }
+      ],
+      "relations": [{ "subject": "worker", "relation": "on", "object": "chair" }],
+      "world": { "time": "day", "states": ["screen on"] },
+      "emotion": "tired sigh, shoulders dropping",
+      "cameraPurpose": "he stays in the chair while he leans back - nobody stands up",
+      "negations": []
+    },
+    {
+      "shot": 3,
+      "where": { "bg": "office" },
+      "who": [{ "id": "worker", "support": "chair_seat", "at": "center", "posture": "sitting, dozing" }],
+      "props": [
+        { "type": "chair", "role": "required" },
+        { "type": "desk", "role": "background" }
+      ],
+      "relations": [{ "subject": "worker", "relation": "on", "object": "chair" }],
+      "world": { "time": "day" },
+      "emotion": "half asleep but upright",
+      "cameraPurpose": "he is NOT asleep: eyes droop, body still seated",
+      "negations": [{ "kind": "absent", "target": "bed" }]
+    },
+    {
+      "shot": 4,
+      "where": { "bg": "office" },
+      "who": [{ "id": "worker", "support": "floor", "at": "right", "posture": "walking" }],
+      "props": [
+        { "type": "window", "role": "required" },
+        { "type": "desk", "role": "background" },
+        { "type": "chair", "role": "background" }
+      ],
+      "relations": [{ "subject": "worker", "relation": "facing", "object": "window" }],
+      "world": { "time": "day" },
+      "emotion": "quiet relief",
+      "cameraPurpose": "he has left the chair and is walking toward the window",
+      "negations": []
+    }
+  ]
+}

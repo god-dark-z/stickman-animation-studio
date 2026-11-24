@@ -33,8 +33,8 @@
     {
       "say": "Next morning, he stands and stretches by the window.",
       "bg": "bedroom", "time": "day", "framing": "full", "camera": "pullOut",
-      "actors": [{ "id": "man", "pose": "reach", "x": 0.55, "z": 0.45, "expression": "happy" }],
-      "props": [{ "type": "bed", "x": 0.5, "z": 0.35, "color": "#4f78c9" }],
+      "actors": [{ "id": "man", "pose": "reach", "x": 0.55, "z": 0.45, "expression": "happy", "facing": "right" }],
+      "props": [{ "type": "bed", "x": 0.5, "z": 0.35, "color": "#4f78c9" }, { "type": "window", "x": 0.85, "z": 0.2 }],
       "beats": [{ "at": "stands", "pose": "stand" }],
       "transition": "dissolve"
     }
