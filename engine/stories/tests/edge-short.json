@@ -1,0 +1,15 @@
+{
+  "title": "Edge Test Very Short",
+  "music": "none",
+  "cast": {
+    "one": { "color": "#f2b632", "outfit": "tshirt", "hair": "spiky", "hairColor": "#1a1a1a" }
+  },
+  "shots": [
+    {
+      "say": "…",
+      "bg": "void", "framing": "full", "camera": "static",
+      "actors": [{ "id": "one", "pose": "stand", "x": 0.5, "z": 0.5, "expression": "neutral" }],
+      "transition": "cut"
+    }
+  ]
+}

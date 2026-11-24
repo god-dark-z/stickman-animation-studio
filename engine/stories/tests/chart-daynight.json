@@ -1,0 +1,29 @@
+{
+  "title": "Chart Test Day To Night",
+  "music": "curious",
+  "cast": {
+    "analyst": { "color": "#2a6fd6", "outfit": "suit", "hair": "parted", "hairColor": "#2a1a10", "glasses": "round" }
+  },
+  "shots": [
+    {
+      "say": "Sales double in the day.",
+      "bg": "office", "time": "day", "framing": "medium", "camera": "pushIn",
+      "actors": [{ "id": "analyst", "pose": "point", "x": 0.5, "z": 0.5, "expression": "happy", "facing": "right" }],
+      "insert": { "type": "chart", "title": "SALES", "data": [10, 14, 20, 28, 40], "highlight": 4, "color": "#2fa84f" }
+    },
+    {
+      "say": "Later that night, the numbers fall.",
+      "bg": "office", "time": "night", "framing": "medium", "camera": "pushIn",
+      "actors": [{ "id": "analyst", "pose": "shrug", "x": 0.5, "z": 0.5, "expression": "worried", "facing": "right" }],
+      "insert": { "type": "chart", "title": "SALES", "data": [40, 26, 14, 6, 2], "highlight": 4, "color": "#d8342c" },
+      "transition": "dissolve"
+    },
+    {
+      "say": "Next morning, the board is empty.",
+      "bg": "office", "time": "day", "framing": "medium", "camera": "static",
+      "actors": [{ "id": "analyst", "pose": "facepalm", "x": 0.5, "z": 0.5, "expression": "sad", "facing": "right" }],
+      "insert": { "type": "list", "title": "CLOSED", "lines": ["no orders", "no calls", "no visitors"] },
+      "transition": "cut"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "title": "Bed Test Sleep",
+  "music": "mystery",
+  "cast": {
+    "man": { "color": "#7a4fd6", "outfit": "tshirt", "hair": "messy", "hairColor": "#2a1a10" }
+  },
+  "shots": [
+    {
+      "say": "At two a.m., he is asleep in his bed.",
+      "bg": "bedroom", "time": "night", "framing": "full", "camera": "drift",
+      "actors": [{ "id": "man", "action": "sleepOn", "on": "bed", "expression": "sleepy", "underBlanket": true }],
+      "props": [{ "type": "bed", "x": 0.5, "z": 0.35, "color": "#4f78c9" }],
+      "fx": ["zzz"]
+    },
+    {
+      "say": "The phone alarm rings, but he does not move.",
+      "bg": "bedroom", "time": "night", "framing": "medium", "camera": "pushIn",
+      "actors": [{ "id": "man", "action": "sleepOn", "on": "bed", "expression": "sleepy", "underBlanket": true }],
+      "props": [
+        { "type": "bed", "x": 0.5, "z": 0.35, "color": "#4f78c9" },
+        { "type": "phone", "x": 0.28, "z": 0.5, "y": 210, "glow": true }
+      ],
+      "sfx": ["alarm"], "transition": "cut"
+    },
+    {
+      "say": "Then he sits up on the edge of the bed.",
+      "bg": "bedroom", "time": "night", "framing": "medium", "camera": "pushIn",
+      "actors": [{ "id": "man", "action": "sitOn", "on": "bed", "expression": "sleepy", "facing": "left" }],
+      "props": [{ "type": "bed", "x": 0.5, "z": 0.35, "color": "#4f78c9" }],
+      "beats": [{ "at": "sits", "pose": "sit" }],
+      "transition": "cut"
+    },
+    {
+      "say": "Next morning, he stands and stretches by the window.",
+      "bg": "bedroom", "time": "day", "framing": "full", "camera": "pullOut",
+      "actors": [{ "id": "man", "pose": "reach", "x": 0.55, "z": 0.45, "expression": "happy" }],
+      "props": [{ "type": "bed", "x": 0.5, "z": 0.35, "color": "#4f78c9" }],
+      "beats": [{ "at": "stands", "pose": "stand" }],
+      "transition": "dissolve"
+    }
+  ]
+}

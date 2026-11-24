@@ -1,0 +1,45 @@
+{
+  "title": "Kitchen Test Cook",
+  "music": "warm",
+  "cast": {
+    "cook": { "color": "#e8a23a", "outfit": "apron", "hair": "bun", "hairColor": "#3a2418" }
+  },
+  "shots": [
+    {
+      "say": "She stands at the counter with a plate.",
+      "bg": "kitchen", "framing": "full", "camera": "pushIn",
+      "actors": [{ "id": "cook", "pose": "hold", "holding": "plate", "x": 0.42, "z": 0.5, "expression": "happy", "facing": "right" }],
+      "props": [{ "type": "table", "x": 0.6, "z": 0.62, "scale": 1.2 }]
+    },
+    {
+      "say": "She cooks, and steam rises from the plate.",
+      "bg": "kitchen", "framing": "medium", "camera": "drift",
+      "actors": [{ "id": "cook", "pose": "hold", "holding": "plate", "x": 0.42, "z": 0.5, "expression": "determined", "facing": "right" }],
+      "props": [{ "type": "table", "x": 0.6, "z": 0.62, "scale": 1.2 }],
+      "fx": ["smoke"], "transition": "cut"
+    },
+    {
+      "say": "She opens the cabinet and takes out food.",
+      "bg": "kitchen", "framing": "medium", "camera": "panRight",
+      "actors": [{ "id": "cook", "pose": "reach", "x": 0.62, "z": 0.5, "expression": "surprised", "facing": "left" }],
+      "props": [
+        { "type": "door", "x": 0.72, "z": 0.3, "scale": 0.8, "open": 0.8 },
+        { "type": "food", "x": 0.72, "z": 0.55, "y": 120 }
+      ],
+      "beats": [{ "at": "opens", "prop": 0, "propOpen": 1 }],
+      "transition": "cut"
+    },
+    {
+      "say": "Then she sits at the table and eats.",
+      "bg": "kitchen", "framing": "full", "camera": "pushIn",
+      "actors": [{ "id": "cook", "action": "sitOn", "on": "chair", "expression": "happy", "facing": "left" }],
+      "props": [
+        { "type": "chair", "x": 0.5, "z": 0.42 },
+        { "type": "table", "x": 0.5, "z": 0.62, "scale": 1.1 },
+        { "type": "plate", "x": 0.5, "z": 0.62, "y": 190 }
+      ],
+      "beats": [{ "at": "eats", "pose": "hold" }],
+      "transition": "dissolve"
+    }
+  ]
+}

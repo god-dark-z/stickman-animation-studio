@@ -1,0 +1,52 @@
+{
+  "title": "Chair Test Office",
+  "music": "warm",
+  "cast": {
+    "worker": { "color": "#3a6fb0", "outfit": "shirt", "tie": "#c23b33", "hair": "short", "hairColor": "#2a1a10" }
+  },
+  "shots": [
+    {
+      "say": "Nine hours. Same chair. Same screen.",
+      "bg": "office", "time": "day", "framing": "full", "camera": "pushIn",
+      "actors": [{ "id": "worker", "action": "sitOn", "on": "chair", "expression": "bored", "facing": "right" }],
+      "props": [
+        { "type": "chair", "x": 0.6, "z": 0.4 },
+        { "type": "desk", "x": 0.34, "z": 0.52, "scale": 1.0 },
+        { "type": "computer", "x": 0.26, "z": 0.52, "y": 190, "scale": 0.75 }
+      ]
+    },
+    {
+      "say": "He types, then leans back and sighs.",
+      "bg": "office", "framing": "medium", "camera": "drift",
+      "actors": [{ "id": "worker", "action": "sitOn", "on": "chair", "expression": "bored", "facing": "right" }],
+      "props": [
+        { "type": "chair", "x": 0.6, "z": 0.4 },
+        { "type": "desk", "x": 0.34, "z": 0.52, "scale": 1.0 },
+        { "type": "computer", "x": 0.26, "z": 0.52, "y": 190, "scale": 0.75 }
+      ],
+      "beats": [
+        { "at": "types", "pose": "type" },
+        { "at": "sighs", "expression": "sad" }
+      ]
+    },
+    {
+      "say": "He is not sleeping, and he is not dreaming.",
+      "bg": "office",       "framing": "medium", "camera": "static",
+      "actors": [{ "id": "worker", "action": "sitOn", "on": "chair", "expression": "sleepy", "facing": "right" }],
+      "props": [
+        { "type": "chair", "x": 0.6, "z": 0.4 },
+        { "type": "desk", "x": 0.34, "z": 0.52, "scale": 1.0 }
+      ],
+      "beats": [{ "at": "not", "expression": "sleepy" }],
+      "transition": "cut"
+    },
+    {
+      "say": "Later, he stands and walks to the window.",
+      "bg": "office", "framing": "full", "camera": "panRight",
+      "actors": [{ "id": "worker", "pose": "walk", "x": 0.5, "z": 0.45, "moveTo": 0.8, "expression": "sad", "facing": "right" }],
+      "props": [{ "type": "desk", "x": 0.34, "z": 0.52, "scale": 1.0 }, { "type": "chair", "x": 0.6, "z": 0.4 }],
+      "beats": [{ "at": "stands", "pose": "stand" }],
+      "transition": "dissolve"
+    }
+  ]
+}

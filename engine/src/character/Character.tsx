@@ -4,16 +4,11 @@ import type { Character as CharDef } from "../schema";
 import { Face, type Expression } from "./faces";
 import { HairShape, HatShape, Star } from "./headwear";
 import { POSE_DEFS, lerpPose, type ArmT, type LegT, type Pose, type PoseDef } from "./poses";
+import { BUILD } from "../scene/layout";
+
+export { BUILD };
 
 type Vec = [number, number];
-
-export const BUILD = {
-  normal: { bw: 106, bh: 148, leg: 100, head: 1, scale: 1 },
-  big: { bw: 150, bh: 160, leg: 92, head: 1.05, scale: 1.06 },
-  skinny: { bw: 80, bh: 150, leg: 112, head: 0.95, scale: 1 },
-  kid: { bw: 96, bh: 118, leg: 78, head: 1.12, scale: 0.74 },
-  tall: { bw: 100, bh: 170, leg: 140, head: 1, scale: 1.05 },
-} as const;
 
 export type CharacterProps = {
   ch: CharDef;
@@ -245,7 +240,7 @@ export const Character: React.FC<CharacterProps> = (p) => {
   return (
     <g transform={lieRot ? `translate(0 -60) rotate(${lieRot})` : undefined}>
       {/* contact shadow */}
-      <ellipse cx={lieRot ? -60 : 0} cy={lieRot ? -170 : 0} rx={lieRot ? 14 : b.bw * 0.75} ry={lieRot ? 190 : 14} fill="rgba(0,0,0,0.22)" />
+      <ellipse cx={lieRot ? -150 : 0} cy={lieRot ? 10 : 0} rx={lieRot ? 200 : b.bw * 0.75} ry={lieRot ? 16 : 14} fill="rgba(0,0,0,0.22)" />
       <g transform={`scale(${mirror} 1)`}>
         <g transform={`rotate(${tilt} 0 ${yB})`}>
           <g transform={`translate(0 ${headY}) rotate(${pd.headTilt}) scale(${b.head * pop})`}>

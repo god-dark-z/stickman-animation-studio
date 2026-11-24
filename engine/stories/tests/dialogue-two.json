@@ -1,0 +1,46 @@
+{
+  "title": "Dialogue Test Two Characters",
+  "music": "tense",
+  "cast": {
+    "maya": { "color": "#2fa84f", "outfit": "hoodie", "hair": "bob", "hairColor": "#1a1a1a", "build": "normal" },
+    "theo": { "color": "#c0281f", "outfit": "suit", "hair": "parted", "hairColor": "#3a2418", "build": "tall" }
+  },
+  "shots": [
+    {
+      "say": "Maya finds the letter on the door.",
+      "bg": "street", "framing": "medium", "camera": "pushIn",
+      "actors": [{ "id": "maya", "pose": "holdUp", "holding": "letter", "x": 0.38, "z": 0.5, "expression": "surprised", "facing": "right" }],
+      "props": [{ "type": "door", "x": 0.75, "z": 0.25, "scale": 0.9 }]
+    },
+    {
+      "say": "Theo reads it and laughs.",
+      "bg": "street", "framing": "full", "camera": "pushIn",
+      "actors": [
+        { "id": "maya", "pose": "hold", "holding": "letter", "x": 0.32, "z": 0.5, "expression": "worried", "facing": "right" },
+        { "id": "theo", "pose": "talk", "x": 0.72, "z": 0.45, "expression": "laugh", "facing": "left" }
+      ],
+      "props": [{ "type": "door", "x": 0.05, "z": 0.25, "scale": 0.9 }],
+      "transition": "cut"
+    },
+    {
+      "say": "“You cannot be serious,” Theo says.",
+      "bg": "street", "framing": "medium", "camera": "pushIn", "quote": "theo",
+      "actors": [
+        { "id": "maya", "pose": "crossed", "x": 0.3, "z": 0.5, "expression": "angry", "facing": "right" },
+        { "id": "theo", "pose": "talk", "x": 0.7, "z": 0.45, "expression": "smug", "facing": "left" }
+      ],
+      "beats": [{ "at": "serious", "actor": "theo", "expression": "grin" }],
+      "transition": "cut"
+    },
+    {
+      "say": "Maya points at the door and smiles.",
+      "bg": "street", "framing": "close", "camera": "pushIn",
+      "actors": [
+        { "id": "maya", "pose": "point", "x": 0.45, "z": 0.5, "expression": "happy", "facing": "right" },
+        { "id": "theo", "pose": "shrug", "x": 0.8, "z": 0.4, "expression": "surprised", "facing": "left" }
+      ],
+      "props": [{ "type": "door", "x": 0.95, "z": 0.25, "scale": 0.9 }],
+      "transition": "dissolve"
+    }
+  ]
+}

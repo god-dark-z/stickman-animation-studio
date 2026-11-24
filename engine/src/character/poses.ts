@@ -34,9 +34,12 @@ export const POSE_DEFS: Record<Pose, PoseDef> = {
   hold: { l: { out: -18, dy: 58, bend: 34 }, r: { out: -18, dy: 58, bend: 34 }, ...legs, tilt: 0, drop: 0, headTilt: 0 },
   holdUp: { l: hang, r: { out: 34, dy: -98, bend: 12 }, ...legs, tilt: -3, drop: 0, headTilt: -6 },
   facepalm: { l: hang, r: { out: 0, dy: 0, bend: -40, at: "face" }, ...legs, tilt: 4, drop: 0, headTilt: 10 },
+  // drop must stay 0: the hip joint sits at leg height, and scene/layout.ts anchors that
+  // hip onto the seat surface. Lowering the body here is what used to sink a seated
+  // character 58px into the chair.
   sit: {
-    l: { out: 8, dy: 76, bend: 18 }, r: { out: 8, dy: 76, bend: 18 },
-    ll: { out: 26, lift: 0, bend: 30 }, rl: { out: 26, lift: 0, bend: 30 }, tilt: 0, drop: 58, headTilt: 0,
+    l: { out: 6, dy: 78, bend: 20 }, r: { out: 6, dy: 78, bend: 20 },
+    ll: { out: 46, lift: 0, bend: 46 }, rl: { out: 46, lift: 0, bend: 46 }, tilt: -3, drop: 0, headTilt: 0,
   },
   walk: { l: hang, r: hang, ...legs, tilt: 3, drop: 0, headTilt: 0 },
   run: { l: { out: 20, dy: 60, bend: -40 }, r: { out: 20, dy: 60, bend: -40 }, ...legs, tilt: 12, drop: 0, headTilt: 0 },

@@ -160,8 +160,11 @@
     {
       "say": "The sleeping modem burns extra power too, holding a connection that keeps failing.",
       "bg": "bedroom", "time": "night", "framing": "full", "camera": "drift",
-      "actors": [{ "id": "sam", "x": 0.3, "z": 0.4, "pose": "lie", "expression": "sleepy" }],
-      "props": [{ "type": "phone", "x": 0.68, "z": 0.5, "y": 230, "glow": true }],
+      "actors": [{ "id": "sam", "action": "sleepOn", "on": "bed", "expression": "sleepy", "underBlanket": true }],
+      "props": [
+        { "type": "bed", "x": 0.25, "z": 0.12 },
+        { "type": "phone", "x": 0.68, "z": 0.5, "y": 230, "glow": true }
+      ],
       "fx": ["zzz"]
     },
     {
@@ -169,7 +172,10 @@
       "bg": "stage", "framing": "close", "camera": "pushIn",
       "actors": [{ "id": "sam", "x": 0.5, "z": 0.5, "pose": "holdUp", "expression": "wink", "holding": "phone" }],
       "fx": ["spotlight"],
-      "beats": [{ "at": "screams", "fx": "exclaim", "zoom": 1.12 }]
+      "beats": [
+        { "at": "So", "pose": "stand" },
+        { "at": "screams", "pose": "holdUp", "fx": "exclaim", "zoom": 1.12 }
+      ]
     }
   ]
 }

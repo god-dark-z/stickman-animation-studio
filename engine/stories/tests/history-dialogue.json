@@ -1,0 +1,37 @@
+{
+  "title": "History Test Two Named Characters",
+  "music": "sad",
+  "cast": {
+    "general": { "color": "#7a2a2a", "outfit": "samurai", "hair": "old", "hairColor": "#d8d2c8", "build": "tall", "mustache": true },
+    "scout": { "color": "#2a3a2a", "outfit": "overalls", "hair": "messy", "hairColor": "#2a1a10", "build": "skinny", "hat": "straw" }
+  },
+  "shots": [
+    {
+      "say": "In the spring, two armies waited on the plains.",
+      "bg": "field", "time": "dawn", "framing": "wide", "camera": "panRight",
+      "actors": [
+        { "id": "general", "pose": "crossed", "x": 0.68, "z": 0.45, "expression": "determined", "facing": "left" },
+        { "id": "scout", "pose": "stand", "x": 0.28, "z": 0.45, "expression": "worried", "facing": "right" }
+      ]
+    },
+    {
+      "say": "“They have no horses,” the scout said.",
+      "bg": "field", "time": "dawn", "framing": "medium", "camera": "pushIn", "quote": "scout",
+      "actors": [
+        { "id": "general", "pose": "crossed", "x": 0.7, "z": 0.45, "expression": "suspicious", "facing": "left" },
+        { "id": "scout", "pose": "talk", "x": 0.3, "z": 0.45, "expression": "scared", "facing": "right" }
+      ],
+      "props": [{ "type": "horse", "x": 0.88, "z": 0.2, "scale": 0.6 }],
+      "transition": "cut"
+    },
+    {
+      "say": "At dawn, the general points at the river.",
+      "bg": "field", "time": "dawn", "framing": "close", "camera": "pushIn",
+      "actors": [
+        { "id": "general", "pose": "point", "x": 0.6, "z": 0.5, "expression": "furious", "facing": "right" }
+      ],
+      "beats": [{ "at": "points", "fx": "exclaim" }],
+      "transition": "dissolve"
+    }
+  ]
+}

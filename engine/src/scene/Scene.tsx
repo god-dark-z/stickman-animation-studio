@@ -1,191 +1,31 @@
 import React from "react";
 import { AbsoluteFill, Img, staticFile } from "remotion";
 import { H, W, clamp, ease, easeOut, easeOutBack, hashStr, lerp, rand } from "../theme";
-import type { Character as CharDef, ResolvedShot, PropSpec, Actor } from "../schema";
+import type { Character as CharDef, ResolvedShot, PropSpec } from "../schema";
 import { Character } from "../character/Character";
-import type { Pose } from "../character/poses";
-import type { Expression } from "../character/faces";
 import { drawProp, HELD, type PropType } from "./props/Props";
 import { buildEnv, type Env, type Light } from "./backgrounds/environments";
 import { X0, X1, Y0, Y1 } from "./backgrounds/parts";
 import { Fx } from "../fx/Fx";
 import { InsertGraphic } from "../fx/Insert";
+import {
+  CHAR_H,
+  DOF,
+  anchorWorld,
+  cameraFor,
+  layerTransform,
+  propWorld,
+  resolveActors,
+  stageOf,
+  type ActorState,
+} from "./layout";
 
-const CHAR_H = 362;
-const TRANS = 7; // dissolve overlap frames (kept in sync with Video.tsx)
-
-// ---------------------------------------------------------------- floor mapping
-export const stageOf = (env: Pick<Env, "horizon">) => {
-  const hz = Math.min(env.horizon, 1250);
-  return {
-    y: (z: number) => hz + 40 + z * 620,
-    s: (z: number) => 0.75 + z * 1.0,
-  };
-};
+// Kept re-exported so the 3D scene and dev tools keep their old import paths.
+export { cameraFor, resolveActors, stageOf, CHAR_H } from "./layout";
 
 type Placed = { kind: "actor"; z: number; node: React.ReactNode } | { kind: "prop"; z: number; node: React.ReactNode };
 
-type ActorState = {
-  a: Actor;
-  pose: Pose; prevPose?: Pose; poseAge: number;
-  expression: Expression; exprAge: number;
-  x: number; y: number; s: number; opacity: number; walking: number; facing: "left" | "right" | "front";
-  yOff: number; sMul: number; // the entrance animation on its own, for scenes that place actors themselves
-};
-
-const FRAMING = {
-  wide: { z: 1, k: 0.5 },
-  full: { z: 1.45, k: 0.52 },
-  medium: { z: 2.0, k: 0.64 },
-  close: { z: 2.9, k: 0.84 },
-  extreme: { z: 4.2, k: 0.87 },
-} as const;
-
-const DOF = { wide: [0, 0, 0], full: [1, 0.5, 0], medium: [4, 2.5, 1.2], close: [7, 5, 3], extreme: [9, 7, 4.5] } as const;
-
-export const resolveActors = (shot: ResolvedShot, env: Pick<Env, "horizon">, frame: number, durFrames: number): ActorState[] => {
-  const st = stageOf(env);
-  const p = clamp(frame / Math.max(1, durFrames));
-  return shot.actors.map((a, idx) => {
-    let pose: Pose = a.pose, prevPose: Pose | undefined, poseAge = 999;
-    let expression: Expression = a.expression, exprAge = 999;
-    for (const b of shot.beatsResolved) {
-      const target = b.actor ?? shot.actors[0]?.id;
-      if (target !== a.id || b.frame > frame) continue;
-      if (b.pose && b.pose !== pose) { prevPose = pose; pose = b.pose; poseAge = frame - b.frame; }
-      if (b.expression && b.expression !== expression) { expression = b.expression; exprAge = frame - b.frame; }
-    }
-    // horizontal motion
-    let x = a.x;
-    let walking = 0;
-    let facing = a.facing;
-    const enterF = 16, exitF = 16;
-    if (a.moveTo !== undefined) {
-      x = lerp(a.x, a.moveTo, ease(p));
-      walking = Math.abs(a.moveTo - a.x) > 0.02 && p < 0.98 ? 1 : 0;
-      if (walking) facing = a.moveTo > a.x ? "right" : "left";
-    }
-    let opacity = 1;
-    let yOff = 0;
-    let sMul = 1;
-    if (a.enter === "left" || a.enter === "right") {
-      const q = clamp(frame / enterF);
-      const from = a.enter === "left" ? -0.35 : 1.35;
-      x = lerp(from, x, easeOut(q));
-      if (q < 1) { walking = 1.4; facing = a.enter === "left" ? "right" : "left"; }
-    } else if (a.enter === "pop") sMul = easeOutBack(clamp(frame / 10));
-    else if (a.enter === "drop") {
-      const q = clamp(frame / 12);
-      yOff = -(1 - q * q) * 900;
-      if (q >= 1) sMul = 1 + 0.08 * Math.sin(clamp((frame - 12) / 8) * Math.PI) * -1;
-    } else if (a.enter === "fade") opacity = clamp(frame / 10);
-    const exitStart = durFrames - exitF;
-    if (a.exit !== "none" && frame > exitStart) {
-      const q = clamp((frame - exitStart) / exitF);
-      if (a.exit === "fade") opacity *= 1 - q;
-      else {
-        x = lerp(x, a.exit === "left" ? -0.4 : 1.4, q * q);
-        walking = 1.6;
-        facing = a.exit;
-      }
-    }
-    if (a.pose === "walk" || a.pose === "run") walking = Math.max(walking, a.pose === "run" ? 1.8 : 1);
-    const s = st.s(a.z) * a.scale * Math.max(0.01, sMul);
-    return {
-      a, pose: walking && pose === "stand" ? "walk" : pose, prevPose, poseAge, expression, exprAge,
-      x: x * W, y: st.y(a.z) + yOff, s, opacity, walking, facing, yOff, sMul: Math.max(0.01, sMul),
-      _i: idx,
-    } as ActorState;
-  });
-};
-
-const propBox = (p: Partial<PropSpec>, env: Env) => {
-  const st = stageOf(env);
-  const z = p.z ?? 0.45;
-  const s = st.s(z) * (p.scale ?? 1);
-  return { x: (p.x ?? 0.5) * W, y: st.y(z) - (p.y ?? 0) * st.s(z), s, z };
-};
-
-export const cameraFor = (shot: ResolvedShot, env: Env, actors: ActorState[], frame: number, durFrames: number) => {
-  const fr = FRAMING[shot.framing];
-  let fx = W / 2, fy = H / 2;
-  const focusId = shot.focus ?? (shot.actors[0]?.id ?? (shot.props.length ? "prop:0" : undefined));
-  if (focusId?.startsWith("prop:")) {
-    const pr = shot.props[parseInt(focusId.slice(5), 10) || 0];
-    if (pr) {
-      const b = propBox(pr, env);
-      fx = b.x; fy = b.y - 130 * b.s;
-    }
-  } else if (focusId) {
-    const a = actors.find((x) => x.a.id === focusId) ?? actors[0];
-    if (a) {
-      // frame the actor at its starting place (not following every step)
-      const st = stageOf(env);
-      fx = a.a.moveTo !== undefined ? lerp(a.a.x, a.a.moveTo, 0.5) * W : a.a.x * W;
-      fy = st.y(a.a.z) - CHAR_H * a.s * fr.k;
-      // wider framings keep the whole group in frame: drift toward the actors' centroid
-      if (actors.length > 1 && (shot.framing === "wide" || shot.framing === "full" || shot.framing === "medium")) {
-        const cxs = actors.map((o) => (o.a.moveTo !== undefined ? lerp(o.a.x, o.a.moveTo, 0.5) : o.a.x) * W);
-        const mid = (Math.min(...cxs) + Math.max(...cxs)) / 2;
-        fx = lerp(fx, mid, shot.framing === "medium" ? 0.45 : 0.85);
-      }
-    }
-  }
-  let zoom = fr.z;
-  if (shot.framing === "wide") { fx = lerp(W / 2, fx, 0.35); fy = lerp(H / 2, fy, 0.25); }
-  // vertical: keep the subject a bit above center (captions live in the lower third)
-  fy += 120 / zoom;
-
-  const p = ease(clamp(frame / Math.max(1, durFrames + TRANS)));
-  const seed = hashStr(shot.say);
-  let dx = 0, dy = 0, dz = 1;
-  switch (shot.camera) {
-    case "pushIn": dz = 1 + 0.12 * p; break;
-    case "pullOut": dz = 1.14 - 0.14 * p; break;
-    case "panLeft": dx = 140 * (0.5 - p) * 2 / zoom; dz = 1.04; break;
-    case "panRight": dx = -140 * (0.5 - p) * 2 / zoom; dz = 1.04; break;
-    case "panUp": dy = 200 * (0.5 - p) * 2 / zoom; dz = 1.04; break;
-    case "panDown": dy = -200 * (0.5 - p) * 2 / zoom; dz = 1.04; break;
-    case "drift": dx = Math.sin(frame / 40 + seed * 6) * 30 / zoom; dz = 1.03 + 0.04 * p; break;
-    case "crashZoom": dz = 1 + 0.55 * easeOut(clamp(frame / 8)); break;
-    case "orbit": dx = 260 * (0.5 - p) * 2 / zoom; dz = 1.06; break;
-    case "static": dz = 1.01; break;
-  }
-  // beat zoom punches
-  for (const b of shot.beatsResolved) {
-    if (b.zoom && frame >= b.frame) dz *= 1 + (b.zoom - 1) * easeOut(clamp((frame - b.frame) / 6));
-  }
-  zoom *= dz;
-  // handheld noise
-  const hx = Math.sin(frame / 23 + seed * 10) * 3 + Math.sin(frame / 11 + seed) * 1.5;
-  const hy = Math.cos(frame / 29 + seed * 7) * 3;
-  // shake
-  let sx = 0, sy = 0;
-  const shakeAt = [
-    ...(shot.fx.includes("shake") ? [0] : []),
-    ...shot.beatsResolved.filter((b) => b.fx === "shake" || b.fx === "explosion" || b.sfx === "boom" || b.sfx === "impact" || b.sfx === "crash").map((b) => b.frame),
-  ];
-  for (const f0 of shakeAt) {
-    const age = frame - f0;
-    if (age >= 0 && age < 14) {
-      const k = (1 - age / 14) * 22;
-      sx += (rand(frame * 1.7 + f0) - 0.5) * k;
-      sy += (rand(frame * 3.1 + f0) - 0.5) * k;
-    }
-  }
-  let cx = fx + dx, cy = fy + dy;
-  const hw = W / 2 / zoom, hh = H / 2 / zoom;
-  cx = clamp(cx, X0 + hw, X1 - hw);
-  cy = clamp(cy, Y0 + hh, Y1 - hh);
-  return { cx: cx + (hx + sx) / zoom, cy: cy + (hy + sy) / zoom, zoom };
-};
-
-const layerTransform = (cam: { cx: number; cy: number; zoom: number }, d: number) => {
-  const z = 1 + (cam.zoom - 1) * d;
-  const cx = W / 2 + (cam.cx - W / 2) * d;
-  const cy = H / 2 + (cam.cy - H / 2) * d;
-  return `translate(${W / 2} ${H / 2}) scale(${z}) translate(${-cx} ${-cy})`;
-};
+const propBox = (p: Partial<PropSpec>, env: Env) => propWorld(p, env);
 
 const Layer: React.FC<{ children: React.ReactNode; blur?: number; blend?: React.CSSProperties["mixBlendMode"]; opacity?: number }> = ({ children, blur = 0, blend, opacity }) => (
   <AbsoluteFill style={{ filter: blur > 0.2 ? `blur(${blur}px)` : undefined, mixBlendMode: blend, opacity }}>
@@ -251,11 +91,22 @@ export const Scene: React.FC<{ shot: ResolvedShot; cast: Record<string, CharDef>
   const actors = resolveActors(shot, E, frame, dur);
   const cam = cameraFor(shot, E, actors, frame, dur);
   const dof = DOF[shot.framing];
-  const st = stageOf(E);
+
+  // A shot prop replaces the background's decorative prop of the same type, so a
+  // character can sit on the chair they are drawn on instead of a second chair.
+  const setProps = E.set.filter(
+    (sp) =>
+      !shot.props.some(
+        (p) =>
+          p.type === sp.type &&
+          Math.abs((p.x ?? 0.5) - (sp.x ?? 0.5)) < 0.08 &&
+          Math.abs((p.z ?? 0.45) - (sp.z ?? 0.45)) < 0.08,
+      ),
+  );
 
   // ------------------------------------------------ world items
   const items: Placed[] = [];
-  const allProps: Partial<PropSpec>[] = [...E.set.map((p) => ({ ...p, _set: true })), ...shot.props];
+  const allProps: Partial<PropSpec>[] = [...setProps, ...shot.props];
   const extraLights: Light[] = [];
   allProps.forEach((p, pi) => {
     const count = p.count ?? 1;
@@ -304,9 +155,38 @@ export const Scene: React.FC<{ shot: ResolvedShot; cast: Record<string, CharDef>
         />
       </g>
     );
-    items.push({ kind: "actor", z: s.a.z + 0.001, node });
+    items.push({ kind: "actor", z: s.z, node });
   });
   items.sort((a, b) => a.z - b.z);
+
+  // A blanket drawn over a sleeping body: the character is still a full figure, but
+  // reads as "in bed" instead of "on top of the covers".
+  const blankets: React.ReactNode[] = [];
+  shot.actors.forEach((a) => {
+    if (!a.underBlanket || !a.on) return;
+    const idx = a.on.startsWith("prop:") ? Number.parseInt(a.on.slice(5), 10) : shot.props.findIndex((p) => p.type === a.on);
+    const prop = shot.props[idx];
+    if (!prop) return;
+    const mat = anchorWorld(prop, E, "mattress");
+    if (!mat) return;
+    const fig = actors.find((x) => x.a.id === a.id);
+    if (!fig) return;
+    blankets.push(
+      <g key={`blanket-${a.id}`}>
+        <path
+          d={`M ${mat.left} ${mat.top - 40 * mat.s} L ${mat.right} ${mat.top - 40 * mat.s} L ${mat.right + 6} ${mat.top + 96 * mat.s} L ${mat.left - 6} ${mat.top + 96 * mat.s} Z`}
+          fill={prop.color ?? "#4f78c9"}
+          stroke="#2a1c15"
+          strokeWidth={6}
+          strokeLinejoin="round"
+        />
+        <path d={`M ${mat.left + 10} ${mat.top + 2} L ${mat.right - 10} ${mat.top + 2}`} stroke="#ffffff" strokeWidth={6} opacity={0.35} strokeLinecap="round" />
+        {/* the blanket edge that the sleeper's head rests above */}
+        <path d={`M ${mat.left} ${mat.top - 40 * mat.s} L ${mat.right} ${mat.top - 40 * mat.s}`} stroke="#2a1c15" strokeWidth={5} strokeLinecap="round" />
+      </g>,
+    );
+  });
+
   // soft back-light behind the subject so characters pop off the background (like a rim/key light pass)
   {
     const fa = actors.find((a) => a.a.id === shot.focus) ?? actors[0];
@@ -342,7 +222,7 @@ export const Scene: React.FC<{ shot: ResolvedShot; cast: Record<string, CharDef>
         </g>
       </Layer>
       <Layer>
-        <g transform={T1}>{items.map((it) => it.node)}</g>
+        <g transform={T1}>{items.map((it) => it.node)}{blankets}</g>
       </Layer>
       {E.fore && <Layer blur={4}><g transform={layerTransform(cam, 1.35)}>{E.fore}</g></Layer>}
       <Layer blend="screen">
@@ -376,3 +256,4 @@ export const PostFX: React.FC<{ frame: number }> = ({ frame }) => (
     }} />
   </>
 );
+

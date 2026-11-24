@@ -1,0 +1,31 @@
+{
+  "title": "Drive Test Travel",
+  "music": "upbeat",
+  "cast": {
+    "sam": { "color": "#ff8a2a", "outfit": "hoodie", "hair": "messy", "hairColor": "#4a2c14" }
+  },
+  "shots": [
+    {
+      "say": "Sam drives across the city at night.",
+      "bg": "city", "time": "night", "framing": "medium", "camera": "panRight",
+      "actors": [{ "id": "sam", "action": "sitOn", "on": "car", "inside": true, "expression": "neutral", "facing": "right" }],
+      "props": [{ "type": "car", "x": 0.5, "z": 0.5 }]
+    },
+    {
+      "say": "The radio says the highway is shut.",
+      "bg": "city", "time": "night", "framing": "close", "camera": "pushIn",
+      "actors": [{ "id": "sam", "action": "sitOn", "on": "car", "inside": true, "expression": "worried", "facing": "right" }],
+      "props": [{ "type": "car", "x": 0.5, "z": 0.5 }],
+      "beats": [{ "at": "shut", "expression": "surprised" }],
+      "transition": "cut"
+    },
+    {
+      "say": "Later, he walks outside and looks at the empty road.",
+      "bg": "street", "time": "night", "framing": "full", "camera": "pullOut",
+      "actors": [{ "id": "sam", "pose": "walk", "x": 0.3, "z": 0.45, "moveTo": 0.6, "expression": "worried", "facing": "right" }],
+      "props": [{ "type": "car", "x": 0.15, "z": 0.3 }],
+      "beats": [{ "at": "Later", "pose": "stand" }],
+      "transition": "dissolve"
+    }
+  ]
+}

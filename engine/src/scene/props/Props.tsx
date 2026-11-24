@@ -163,14 +163,16 @@ export const drawProp = (type: PropType, o: PropOpts): React.ReactNode => {
         </g>
       );
     case "bed": {
+      // 440 wide so a lying stickman (head-to-toe 407 drawing units) fits between the
+      // boards with the head on the pillow — see scene/anchors.ts
       const k = c ?? "#4f78c9";
       return (
         <g>
-          <rect x={-200} y={-200} width={30} height={200} rx={6} {...s("#8a5a32")} />
-          <rect x={170} y={-140} width={30} height={140} rx={6} {...s("#8a5a32")} />
-          <rect x={-180} y={-110} width={360} height={70} rx={10} {...s("#f4f4f2")} />
-          <rect x={-60} y={-120} width={240} height={80} rx={14} {...s(k)} />
-          <ellipse cx={-120} cy={-118} rx={50} ry={22} {...s("#ffffff")} />
+          <rect x={-240} y={-200} width={30} height={200} rx={6} {...s("#8a5a32")} />
+          <rect x={210} y={-140} width={30} height={140} rx={6} {...s("#8a5a32")} />
+          <rect x={-220} y={-110} width={440} height={70} rx={10} {...s("#f4f4f2")} />
+          <rect x={-80} y={-120} width={300} height={80} rx={14} {...s(k)} />
+          <ellipse cx={-145} cy={-118} rx={50} ry={22} {...s("#ffffff")} />
         </g>
       );
     }

@@ -60,7 +60,16 @@ export const ActorSchema = z.object({
   id: z.string().describe("key in story.cast"),
   x: z.number().min(-0.5).max(1.5).default(0.5).describe("0=left edge, 1=right edge"),
   z: z.number().min(0).max(1).default(0.45).describe("0=far (back wall), 1=near camera"),
-  pose: z.enum(POSES).default("stand"),
+  pose: z.enum(POSES).default("stand").describe("low-level pose. Prefer `action` — the engine places the body on the prop for you"),
+  // Semantic action layer: say WHAT happens, the engine resolves WHERE the body goes,
+  // which anchor it touches and how it is layered. See references/05-storyboard-craft.md.
+  action: z
+    .enum(["none", "sitOn", "lieOn", "sleepOn", "standAt", "hold", "use", "face", "pointAt", "react", "handOver"])
+    .default("none")
+    .describe("high-level action resolved onto a prop's anchors; overrides pose/x/z where it applies"),
+  on: z.string().optional().describe("the prop this action uses: a prop type in this shot (\"chair\") or \"prop:1\""),
+  underBlanket: z.boolean().default(false).describe("sleeping: draw the bed's blanket over the body"),
+  inside: z.boolean().default(false).describe("driving/riding: draw the body behind the vehicle body so only the upper body shows"),
   expression: z.enum(EXPRESSIONS).default("neutral"),
   facing: z.enum(["left", "right", "front"]).default("front"),
   holding: z.enum(PROPS).optional().describe("prop drawn in the actor's hand"),

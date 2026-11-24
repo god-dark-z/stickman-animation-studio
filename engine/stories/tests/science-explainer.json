@@ -1,0 +1,37 @@
+{
+  "title": "Science Test Explain",
+  "music": "curious",
+  "cast": {
+    "host": { "color": "#3a8ad6", "outfit": "labcoat", "hair": "short", "hairColor": "#1a1a1a" }
+  },
+  "shots": [
+    {
+      "say": "Your phone gets hot because it is shouting.",
+      "bg": "stage", "framing": "close", "camera": "pushIn",
+      "actors": [{ "id": "host", "pose": "holdUp", "holding": "phone", "x": 0.5, "z": 0.5, "expression": "shocked" }],
+      "fx": ["glow"]
+    },
+    {
+      "say": "Near the tower, it whispers.",
+      "bg": "street", "framing": "medium", "camera": "pushIn",
+      "actors": [{ "id": "host", "pose": "phone", "x": 0.42, "z": 0.5, "expression": "happy" }],
+      "props": [{ "type": "tower", "x": 0.82, "z": 0.06, "scale": 1.4 }],
+      "transition": "dissolve"
+    },
+    {
+      "say": "In a dead zone, it screams.",
+      "bg": "desert", "framing": "medium", "camera": "crashZoom",
+      "actors": [{ "id": "host", "pose": "armsUp", "x": 0.5, "z": 0.5, "expression": "furious" }],
+      "fx": ["speedlines", "rage"],
+      "beats": [{ "at": "screams", "fx": "exclaim", "zoom": 1.2 }],
+      "transition": "flash"
+    },
+    {
+      "say": "The radio climbs to maximum power.",
+      "bg": "void", "wall": "#3d4d6e", "framing": "medium", "camera": "crashZoom",
+      "actors": [],
+      "insert": { "type": "bigtext", "title": "MAX POWER", "color": "#ff4a4a" },
+      "transition": "zoom"
+    }
+  ]
+}
