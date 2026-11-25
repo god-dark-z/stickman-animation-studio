@@ -11,5 +11,5 @@
     "resolveJsonModule": true,
     "lib": ["DOM", "ES2022"]
   },
-  "include": ["src", "scripts"]
+  "include": ["src", "scripts", "lang"]
 }

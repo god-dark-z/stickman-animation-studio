@@ -3,6 +3,7 @@
  *
  *   npm run studio -- <topic-or-story.json> [--tier draft|standard|studio]
  *                    [--no-tts] [--resume] [--force] [--from <stage>] [--engine <dir>]
+ *                    [--lang en|bn] [--voice auto|male|female|<voice-id>]
  *
  * Stages (in order):
  *   validate   schema + asset + cast checks (tsx scripts/validate.ts)
@@ -35,7 +36,7 @@ type Stage = (typeof STAGES)[number];
 const args = process.argv.slice(2);
 const flag = (f: string) => args.includes(f);
 const opt = (f: string, d?: string) => (args.includes(f) ? args[args.indexOf(f) + 1] : d);
-const storyArg = args.find((a, i) => !a.startsWith("--") && !["--tier", "--from", "--engine"].includes(args[i - 1] ?? ""));
+const storyArg = args.find((a, i) => !a.startsWith("--") && !["--tier", "--from", "--engine", "--lang", "--voice"].includes(args[i - 1] ?? ""));
 if (!storyArg) {
   console.error("usage: npm run studio -- <story.json|slug> [--tier draft|standard|studio] [--no-tts] [--resume] [--force] [--from <stage>]");
   process.exit(2);
@@ -45,6 +46,14 @@ if (!["draft", "standard", "studio"].includes(tier)) {
   console.error(`unknown tier "${tier}" — use draft | standard | studio`);
   process.exit(2);
 }
+
+// --lang / --voice are options of every stage, so they are forwarded verbatim to the child
+// commands that accept them (make.ts, and the gates that read story-derived data).
+const passthrough: string[] = [];
+const langArg = opt("--lang");
+const voiceArg = opt("--voice");
+if (langArg !== undefined) passthrough.push("--lang", langArg);
+if (voiceArg !== undefined) passthrough.push("--voice", voiceArg);
 
 const paths = resolvePaths({ engine: opt("--engine") });
 const storyPath = resolveStory(storyArg, paths);
@@ -84,17 +93,17 @@ const stageCmd = (stage: Stage): { cmd: string; args: string[]; skip?: string } 
   const preview = tier === "draft";
   switch (stage) {
     case "validate": return { cmd: "npx", args: ["tsx", "scripts/validate.ts", storyPath] };
-    case "narration": return hasTts ? { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--narration-only"] } : { cmd: "", args: [], skip: "--no-tts" };
-    case "timeline": return { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--timeline-only"] };
+    case "narration": return hasTts ? { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--narration-only", ...passthrough] } : { cmd: "", args: [], skip: "--no-tts" };
+    case "timeline": return { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--timeline-only", ...passthrough] };
     case "sync": return { cmd: "npx", args: ["tsx", "scripts/qa_sync.ts", storyPath] };
     case "geometry": return { cmd: "npx", args: ["tsx", "scripts/qa_geometry.ts", storyPath] };
     case "commonsense": return { cmd: "npx", args: ["tsx", "scripts/qa_commonsense.ts", storyPath] };
-    case "stills": return { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--stills", ...(hasTts ? [] : ["--no-tts"])] };
+    case "stills": return { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--stills", ...(hasTts ? [] : ["--no-tts"]), ...passthrough] };
     case "pixels": return { cmd: python, args: ["scripts/qa_stills.py", path.join(paths.out, slug, "stills")] };
     case "timing": return hasTts
       ? { cmd: python, args: ["scripts/qa_timing.py", path.join(outDir, "words.json"), path.join(paths.publicDir, "voice", `${slug}.mp3`)] }
       : { cmd: "", args: [], skip: "--no-tts: estimated timing" };
-    case "render": return { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, ...(preview ? ["--preview"] : []), ...(hasTts ? [] : ["--no-tts"]), "--crf", tier === "studio" ? "16" : preview ? "28" : "20"] };
+    case "render": return { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, ...(preview ? ["--preview"] : []), ...(hasTts ? [] : ["--no-tts"]), "--crf", tier === "studio" ? "16" : preview ? "28" : "20", ...passthrough] };
     case "video": return { cmd: python, args: ["scripts/qa_video.py", path.join(outDir, `${slug}${preview ? "-preview" : ""}.mp4`), ...(preview ? ["--preview"] : []), ...(hasTts ? [] : ["--silent"])] };
     case "audio": return hasTts
       ? { cmd: python, args: ["scripts/qa_audio.py", path.join(outDir, `${slug}${preview ? "-preview" : ""}.mp4`)] }

@@ -1,10 +1,13 @@
 // One command: story JSON -> narrated, captioned, sound-designed 1080x1920 MP4.
 //
 //   npm run make -- stories/my-story.json [--preview] [--stills] [--no-tts]
+//                  [--lang en|bn] [--voice auto|male|female|<voice-id>]
 //
 //   --preview  render at 50% resolution (fast check of timing and framing)
 //   --stills   only render one QA still per shot to out/<slug>/stills (no video)
 //   --no-tts   skip narration (estimated timings, silent voice) for offline work
+//   --lang     override the story's language (default: the story JSON's `lang`, else en)
+//   --voice    override the story's voice: auto (pack default), male, female, or an exact id
 import path from "node:path";
 import fs from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -16,6 +19,7 @@ import { PROPS, SFX } from "../src/catalog";
 import { loadLibrary } from "./location-lib";
 import { hashStr } from "../src/theme";
 import { resolvePaths } from "./paths";
+import { getPack, isLang, resolveVoice } from "../lang";
 
 const root = resolvePaths().engine;
 const args = process.argv.slice(2);
@@ -32,6 +36,23 @@ const python = process.platform === "win32" ? "python" : "python3";
 
 // ---------------------------------------------------------------- 1. validate
 const raw = JSON.parse(fs.readFileSync(storyPath, "utf8"));
+// --lang / --voice override what the story file says, before validation, so one story can be
+// produced in either language without editing it (the resolver already decided; this is the flag).
+const langFlag = opt("--lang");
+if (langFlag !== undefined) {
+  if (!isLang(langFlag)) {
+    console.error(`--lang "${langFlag}" is not enabled. Use: en, bn`);
+    process.exit(1);
+  }
+  raw.lang = langFlag;
+}
+const voiceFlag = opt("--voice");
+if (voiceFlag !== undefined) {
+  const storyLang = isLang(raw.lang) ? raw.lang : "en";
+  if (["auto", "male", "female"].includes(voiceFlag)) raw.voice = resolveVoice(storyLang, voiceFlag);
+  else raw.voice = voiceFlag; // explicit id — the pack catalog check below catches typos
+  delete raw.rate; // a new voice brings its own default rate
+}
 const parsed = StorySchema.safeParse(raw);
 if (!parsed.success) {
   console.error("\x1b[31mStory JSON is invalid:\x1b[0m");
@@ -39,6 +60,16 @@ if (!parsed.success) {
   process.exit(1);
 }
 const story = parsed.data;
+// The chosen voice must exist in the language pack's catalog for edge narration (a typo would
+// otherwise be discovered only after the network round-trip).
+if (story.provider === "edge") {
+  const pack = getPack(story.lang);
+  if (!pack.tts.voices.some((v) => v.id === story.voice)) {
+    console.error(`voice "${story.voice}" is not in the ${story.lang} catalog. Available:`);
+    for (const v of pack.tts.voices) console.error(`  • ${v.id} (${v.gender}, ${v.locale})`);
+    process.exit(1);
+  }
+}
 for (const [i, s] of story.shots.entries()) {
   for (const a of s.actors) if (!story.cast[a.id]) { console.error(`shot ${i}: actor "${a.id}" is not in cast`); process.exit(1); }
   if (s.quote && !story.cast[s.quote]) { console.error(`shot ${i}: quote "${s.quote}" is not in cast`); process.exit(1); }
@@ -87,9 +118,10 @@ if (!flag("--no-tts")) {
   const isKokoro = story.provider === "kokoro";
   const audioFile = path.join(voiceDir, `${slug}${isKokoro ? "-kokoro" : ""}.${isKokoro ? "wav" : "mp3"}`);
   const wj = path.join(outDir, "words.json");
-  // the same text, voice, rate and provider don't need synthesizing again, and keep their exact timing
+  // the same text, voice, rate, provider and language don't need synthesizing again, and keep
+  // their exact timing
   const keyFile = path.join(outDir, "narration.key");
-  const key = JSON.stringify([fs.readFileSync(textFile, "utf8"), story.voice, story.rate, story.provider]);
+  const key = JSON.stringify([fs.readFileSync(textFile, "utf8"), story.voice, story.rate, story.provider, story.lang]);
   const reusable = fs.existsSync(keyFile) && fs.readFileSync(keyFile, "utf8") === key && fs.existsSync(wj) && fs.existsSync(audioFile) && fs.statSync(audioFile).size > 0;
   if (reusable) log("narration: unchanged, reusing it");
   else if (isKokoro) {
@@ -98,9 +130,9 @@ if (!flag("--no-tts")) {
     execFileSync(python, [path.join(root, "scripts/tts_kokoro.py"), textFile, audioFile, wj, story.voice, story.rate], { stdio: "inherit" });
     fs.writeFileSync(keyFile, key);
   } else {
-    // edge-tts neural voice (default) — exact per-word boundaries
-    log(`narration: ${story.voice} @ ${story.rate}`);
-    execFileSync(python, [path.join(root, "scripts/tts.py"), textFile, audioFile, wj, story.voice, story.rate], { stdio: "inherit" });
+    // edge-tts neural voice (default) — exact per-word boundaries; --lang selects the normalizer
+    log(`narration: ${story.voice} @ ${story.rate} (${story.lang})`);
+    execFileSync(python, [path.join(root, "scripts/tts.py"), textFile, audioFile, wj, story.voice, story.rate, "+0Hz", "--lang", story.lang], { stdio: "inherit" });
     fs.writeFileSync(keyFile, key);
   }
   wordTimes = JSON.parse(fs.readFileSync(wj, "utf8"));

@@ -4,18 +4,19 @@ import {
   TIMES, TRANSITIONS,
 } from "./catalog";
 import type { LocationData, Objects } from "./location3d/schema";
+import { DEFAULT_LANG, getPack, LANGS, type LangId } from "../lang";
 
 const color = z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, "hex color like #f2b632");
 
 // ------------------------------------------------------------ narration routing
-// English-only production. edge-tts (free Microsoft neural voices, with per-word
-// timestamps that time every shot) is the default; Kokoro (local ONNX, English voices)
-// is the offline fallback. No other TTS backends are wired up on purpose: they were
-// evaluated and rejected for quality or reliability.
+// Two production languages, both built in: `en` (default, unchanged V3 behaviour) and `bn`.
+// edge-tts (free Microsoft neural voices, with per-word timestamps that time every shot) is
+// the default for both; Kokoro (local ONNX, English voices) stays the offline fallback.
+// Voice catalogs, default voice and default rate live in lang/<id>/pack.json — never here.
 export const NARRATION_PROVIDERS = ["edge", "kokoro"] as const;
 export type NarrationProvider = (typeof NARRATION_PROVIDERS)[number];
 export const PROVIDER_VOICES: Record<NarrationProvider, string> = {
-  edge: "en-US-AndrewMultilingualNeural",
+  edge: getPack("en").tts.defaultVoice,
   kokoro: "am_michael",
 };
 
@@ -130,7 +131,11 @@ export const InsertSchema = z.object({
 
 export const ShotSchema = z.object({
   say: z.union([z.string().min(1), z.literal("…")]).describe("narration spoken during this shot, or \"…\" for a fully silent shot"),
-  call: CallSchema.optional().describe("an on-screen call — flickering English text + whisper, never narrated"),
+  gloss: z
+    .string()
+    .optional()
+    .describe("English gloss of `say` — REQUIRED for Bangla stories; the scene spec, claims and relation checks run on it"),
+  call: CallSchema.optional().describe("an on-screen call — flickering text + whisper, never narrated"),
   bg: z.enum(BACKGROUNDS).default("void").describe("2D background; ignored when location is set"),
   location: z.string().optional().describe("a 3D location: the name of a file in locations/"),
   time: z.enum(TIMES).default("day"),
@@ -151,6 +156,7 @@ export const ShotSchema = z.object({
 
 export type ResolvedStory = {
   title: string;
+  lang: LangId;
   provider: NarrationProvider;
   voice: string;
   rate: string;
@@ -164,9 +170,12 @@ export type ResolvedStory = {
 export const StorySchema = z
   .object({
     title: z.string(),
+    lang: z.enum(LANGS as [LangId, ...LangId[]]).default(DEFAULT_LANG).describe(
+      "production language: en (default) or bn. Set by scripts/resolve_language.ts from the user's request",
+    ),
     provider: z.enum(NARRATION_PROVIDERS).optional().describe("tts backend; default edge (edge-tts). kokoro = offline fallback"),
-    voice: z.string().optional(),
-    rate: z.string().default("+22%"),
+    voice: z.string().optional().describe("explicit edge-tts voice id; default = the language pack's default voice"),
+    rate: z.string().optional().describe("edge-tts rate like +22%; default per provider (kokoro: speed multiplier)"),
     music: z.enum(MUSIC).default("curious"),
     mix: z.object({
       music: z.number().min(0).max(1).default(0.14).describe("music bed level"),
@@ -191,9 +200,14 @@ export const StorySchema = z
   })
   .transform((s): ResolvedStory => {
     const provider: NarrationProvider = s.provider ?? "edge";
+    const lang: LangId = s.lang ?? DEFAULT_LANG;
+    const pack = getPack(lang);
+    // The default voice and rate follow the language pack; explicit values always win.
+    const defaultVoice = provider === "kokoro" ? PROVIDER_VOICES.kokoro : pack.tts.defaultVoice;
+    const defaultRate = pack.tts.voices.find((v) => v.id === pack.tts.defaultVoice)?.rate ?? "+22%";
     // Kokoro takes a speed multiplier, not a percentage; edge takes a percentage.
-    const rate = provider === "kokoro" && s.rate === "+22%" ? "0.82" : s.rate;
-    return { ...s, provider, rate, voice: s.voice ?? PROVIDER_VOICES[provider] };
+    const rate = provider === "kokoro" && (s.rate ?? defaultRate) === "+22%" ? "0.82" : s.rate ?? defaultRate;
+    return { ...s, lang, provider, rate, voice: s.voice ?? defaultVoice };
   });
 
 export type Story = ResolvedStory;
@@ -202,6 +216,7 @@ export type Story = ResolvedStory;
 // spell the input type out from the object definition.
 const STORY_INPUT_KEYS = z.object({
   title: z.string(),
+  lang: z.enum(LANGS as [LangId, ...LangId[]]).optional(),
   provider: z.enum(NARRATION_PROVIDERS).optional(),
   voice: z.string().optional(),
   rate: z.string().optional(),

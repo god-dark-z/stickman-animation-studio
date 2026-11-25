@@ -1,0 +1,53 @@
+{
+  "id": "en",
+  "displayName": "English",
+  "nativeName": "English",
+  "tts": {
+    "provider": "edge",
+    "defaultVoice": "en-US-AndrewMultilingualNeural",
+    "fallback": ["en-US-GuyNeural", "en-US-ChristopherNeural", "en-US-JennyNeural"],
+    "voices": [
+      { "id": "en-US-AndrewMultilingualNeural", "gender": "male", "locale": "en-US", "tone": ["punchy", "storytelling", "default"], "rate": "+22%", "pitch": "+0Hz" },
+      { "id": "en-US-ChristopherNeural", "gender": "male", "locale": "en-US", "tone": ["calm", "documentary", "authority"], "rate": "+8%", "pitch": "-2Hz" },
+      { "id": "en-US-GuyNeural", "gender": "male", "locale": "en-US", "tone": ["dramatic", "history", "weight"], "rate": "+8%", "pitch": "-3Hz" },
+      { "id": "en-US-AriaNeural", "gender": "female", "locale": "en-US", "tone": ["bright", "educational", "clear"], "rate": "+12%", "pitch": "+0Hz" },
+      { "id": "en-US-JennyNeural", "gender": "female", "locale": "en-US", "tone": ["warm", "family", "gentle"], "rate": "+10%", "pitch": "+0Hz" },
+      { "id": "en-US-AnaNeural", "gender": "female", "locale": "en-US", "tone": ["playful", "child"], "rate": "+10%", "pitch": "+0Hz" }
+    ]
+  },
+  "normalizer": { "id": "en-basic" },
+  "captions": {
+    "fontStack": ["Montserrat", "Inter", "system-ui", "sans-serif"],
+    "fontFamily": "Montserrat",
+    "fontSize": 82,
+    "lineHeight": 1.05,
+    "top": 1255,
+    "width": 980,
+    "highlight": "none",
+    "letterSpacing": -1,
+    "digits": "western"
+  },
+  "scriptCraft": "references/04-script-craft.md",
+  "voiceDirection": "references/10-english-voice-direction.md",
+  "intentGlossary": "engine/data/intent-glossary.json",
+  "requiresGloss": false,
+  "wordBudget": [
+    { "seconds": 45, "words": 150 },
+    { "seconds": 60, "words": 200 },
+    { "seconds": 75, "words": 250 }
+  ],
+  "rates": {
+    "wordsPerSecond": 3.9,
+    "charsPerSecond": 20.6,
+    "sentencePause": 0.22,
+    "clausePause": 0.1,
+    "measuredWith": "edge-tts en-US-AndrewMultilingualNeural @ +22%, 188-word demo narration (V4 Phase A baseline)"
+  },
+  "qa": {
+    "glyphCoverage": false,
+    "latinPolicy": "allow",
+    "timingMedianMs": 120,
+    "timingMaxMs": 300,
+    "voicePresenceThreshold": 38.5
+  }
+}

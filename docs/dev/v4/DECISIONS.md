@@ -17,7 +17,15 @@ Judgement calls made without asking, with the reason. Numbering continues V3's l
 
 ## Phase B
 
-_(to be filled as the phase proceeds)_
+| # | Decision | Why |
+|---|---|---|
+| V4-8 | Language packs are **JSON data** (`engine/lang/<id>/pack.json`) with a thin TS loader, not TS modules | The Python side (`resolve_language.py`, `tts.py`, `doctor`) must read the same voice catalog and budgets without a Node runtime. Data also means "add a language" really is a data task. |
+| V4-9 | Resolver is TypeScript with a **Python bridge that shells out to the TS CLI** | One implementation, two entry points. Re-implementing the heuristics in Python would guarantee divergence over time; the bridge costs one process spawn per decision. |
+| V4-10 | A directive verb written in Bangla script ("…বলো / …বানাও / …করো") counts as an explicit Bangla request | If the user is instructing the agent in Bangla and telling it to say/make the video, the language intent is unambiguous. Treating it as "topic only" would produce an English video for a Bangla-speaker's request. |
+| V4-11 | `"script"` removed from the production-noun trigger list | "The origin of the Bangla script" is a topic about the writing system; including the word caused a false positive in the first test run. Explicit request words remain (narration/voice/voiceover/audio/video/captions/version). |
+| V4-12 | The narration cache key includes `lang` | A story switched from en→bn must never reuse the English MP3 and its word timings — a silent, near-invisible class of bug. |
+| V4-13 | `--voice male\|female` maps to the **first voice of that gender in the default locale**, falling back to any locale | Deterministic and documented; Bangla's default locale is BD, so a male narrator is Pradeep (BD) before Bashkar (IN). Explicit ids always pass through unchanged. |
+| V4-14 | `tts.py` keeps one entry point for both languages; `--lang` selects the normalizer | Duplicating the whole edge-tts path for Bangla would double the surface for regressions. The English path is the same code as V3 (normalize returns the text unchanged). |
 
 ## Phase C
 

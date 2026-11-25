@@ -4,8 +4,8 @@
  *   npm test      -> tsx scripts/test.ts
  *
  * Covers the pure units the pipeline depends on: tokenizer robustness, story-schema
- * narration defaults (English-only), timeline word alignment + beat resolution,
- * caption chunking, and the silent-shot marker.
+ * narration defaults, timeline word alignment + beat resolution, caption chunking, the
+ * silent-shot marker, the commonsense units, the language packs, and the language resolver.
  */
 import assert from "node:assert/strict";
 import { StorySchema } from "../src/schema";
@@ -19,6 +19,8 @@ import { checkRequirement, matches } from "../src/commonsense/glossary";
 import { checkRelation } from "../src/commonsense/relations";
 import { SpecSchema, validateSpec } from "../src/commonsense/spec";
 import { seenOf } from "./qa_commonsense";
+import { allPacks, resolveVoice, secondsForWords, wordsForSeconds } from "../lang";
+import { runLanguageTests } from "./test_language";
 
 let passed = 0;
 const test = (name: string, fn: () => void) => {
@@ -364,6 +366,66 @@ test("a reasoned intent exemption is accepted by the schema and keeps its reason
   });
   assert.equal(s.intentExempt.length, 1);
   assert.match(s.intentExempt[0].reason, /metaphor/);
+});
+
+// ------------------------------------------------- language resolution + packs
+// The resolver suite lives in its own file (59 cases) so the skill's language trigger has a
+// single readable home; it runs here so `npm test` covers it.
+const langResult = runLanguageTests();
+passed += langResult.passed;
+if (langResult.failed) process.exitCode = 1;
+
+// English defaults are frozen: no V4 change may silently alter them.
+test("StorySchema without lang stays English with the English default voice and rate", () => {
+  const s = StorySchema.parse({ title: "t", cast: { m: { color: "#ffffff" } }, shots: [{ say: "Hello there." }] });
+  assert.equal(s.lang, "en");
+  assert.equal(s.voice, "en-US-AndrewMultilingualNeural");
+  assert.equal(s.rate, "+22%");
+});
+
+test("a Bangla story defaults to the Bangla pack voice, not the English one", () => {
+  const s = StorySchema.parse({ title: "t", lang: "bn", cast: { m: { color: "#ffffff" } }, shots: [{ say: "আজ বৃষ্টি পড়ছে।" }] });
+  assert.equal(s.lang, "bn");
+  assert.equal(s.voice, "bn-BD-NabanitaNeural");
+  assert.equal(s.rate, "+22%");
+});
+
+test("explicit voice beats the language pack default", () => {
+  const s = StorySchema.parse({ title: "t", lang: "bn", voice: "bn-BD-PradeepNeural", cast: { m: { color: "#ffffff" } }, shots: [{ say: "আজ বৃষ্টি পড়ছে।" }] });
+  assert.equal(s.voice, "bn-BD-PradeepNeural");
+});
+
+test("word budgets follow the measured pack rates, not English", () => {
+  // measured: en 3.9 w/s, bn 2.75 w/s — a 60 s Bangla video takes fewer words
+  const en = wordsForSeconds("en", 60);
+  const bn = wordsForSeconds("bn", 60);
+  assert.ok(bn < en, `bn ${bn} should be below en ${en}`);
+  assert.ok(Math.abs(bn - 165) <= 2, `bn 60s budget ${bn} should be near the measured 165`);
+});
+
+test("secondsForWords uses the pack's measured rate", () => {
+  assert.ok(Math.abs(secondsForWords("bn", 165) - 60) < 1.5, `165 bn words ≈ 60 s, got ${secondsForWords("bn", 165)}`);
+});
+
+test("resolveVoice maps gender to a real catalog voice in the default locale first", () => {
+  assert.equal(resolveVoice("bn", "auto"), "bn-BD-NabanitaNeural");
+  assert.equal(resolveVoice("bn", "male"), "bn-BD-PradeepNeural");
+  assert.equal(resolveVoice("bn", "female"), "bn-BD-NabanitaNeural");
+  assert.equal(resolveVoice("en", "female"), "en-US-AriaNeural");
+  assert.equal(resolveVoice("en", "male"), "en-US-AndrewMultilingualNeural");
+});
+
+test("every voice in every pack has a gender, locale, rate and pitch", () => {
+  for (const pack of allPacks()) {
+    for (const v of pack.tts.voices) {
+      assert.ok(["male", "female"].includes(v.gender), `${pack.id} ${v.id} gender`);
+      assert.match(v.locale, /^[a-z]{2}-[A-Z]{2}$/, `${pack.id} ${v.id} locale`);
+      assert.match(v.rate, /^[+-]?\d+(\.\d+)?%?$/, `${pack.id} ${v.id} rate`);
+      assert.match(v.pitch, /^[+-]\d+Hz$/, `${pack.id} ${v.id} pitch`);
+    }
+    assert.ok(pack.tts.voices.some((v) => v.id === pack.tts.defaultVoice), `${pack.id} default voice is in its catalog`);
+    for (const f of pack.tts.fallback) assert.ok(pack.tts.voices.some((v) => v.id === f), `${pack.id} fallback ${f} is in its catalog`);
+  }
 });
 
 console.log(`\n${passed} passed${process.exitCode ? " (with failures)" : ""}`);

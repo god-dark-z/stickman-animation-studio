@@ -1,12 +1,14 @@
 ---
 name: stickman-animation-studio
 description: |
-  Produce a complete professional English-narrated stickman cartoon video from one prompt (a
-  topic, a title, "explain why X", or a TXT file with a video concept). Covers the full pipeline:
-  capability probing, research and fact-checking, English script and voice direction, a
-  narration-to-visual synchronized storyboard (validated by an executable sync gate), programmatic
-  2D/3D animation with the bundled Remotion engine, narration + captions + procedural music and
-  sound effects, stills QA, audio QA, final render and verification. Use whenever the user asks to
+  Produce a complete professional stickman cartoon video from one prompt (a topic, a title,
+  "explain why X", or a TXT file with a video concept), in English (default) or in Bangla / Bengali
+  (বাংলা) when the user asks for it ("in Bangla", "বাংলায় বানাও", "bangla te banao", "Bangla
+  narration / voice / voiceover"). Covers the full pipeline: capability probing, language
+  resolution, research and fact-checking, script and voice direction, a narration-to-visual
+  synchronized storyboard (validated by an executable sync gate), programmatic 2D/3D animation
+  with the bundled Remotion engine, narration + captions + procedural music and sound effects,
+  stills QA, audio QA, final render and verification. Use whenever the user asks to
   make/create/generate a video, short, cartoon, or animated explainer — especially with the
   /make-video command. Model- and agent-agnostic. No AI image generation, no AI video generation,
   no paid APIs: every frame and every sound is produced by code.
@@ -14,7 +16,7 @@ description: |
 
 # Stickman Animation Studio — /make-video
 
-Turn one prompt into a finished, studio-quality English vertical cartoon (1080×1920, 30 fps,
+Turn one prompt into a finished, studio-quality vertical cartoon (1080×1920, 30 fps,
 H.264 + AAC) using nothing but code. You write the story, storyboard it with an explicit
 narration-to-visual sync contract, run the bundled engine through its QA gates, and hand back the
 verified MP4 with its sources.
@@ -23,11 +25,40 @@ verified MP4 with its sources.
 If a step is blocked, treat it as a routing problem: try the next tool, the next asset, or build
 it yourself. Only stop when the video is rendered, verified, and delivered.
 
-**Production language is English — exclusively.** Narration, dialogue, on-screen text, captions,
-labels, and insert copy are all English. The narration must sound like professional documentary,
-educational, or animated storytelling (`references/10-english-voice-direction.md`).
+**Production language: English by default, Bangla on request.** Narration, dialogue, on-screen
+text, captions, labels, and insert copy are all in the video's single production language. Never
+mix languages inside one video. English direction: `references/10-english-voice-direction.md`;
+Bangla direction: `references/12-bangla-voice-and-script.md`.
 
-## 0. Probe your capabilities, then adapt
+## 0.1 Resolve the language before anything else
+
+Language is a **mechanical decision**, not a judgement call. Run the resolver on the user's exact
+words; it is unit-tested (59 cases) and knows English, Bangla script and Banglish phrasings,
+negations, and topic false positives.
+
+```bash
+npx tsx scripts/resolve_language.ts --text "<the user's exact request>" --json
+# → { lang: "en" | "bn", voice_pref: "auto"|"male"|"female"|<voice-id>, evidence: [...], note? }
+```
+
+Rules it enforces (do not re-implement them by hand):
+
+- `en` is the default. `bn` only on an explicit request.
+- `--lang en|bn` beats any wording; a negation ("not in Bangla", "English only", "ইংরেজিতে")
+  forces `en`.
+- A topic that merely mentions Bangla — "a story about Bangla literature", "the Bengal tiger",
+  "the language movement" — stays `en`.
+- If the topic itself is Bangla script with no language request, the resolver keeps `en` and adds
+  a `note`; print that one line in the final report.
+- If it returns a note or all of the request is Bangla script with a directive verb ("বাংলায়
+  বলো"), the `lang` decides everything downstream: voice, normalizer, fonts, captions, inserts.
+
+Then pass it through **flags, not edits**: `--lang <id>` `--voice auto|male|female|<voice-id>` on
+`studio.ts` / `make.ts`. The story JSON records it as `"lang": "bn"` so the run is reproducible.
+Voice choice (when `voice_pref` is `auto`) is Phase-D logic: `scripts/choose_voice.ts` scores the
+topic and writes `stories/<slug>/voice-decision.md` — never pick a voice silently.
+
+## 0.2 Probe your capabilities, then adapt
 
 Before producing, inspect what THIS agent/model can actually do, and adapt the workflow. Do not
 assume; check. One minute here saves a broken render later.
@@ -143,8 +174,9 @@ pip install edge-tts imageio-ffmpeg numpy scipy pillow   # narration + procedura
 
 The 65 SFX, 6 music beds and film grain are generated procedurally on first render (no downloads,
 no licenses, no third-party audio). Narration needs internet for edge-tts (free, no key);
-`--no-tts` works fully offline for staging work. English voices only — see
-`references/10-english-voice-direction.md` for the voice catalog and direction rules.
+`--no-tts` works fully offline for staging work. Voices come from the language pack
+(`engine/lang/en/pack.json`, `engine/lang/bn/pack.json`) — English direction in
+`references/10-english-voice-direction.md`, Bangla in `references/12-bangla-voice-and-script.md`.
 
 ## 1. Research the topic (English)
 
@@ -314,7 +346,8 @@ were checked).
 - **No repetition, no slop:** vary framings, transitions and reactions; ≤ 2 fx per shot; ≤ 1
   insert per 8–10 shots.
 - **No AI-generated images or video, no image-generation services, no paid APIs. Ever.**
-- **English only** — narration, dialogue, on-screen text, captions.
+- **One language per video** — English (default) or Bangla (on request): narration, dialogue,
+  on-screen text, captions, labels all follow the resolved `lang`.
 
 ## Deep reference material (read per stage, not all at once)
 

@@ -1,0 +1,55 @@
+{
+  "id": "bn",
+  "displayName": "Bangla",
+  "nativeName": "বাংলা",
+  "tts": {
+    "provider": "edge",
+    "defaultVoice": "bn-BD-NabanitaNeural",
+    "fallback": ["bn-BD-PradeepNeural", "bn-IN-TanishaaNeural", "bn-IN-BashkarNeural"],
+    "voices": [
+      { "id": "bn-BD-NabanitaNeural", "gender": "female", "locale": "bn-BD", "tone": ["warm", "storytelling", "default"], "rate": "+22%", "pitch": "+0Hz" },
+      { "id": "bn-BD-PradeepNeural", "gender": "male", "locale": "bn-BD", "tone": ["authority", "documentary", "calm"], "rate": "+22%", "pitch": "+0Hz" },
+      { "id": "bn-IN-TanishaaNeural", "gender": "female", "locale": "bn-IN", "tone": ["gentle", "educational", "stable"], "rate": "+22%", "pitch": "+0Hz" },
+      { "id": "bn-IN-BashkarNeural", "gender": "male", "locale": "bn-IN", "tone": ["dramatic", "history", "weight"], "rate": "+22%", "pitch": "+0Hz" }
+    ]
+  },
+  "normalizer": {
+    "id": "bn-full",
+    "pronunciation": "engine/lang/bn/pronunciation.json"
+  },
+  "captions": {
+    "fontStack": ["Noto Sans Bengali", "Hind Siliguri", "system-ui", "sans-serif"],
+    "fontFamily": "Noto Sans Bengali",
+    "fontSize": 74,
+    "lineHeight": 1.45,
+    "top": 1230,
+    "width": 960,
+    "highlight": "current-word",
+    "letterSpacing": 0,
+    "digits": "bengali"
+  },
+  "syncLexicon": "engine/lang/bn/sync-lexicon.json",
+  "scriptCraft": "references/12-bangla-voice-and-script.md",
+  "voiceDirection": "references/12-bangla-voice-and-script.md",
+  "intentGlossary": "engine/lang/bn/intent-glossary.json",
+  "requiresGloss": true,
+  "wordBudget": [
+    { "seconds": 45, "words": 120 },
+    { "seconds": 60, "words": 165 },
+    { "seconds": 75, "words": 205 }
+  ],
+  "rates": {
+    "wordsPerSecond": 2.75,
+    "charsPerSecond": 13.1,
+    "sentencePause": 0.34,
+    "clausePause": 0.14,
+    "measuredWith": "edge-tts bn-BD-NabanitaNeural / bn-BD-PradeepNeural @ +22%, 35-word 4-sentence sample, 2026-11-26 (BD 2.74-2.75 w/s, IN 2.42-2.45 w/s at the same rate)"
+  },
+  "qa": {
+    "glyphCoverage": true,
+    "latinPolicy": "warn",
+    "timingMedianMs": 120,
+    "timingMaxMs": 300,
+    "voicePresenceThreshold": 30.0
+  }
+}
