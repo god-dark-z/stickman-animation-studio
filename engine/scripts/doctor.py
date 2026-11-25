@@ -238,6 +238,71 @@ def webgl(quick: bool) -> None:
         record("webgl", "FAIL", f"{type(e).__name__}: {e}", "npx remotion browser ensure")
 
 
+def bangla_support() -> None:
+    """The Bangla engine must be usable out of the box: pack, normalizer, voices, 1-sentence synth."""
+    pack_path = os.path.join(ROOT, "lang", "bn", "pack.json")
+    try:
+        pack = json.load(open(pack_path, encoding="utf8"))
+        voices = [v["id"] for v in pack["tts"]["voices"]]
+        record("bangla pack", "PASS", f"{len(voices)} voices, default {pack['tts']['defaultVoice']}")
+    except Exception as e:  # noqa: BLE001 — a missing pack is a FAIL with a fix
+        record("bangla pack", "FAIL", f"cannot read lang/bn/pack.json ({type(e).__name__})",
+               "re-clone the repository: the pack ships with the engine")
+        return
+
+    try:
+        sys.path.insert(0, os.path.join(ROOT, "scripts"))
+        from bn_normalize import normalize_bangla
+        from gen_bn_pronunciation import OUT as PRON_PATH
+
+        out = normalize_bangla("১৯৯০ সালে ৪০% মানুষ ৳৫০০ দিয়েছিল।")
+        assert "শতাংশ" in out and "টাকা" in out, out
+        n = len(json.load(open(PRON_PATH, encoding="utf8"))["entries"])
+        if n >= 200:
+            record("bangla text", "PASS", f"normalizer ok, pronunciation dictionary {n} entries")
+        else:
+            record("bangla text", "WARN", f"pronunciation dictionary has only {n} entries (want >= 200)",
+                   "python scripts/gen_bn_pronunciation.py")
+    except Exception as e:  # noqa: BLE001
+        record("bangla text", "FAIL", f"normalizer failed: {type(e).__name__}: {e}",
+               "re-clone; scripts/bn_normalize.py and lang/bn/pronunciation.json ship with the engine")
+
+    try:
+        listed = subprocess.run([sys.executable, "-m", "edge_tts", "--list-voices"], capture_output=True, text=True).stdout
+        missing = [v for v in voices if v not in listed]
+        if missing:
+            record("bangla voices", "WARN", f"{len(voices) - len(missing)}/{len(voices)} listed; missing {', '.join(missing)}",
+                   "the voice may be temporarily gone; the engine falls back to another bn voice")
+        else:
+            record("bangla voices", "PASS", f"all {len(voices)} bn voices listed")
+    except Exception as e:  # noqa: BLE001
+        record("bangla voices", "WARN", f"could not list voices ({type(e).__name__})", "check the network")
+
+    try:
+        import asyncio
+        import edge_tts
+
+        async def probe():
+            n, audio = 0, 0
+            comm = edge_tts.Communicate("আজ বৃষ্টি।", pack["tts"]["defaultVoice"], boundary="WordBoundary")
+            async for chunk in comm.stream():
+                if chunk["type"] == "audio":
+                    audio += len(chunk["data"])
+                elif chunk["type"] == "WordBoundary":
+                    n += 1
+            return n, audio
+
+        n, audio = asyncio.run(probe())
+        if audio > 2000 and n >= 1:
+            record("bangla tts", "PASS", f"1-sentence synthesis: {n} word boundaries, {audio} bytes")
+        else:
+            record("bangla tts", "WARN", f"thin result ({n} boundaries, {audio} bytes) — retry before assuming it is broken",
+                   "python scripts/tts.py sample.txt out.mp3 words.json bn-BD-NabanitaNeural +22% +0Hz --lang bn")
+    except Exception as e:  # noqa: BLE001
+        record("bangla tts", "WARN", f"probe failed ({type(e).__name__}) — the engine retries and falls back",
+               "check the network; --no-tts still renders silent for staging")
+
+
 def main() -> int:
     quick = "--quick" in sys.argv
     as_json = "--json" in sys.argv
@@ -252,8 +317,10 @@ def main() -> int:
     online = internet()
     if online:
         edge_tts_boundaries()
+        bangla_support()
     else:
         record("edge-tts words", "SKIP", "offline")
+        record("bangla tts", "SKIP", "offline")
     chromium()
     webgl(quick or not online)
 

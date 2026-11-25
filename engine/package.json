@@ -25,7 +25,9 @@
     "qa": "npm run typecheck && npm test && npx tsx scripts/qa_sync.ts stories/why-phone-gets-hot.json && npx tsx scripts/qa_geometry.ts stories/why-phone-gets-hot.json && npx tsx scripts/qa_commonsense.ts stories/why-phone-gets-hot.json && npx tsx scripts/battery.ts",
     "qa:commonsense": "tsx scripts/qa_commonsense.ts",
     "qa:spec": "tsx scripts/spec_check.ts",
-    "battery": "tsx scripts/battery.ts"
+    "battery": "tsx scripts/battery.ts",
+    "test:py": "python scripts/test_all.py",
+    "test:all": "tsx scripts/test.ts && python scripts/test_all.py"
   },
   "dependencies": {
     "@react-three/fiber": "9.4.0",
