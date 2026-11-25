@@ -28,9 +28,13 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { StorySchema } from "../src/schema";
 import { resolvePaths, resolveStory, slugOf } from "./paths";
+import { getPack, isLang } from "../lang";
+import { chooseVoice, decisionMarkdown } from "./choose_voice";
 
 type Tier = "draft" | "standard" | "studio";
-const STAGES = ["validate", "narration", "timeline", "sync", "geometry", "commonsense", "stills", "pixels", "timing", "render", "video", "audio", "visual"] as const;
+// `bangla` is a no-op PASS for English stories, so it can sit in one fixed stage list: the
+// pipeline never branches, and a Bangla story cannot skip its text gate by accident.
+const STAGES = ["validate", "bangla", "narration", "timeline", "sync", "geometry", "commonsense", "stills", "pixels", "timing", "render", "video", "audio", "visual"] as const;
 type Stage = (typeof STAGES)[number];
 
 const args = process.argv.slice(2);
@@ -56,8 +60,7 @@ if (langArg !== undefined) passthrough.push("--lang", langArg);
 if (voiceArg !== undefined) passthrough.push("--voice", voiceArg);
 
 const paths = resolvePaths({ engine: opt("--engine") });
-const storyPath = resolveStory(storyArg, paths);
-const raw = JSON.parse(fs.readFileSync(storyPath, "utf8"));
+const storyPath = resolveStory(storyArg, paths);const raw = JSON.parse(fs.readFileSync(storyPath, "utf8"));
 const parsed = StorySchema.safeParse(raw);
 if (!parsed.success) {
   console.error(`\x1b[31mStory JSON is invalid\x1b[0m (${path.relative(process.cwd(), storyPath)}):`);
@@ -72,6 +75,21 @@ fs.mkdirSync(outDir, { recursive: true });
 fs.mkdirSync(stateDir, { recursive: true });
 const logPath = path.join(outDir, "run.log");
 const statePath = path.join(stateDir, ".state.json");
+
+// Voice decision file: written before narration so the choice is on record even when the run
+// fails later. Only when the story left the voice to the pipeline (no explicit voice in the JSON
+// and no --voice flag) — a user-chosen voice needs no justification.
+if (!story.voice || story.voice === getPack(story.lang).tts.defaultVoice) {
+  const explicit = Object.values(story.cast).some((c) => c.voice);
+  if (!explicit) {
+    try {
+      const choice = chooseVoice({ text: story.title, lang: story.lang, script: story.shots.map((s) => s.say).join(" ") });
+      fs.writeFileSync(path.join(stateDir, "voice-decision.md"), decisionMarkdown(story.title, story.lang, choice));
+    } catch {
+      // a missing decision file must never block a render; the gate list is what matters
+    }
+  }
+}
 
 type State = { slug: string; story: string; tier: Tier; stages: Record<string, { status: "ok" | "failed"; ms: number; at: string; cmd?: string }> };
 const state: State = fs.existsSync(statePath)
@@ -93,6 +111,13 @@ const stageCmd = (stage: Stage): { cmd: string; args: string[]; skip?: string } 
   const preview = tier === "draft";
   switch (stage) {
     case "validate": return { cmd: "npx", args: ["tsx", "scripts/validate.ts", storyPath] };
+    case "bangla": {
+      // effective language: the --lang flag wins, else the story's own lang
+      const effLang = langArg ?? (isLang(raw.lang) ? raw.lang : "en");
+      return effLang === "bn"
+        ? { cmd: python, args: ["scripts/qa_bangla.py", storyPath] }
+        : { cmd: "", args: [], skip: "English story: the Bangla text gate does not apply" };
+    }
     case "narration": return hasTts ? { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--narration-only", ...passthrough] } : { cmd: "", args: [], skip: "--no-tts" };
     case "timeline": return { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--timeline-only", ...passthrough] };
     case "sync": return { cmd: "npx", args: ["tsx", "scripts/qa_sync.ts", storyPath] };
@@ -130,8 +155,27 @@ const runStage = (stage: Stage): Promise<number> =>
     child.on("error", (e) => { console.error(e.message); resolve(1); });
   });
 
+const STAGE_DOCS: Record<Stage, string> = {
+  validate: "schema + asset + cast checks",
+  bangla: "Bangla text gate (single script, gloss present) — skipped for English",
+  narration: "TTS -> audio + word timings (skipped by --no-tts)",
+  timeline: "build the resolved timeline",
+  sync: "sync gate (qa_sync.ts)",
+  geometry: "scene-graph gate (qa_geometry.ts)",
+  commonsense: "Director's Brief + intent glossary (qa_commonsense.ts)",
+  stills: "one still per shot",
+  pixels: "stills pixel gate (qa_stills.py)",
+  timing: "narration timing audit (qa_timing.py)",
+  render: "the video",
+  video: "container/spec/dead-frame gate (qa_video.py)",
+  audio: "loudness/peak gate (qa_audio.py)",
+  visual: "per-shot claim checklist + review file (qa_visual_report.py)",
+};
+void STAGE_DOCS;
+
 const FIX: Record<Stage, string> = {
   validate: "fix the story JSON (the error names the field), then re-run",
+  bangla: "make the text one script: add Latin words to stories/<slug>/pronunciation.json, rewrite English lines in Bangla, and add a `gloss` to every spoken shot",
   narration: "check the network / voice name, or run with --no-tts",
   timeline: "fix the story (see the error above)",
   sync: "change the shot's world/time/pose/props, or rephrase the narration, until 0 errors",

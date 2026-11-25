@@ -21,6 +21,7 @@ import { SpecSchema, validateSpec } from "../src/commonsense/spec";
 import { seenOf } from "./qa_commonsense";
 import { allPacks, resolveVoice, secondsForWords, wordsForSeconds } from "../lang";
 import { runLanguageTests } from "./test_language";
+import { checkDistinctSpeakers, chooseVoice } from "./choose_voice";
 
 let passed = 0;
 const test = (name: string, fn: () => void) => {
@@ -426,6 +427,53 @@ test("every voice in every pack has a gender, locale, rate and pitch", () => {
     assert.ok(pack.tts.voices.some((v) => v.id === pack.tts.defaultVoice), `${pack.id} default voice is in its catalog`);
     for (const f of pack.tts.fallback) assert.ok(pack.tts.voices.some((v) => v.id === f), `${pack.id} fallback ${f} is in its catalog`);
   }
+});
+
+// ------------------------------------------------- voice choice + character voices
+// The 41-case table lives in test_voice_choice.ts; these assert the contract make.ts depends on.
+test("auto voice for a plain topic falls back to the pack default", () => {
+  const c = chooseVoice({ text: "a video about tides", lang: "en" });
+  assert.equal(c.source, "default");
+  assert.equal(c.voice, "en-US-AndrewMultilingualNeural");
+});
+
+test("auto voice follows a clear genre signal", () => {
+  assert.equal(chooseVoice({ text: "trench warfare in world war one", lang: "en" }).gender, "male");
+  assert.equal(chooseVoice({ text: "a gentle lullaby for a baby", lang: "en" }).gender, "female");
+  assert.equal(chooseVoice({ text: "মায়ের চিঠি ও স্মৃতি", lang: "bn" }).gender, "female");
+});
+
+test("a user preference always wins over the genre score", () => {
+  const c = chooseVoice({ text: "trench warfare", lang: "en", pref: "female" });
+  assert.equal(c.gender, "female");
+  assert.equal(c.source, "user");
+});
+
+test("two same-gender characters on the same voice and rate are rejected", () => {
+  const problems = checkDistinctSpeakers("bn", [
+    { id: "a", voice: "bn-BD-NabanitaNeural" },
+    { id: "b", voice: "bn-BD-NabanitaNeural" },
+  ], "+22%");
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /another voice|rate/);
+});
+
+test("two characters with different voices pass the distinctness check", () => {
+  assert.deepEqual(
+    checkDistinctSpeakers("bn", [
+      { id: "a", voice: "bn-BD-NabanitaNeural" },
+      { id: "b", voice: "bn-BD-PradeepNeural" },
+    ], "+22%"),
+    [],
+  );
+});
+
+test("a character voice must exist in the language pack", () => {
+  const s = StorySchema.parse({
+    title: "t", lang: "bn", cast: { c: { color: "#ffffff", voice: "bn-IN-BashkarNeural" } },
+    shots: [{ say: "আজ বৃষ্টি।" }],
+  });
+  assert.equal(s.cast.c.voice, "bn-IN-BashkarNeural");
 });
 
 console.log(`\n${passed} passed${process.exitCode ? " (with failures)" : ""}`);

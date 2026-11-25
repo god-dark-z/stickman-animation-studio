@@ -20,6 +20,7 @@ import { loadLibrary } from "./location-lib";
 import { hashStr } from "../src/theme";
 import { resolvePaths } from "./paths";
 import { getPack, isLang, resolveVoice } from "../lang";
+import { checkDistinctSpeakers } from "./choose_voice";
 
 const root = resolvePaths().engine;
 const args = process.argv.slice(2);
@@ -64,9 +65,29 @@ const story = parsed.data;
 // otherwise be discovered only after the network round-trip).
 if (story.provider === "edge") {
   const pack = getPack(story.lang);
+  for (const [id, c] of Object.entries(story.cast)) {
+    if (c.voice && !pack.tts.voices.some((v) => v.id === c.voice)) {
+      console.error(`cast.${id}.voice "${c.voice}" is not in the ${story.lang} catalog. Available:`);
+      for (const v of pack.tts.voices) console.error(`  • ${v.id} (${v.gender}, ${v.locale})`);
+      process.exit(1);
+    }
+  }
   if (!pack.tts.voices.some((v) => v.id === story.voice)) {
     console.error(`voice "${story.voice}" is not in the ${story.lang} catalog. Available:`);
     for (const v of pack.tts.voices) console.error(`  • ${v.id} (${v.gender}, ${v.locale})`);
+    process.exit(1);
+  }
+}
+
+// Two speakers must be audibly distinct: same voice at the same rate sounds like one person
+// talking to themselves. This is a validation error, not a style note.
+const speakers = [...new Set(story.shots.filter((s) => s.quote).map((s) => s.quote!))]
+  .map((id) => ({ id, voice: story.cast[id]?.voice, rate: story.cast[id]?.voiceRate, gender: undefined }));
+if (speakers.length > 1) {
+  const problems = checkDistinctSpeakers(story.lang, speakers, story.rate);
+  if (problems.length) {
+    console.error("\x1b[31mDialogue speakers are not distinct:\x1b[0m");
+    for (const p of problems) console.error(`  • ${p}`);
     process.exit(1);
   }
 }
@@ -118,16 +139,47 @@ if (!flag("--no-tts")) {
   const isKokoro = story.provider === "kokoro";
   const audioFile = path.join(voiceDir, `${slug}${isKokoro ? "-kokoro" : ""}.${isKokoro ? "wav" : "mp3"}`);
   const wj = path.join(outDir, "words.json");
+
+  // ---------------------------------------------------------- character voices
+  // A character with `voice`/`voiceRate` speaks its own lines. When any character overrides the
+  // narrator, the narration becomes a speaker plan: one run per shot, in order, each with its
+  // own voice and rate. With a single voice the plan collapses to the V3 single-request path.
+  const speakerOf = (shotIdx: number): { speaker: string; voice: string; rate: string; pitch: string } => {
+    const shot = story.shots[shotIdx];
+    const id = shot.quote ?? (shot.actors.length === 1 ? shot.actors[0].id : undefined);
+    const cast = id ? story.cast[id] : undefined;
+    return {
+      speaker: id ?? "narrator",
+      voice: cast?.voice ?? story.voice,
+      rate: cast?.voiceRate ?? story.rate,
+      pitch: cast?.voicePitch ?? "+0Hz",
+    };
+  };
+  const plan = story.shots.map((s, i) => ({ ...speakerOf(i), text: s.say === "…" ? "" : s.say.trim() }));
+  const distinctVoices = new Set(plan.filter((p) => p.text).map((p) => `${p.voice}|${p.rate}|${p.pitch}`));
+  const multiVoice = !isKokoro && distinctVoices.size > 1;
+
+  const keyPayload = multiVoice
+    ? [JSON.stringify(plan), story.provider, story.lang]
+    : [fs.readFileSync(textFile, "utf8"), story.voice, story.rate, story.provider, story.lang];
   // the same text, voice, rate, provider and language don't need synthesizing again, and keep
   // their exact timing
   const keyFile = path.join(outDir, "narration.key");
-  const key = JSON.stringify([fs.readFileSync(textFile, "utf8"), story.voice, story.rate, story.provider, story.lang]);
+  const key = JSON.stringify(keyPayload);
   const reusable = fs.existsSync(keyFile) && fs.readFileSync(keyFile, "utf8") === key && fs.existsSync(wj) && fs.existsSync(audioFile) && fs.statSync(audioFile).size > 0;
   if (reusable) log("narration: unchanged, reusing it");
   else if (isKokoro) {
     // local Kokoro ONNX TTS + faster-whisper for word timings (offline fallback)
     log(`narration: kokoro ${story.voice} @ ${story.rate}x`);
     execFileSync(python, [path.join(root, "scripts/tts_kokoro.py"), textFile, audioFile, wj, story.voice, story.rate], { stdio: "inherit" });
+    fs.writeFileSync(keyFile, key);
+  } else if (multiVoice) {
+    // several speakers: one run per shot with its own voice, joined on an exact byte clock
+    const planFile = path.join(outDir, "speakers.json");
+    fs.writeFileSync(planFile, JSON.stringify(plan, null, 1));
+    const speakers = [...new Set(plan.filter((p) => p.text).map((p) => p.speaker))];
+    log(`narration: ${distinctVoices.size} voices (${speakers.join(", ")}) — ${story.lang}`);
+    execFileSync(python, [path.join(root, "scripts/dialogue_tts.py"), planFile, audioFile, wj, "--lang", story.lang], { stdio: "inherit" });
     fs.writeFileSync(keyFile, key);
   } else {
     // edge-tts neural voice (default) — exact per-word boundaries; --lang selects the normalizer

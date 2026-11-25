@@ -147,13 +147,6 @@ def _clean(text: str) -> str:
     return text.strip()
 
 
-def _load_pronunciation() -> dict[str, str]:
-    try:
-        with open(PRON_PATH, encoding="utf8") as f:
-            data = json.load(f)
-        return {k: v for k, v in data.get("entries", {}).items() if k and v}
-    except FileNotFoundError:
-        return {}
 
 
 # units that should be read as words when attached to a number
@@ -253,6 +246,20 @@ def _number_phrases(text: str) -> str:
     return text
 
 
+def load_pronunciation(extra_paths: list[str] | None = None) -> dict[str, str]:
+    """Base dictionary plus any story-level extensions (later files win)."""
+    entries: dict[str, str] = {}
+    paths = [PRON_PATH] + (extra_paths or [])
+    for p in paths:
+        try:
+            with open(p, encoding="utf8") as f:
+                data = json.load(f)
+            entries.update({k: v for k, v in data.get("entries", {}).items() if k and v})
+        except FileNotFoundError:
+            continue
+    return entries
+
+
 def _apply_pronunciation(text: str, entries: dict[str, str]) -> str:
     """Longest-match dictionary substitution, safe for Bangla and Latin keys."""
     if not entries:
@@ -271,6 +278,23 @@ def _apply_pronunciation(text: str, entries: dict[str, str]) -> str:
     return pattern.sub(sub, text)
 
 
+LATIN_WORD = re.compile(r"[A-Za-z][A-Za-z'’\-]*")
+
+
+def latin_leftovers(text: str) -> list[str]:
+    """Latin-script words the dictionary did not respell — a Bangla video should not show them.
+
+    Returns the distinct words in order, so a caller can warn (or fail, per the pack's
+    latinPolicy) with the exact list instead of a generic message.
+    """
+    seen: list[str] = []
+    for m in LATIN_WORD.finditer(text):
+        w = m.group(0)
+        if w not in seen:
+            seen.append(w)
+    return seen
+
+
 def _fix_spacing(text: str) -> str:
     # Bangla danda / punctuation spacing: no space before, one after
     text = re.sub(r"\s+([।,!?;:])", r"\1", text)
@@ -279,10 +303,12 @@ def _fix_spacing(text: str) -> str:
     return text.strip()
 
 
-def normalize_bangla(text: str) -> str:
+def normalize_bangla(text: str, extra_pronunciation: list[str] | None = None) -> str:
+    """Full pipeline. `extra_pronunciation` is a list of story-level dictionary files merged on
+    top of the shipped one, so a single story can respell its own proper nouns."""
     text = _clean(text)
     text = _number_phrases(text)
-    text = _apply_pronunciation(text, _load_pronunciation())
+    text = _apply_pronunciation(text, load_pronunciation(extra_pronunciation))
     for a, b in _ABBREV.items():
         text = text.replace(a, b)
     text = _fix_spacing(text)

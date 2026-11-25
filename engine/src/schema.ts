@@ -51,6 +51,17 @@ export const CharacterSchema = z.object({
   hairOverFace: z.boolean().default(false).describe("long hair falls forward and covers the whole face"),
   backpack: z.boolean().default(false).describe("a school satchel worn on the back (see backpackColor)"),
   backpackColor: color.default("#b3202a"),
+  // ---------- character voice (dialogue) ----------
+  // The narrator uses the story's `voice`. A character with lines gets this voice instead, so a
+  // two-person conversation sounds like two people. Same-gender characters must differ in voice
+  // or rate (checked by scripts/choose_voice.ts::checkDistinctSpeakers).
+  voice: z.string().optional().describe("explicit edge-tts voice id for this character's spoken lines"),
+  voiceRate: z
+    .string()
+    .regex(/^[+-]\d{1,2}%$/, "rate like +6%")
+    .optional()
+    .describe("rate override for this character (within ±30% of normal to stay natural)"),
+  voicePitch: z.string().regex(/^[+-]\d{1,3}Hz$/, "pitch like +2Hz").optional().describe("pitch override for this character"),
 });
 
 const at = z.union([z.string(), z.number()]).describe(

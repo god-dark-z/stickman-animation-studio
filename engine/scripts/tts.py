@@ -57,14 +57,30 @@ def parse_args(argv):
     }
 
 
-def normalize(text, lang):
-    """Language hook. English passes through unchanged; Bangla gets the full normalizer."""
+def normalize(text, lang, story_dir=None):
+    """Language hook. English passes through unchanged; Bangla gets the full normalizer.
+
+    A story may ship `stories/<slug>/pronunciation.json` to respell its own proper nouns; it is
+    merged on top of the shipped dictionary.
+    """
     if lang == "bn":
         if HERE not in sys.path:
             sys.path.insert(0, HERE)
-        from bn_normalize import normalize_bangla
+        from bn_normalize import latin_leftovers, normalize_bangla
 
-        return normalize_bangla(text)
+        extras = []
+        if story_dir:
+            p = os.path.join(story_dir, "pronunciation.json")
+            if os.path.exists(p):
+                extras.append(p)
+        out = normalize_bangla(text, extras)
+        leftovers = latin_leftovers(out)
+        if leftovers:
+            # The pack's latinPolicy is "warn": say exactly which words, so the agent can add them
+            # to the story dictionary or rewrite the line.
+            print(f"tts: BANGLA LATIN LEFTOVER {len(leftovers)} word(s): {', '.join(leftovers[:12])}"
+                  + (" …" if len(leftovers) > 12 else ""))
+        return out
     return text
 
 
@@ -121,7 +137,14 @@ async def main():
     cfg = parse_args(sys.argv[1:])
     lang = cfg["lang"]
     raw_text = open(cfg["text_file"], encoding="utf8").read()
-    text = normalize(raw_text, lang)
+    # the story directory lives beside the words file: out/<slug>/words.json ← stories/<slug>/
+    story_dir = None
+    outdir = os.path.dirname(os.path.abspath(cfg["out_json"]))
+    cand = os.path.join(os.path.dirname(HERE), "stories")
+    slug = os.path.basename(outdir)
+    if os.path.isdir(os.path.join(cand, slug)):
+        story_dir = os.path.join(cand, slug)
+    text = normalize(raw_text, lang, story_dir)
 
     if cfg["estimate_only"]:
         if HERE not in sys.path:
