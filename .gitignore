@@ -12,3 +12,6 @@ engine/__pycache__/
 
 # per-machine orchestrator state
 engine/stories/*/.state.json
+
+# heavy generated media never belongs in git
+docs/dev/v4/golden-en/*.mp4

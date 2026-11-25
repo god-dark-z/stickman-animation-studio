@@ -1,7 +1,9 @@
 # Pinned production dependencies for the Python side of the pipeline.
 # Install with:  python -m pip install -r requirements.txt
 # Tested with Python 3.10.11 / 3.12.10 on Windows 11, macOS 14, Ubuntu 22.04.
-edge-tts==7.0.2
+# 7.2.1 is the minimum version whose Communicate() accepts boundary="WordBoundary"
+# (scripts/tts.py depends on it); 7.0.2/7.1.0 raise TypeError on a clean install.
+edge-tts==7.2.1
 imageio-ffmpeg==0.6.0
 numpy==2.2.6
 scipy==1.15.2
