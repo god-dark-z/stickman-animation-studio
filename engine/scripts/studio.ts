@@ -112,11 +112,12 @@ const stageCmd = (stage: Stage): { cmd: string; args: string[]; skip?: string } 
   switch (stage) {
     case "validate": return { cmd: "npx", args: ["tsx", "scripts/validate.ts", storyPath] };
     case "bangla": {
-      // effective language: the --lang flag wins, else the story's own lang
+      // effective language: the --lang flag wins, else the story's own lang.
+      // Two gates: the text is single-script and glossed, AND the Bangla claims match the gloss.
       const effLang = langArg ?? (isLang(raw.lang) ? raw.lang : "en");
-      return effLang === "bn"
-        ? { cmd: python, args: ["scripts/qa_bangla.py", storyPath] }
-        : { cmd: "", args: [], skip: "English story: the Bangla text gate does not apply" };
+      if (effLang !== "bn") return { cmd: "", args: [], skip: "English story: the Bangla text gate does not apply" };
+      // qa_bangla runs both checks in order (it shells to qa_gloss when the story is Bangla)
+      return { cmd: python, args: ["scripts/qa_bangla.py", storyPath, "--with-gloss"] };
     }
     case "narration": return hasTts ? { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--narration-only", ...passthrough] } : { cmd: "", args: [], skip: "--no-tts" };
     case "timeline": return { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--timeline-only", ...passthrough] };

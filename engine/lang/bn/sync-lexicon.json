@@ -1,0 +1,784 @@
+{
+ "version": 1,
+ "note": "Canonical claims for the Bangla meaning layer. Each id is one thing a sentence can assert about the world; `bn` lists the Bangla cues that assert it and `en` the English cues (the gloss uses English). qa_gloss.ts compares the claims found in `say` with the claims found in `gloss` — same ids, two languages.",
+ "claims": {
+  "rain": {
+   "bn": [
+    "বৃষ্টি",
+    "বৃষ্টিতে",
+    "বৃষ্টির",
+    "ভিজে",
+    "ছাতা"
+   ],
+   "en": [
+    "rain",
+    "rained",
+    "raining",
+    "wet",
+    "umbrella"
+   ]
+  },
+  "night": {
+   "bn": [
+    "রাতে",
+    "রাত",
+    "মাঝরাতে",
+    "রাতের"
+   ],
+   "en": [
+    "night",
+    "midnight",
+    "at night"
+   ]
+  },
+  "sunset": {
+   "bn": [
+    "সন্ধ্যা",
+    "সন্ধ্যায়",
+    "সূর্য ডুবে"
+   ],
+   "en": [
+    "sunset",
+    "dusk",
+    "evening"
+   ]
+  },
+  "dawn": {
+   "bn": [
+    "ভোর",
+    "ভোরে",
+    "সকাল"
+   ],
+   "en": [
+    "dawn",
+    "morning",
+    "sunrise"
+   ]
+  },
+  "storm": {
+   "bn": [
+    "ঝড়",
+    "তুফান",
+    "ঝড়ে"
+   ],
+   "en": [
+    "storm",
+    "gale",
+    "wind"
+   ]
+  },
+  "cold": {
+   "bn": [
+    "শীত",
+    "ঠান্ডা",
+    "শীতে"
+   ],
+   "en": [
+    "cold",
+    "winter",
+    "chilly"
+   ]
+  },
+  "sit": {
+   "bn": [
+    "বসে",
+    "বসল",
+    "বসেছিল",
+    "বসা"
+   ],
+   "en": [
+    "sits",
+    "sat",
+    "seated",
+    "sitting"
+   ]
+  },
+  "stand": {
+   "bn": [
+    "দাঁড়িয়ে",
+    "দাঁড়াল",
+    "দাঁড়ানো"
+   ],
+   "en": [
+    "stands",
+    "stood",
+    "standing"
+   ]
+  },
+  "lie": {
+   "bn": [
+    "শুয়ে",
+    "শুল",
+    "শোয়া"
+   ],
+   "en": [
+    "lies",
+    "lay",
+    "lying"
+   ]
+  },
+  "sleep": {
+   "bn": [
+    "ঘুমিয়ে",
+    "ঘুমাচ্ছে",
+    "ঘুমাল"
+   ],
+   "en": [
+    "asleep",
+    "sleeping",
+    "sleeps",
+    "slept"
+   ]
+  },
+  "walk": {
+   "bn": [
+    "হেঁটে",
+    "হাঁটতে",
+    "চলে গেল"
+   ],
+   "en": [
+    "walks",
+    "walked",
+    "walking"
+   ]
+  },
+  "run": {
+   "bn": [
+    "দৌড়ে",
+    "ছুটছে",
+    "ছুটল"
+   ],
+   "en": [
+    "runs",
+    "ran",
+    "running",
+    "sprinted"
+   ]
+  },
+  "fall": {
+   "bn": [
+    "পড়ে গেল",
+    "ধপাস",
+    "হোঁচট"
+   ],
+   "en": [
+    "fell",
+    "falls",
+    "tripped",
+    "collapsed"
+   ]
+  },
+  "cry": {
+   "bn": [
+    "কাঁদছে",
+    "কেঁদে",
+    "কান্না",
+    "চোখে পানি"
+   ],
+   "en": [
+    "cries",
+    "cried",
+    "crying",
+    "tears"
+   ]
+  },
+  "laugh": {
+   "bn": [
+    "হেসে",
+    "হাসছে",
+    "হাসল",
+    "হাসি"
+   ],
+   "en": [
+    "laughs",
+    "laughed",
+    "laughing",
+    "smiled"
+   ]
+  },
+  "shocked": {
+   "bn": [
+    "অবাক",
+    "চমকে",
+    "হতবাক",
+    "বিস্মিত"
+   ],
+   "en": [
+    "shocked",
+    "surprised",
+    "stunned",
+    "astonished"
+   ]
+  },
+  "angry": {
+   "bn": [
+    "রাগ",
+    "রেগে",
+    "ক্রুদ্ধ"
+   ],
+   "en": [
+    "angry",
+    "furious",
+    "raged"
+   ]
+  },
+  "afraid": {
+   "bn": [
+    "ভয়",
+    "ভীত",
+    "আতঙ্ক"
+   ],
+   "en": [
+    "afraid",
+    "scared",
+    "terrified",
+    "fear"
+   ]
+  },
+  "sad": {
+   "bn": [
+    "দুঃখ",
+    "মন খারাপ",
+    "দুঃখিত"
+   ],
+   "en": [
+    "sad",
+    "unhappy",
+    "sorrow"
+   ]
+  },
+  "happy": {
+   "bn": [
+    "খুশি",
+    "আনন্দ",
+    "আনন্দে"
+   ],
+   "en": [
+    "happy",
+    "glad",
+    "joyful",
+    "delighted"
+   ]
+  },
+  "tired": {
+   "bn": [
+    "ক্লান্ত",
+    "পরিশ্রান্ত",
+    "ক্লান্তি"
+   ],
+   "en": [
+    "tired",
+    "exhausted",
+    "weary"
+   ]
+  },
+  "hungry": {
+   "bn": [
+    "ক্ষুধা",
+    "খিদে"
+   ],
+   "en": [
+    "hungry",
+    "hunger",
+    "starving"
+   ]
+  },
+  "bed": {
+   "bn": [
+    "বিছানা",
+    "বিছানায়",
+    "বিছানার",
+    "খাট"
+   ],
+   "en": [
+    "bed",
+    "mattress",
+    "bedroom"
+   ]
+  },
+  "chair": {
+   "bn": [
+    "চেয়ার",
+    "চেয়ারে",
+    "চেয়ারটা"
+   ],
+   "en": [
+    "chair",
+    "seated on the chair"
+   ]
+  },
+  "desk": {
+   "bn": [
+    "ডেস্ক",
+    "টেবিল",
+    "টেবিলে"
+   ],
+   "en": [
+    "desk",
+    "table"
+   ]
+  },
+  "window": {
+   "bn": [
+    "জানালা",
+    "জানালার",
+    "জানালায়"
+   ],
+   "en": [
+    "window"
+   ]
+  },
+  "door": {
+   "bn": [
+    "দরজা",
+    "দরজায়",
+    "দরজার"
+   ],
+   "en": [
+    "door",
+    "doorway"
+   ]
+  },
+  "kitchen": {
+   "bn": [
+    "রান্নাঘর",
+    "রান্নাঘরে",
+    "চুলা"
+   ],
+   "en": [
+    "kitchen",
+    "stove",
+    "cooking"
+   ]
+  },
+  "street": {
+   "bn": [
+    "রাস্তা",
+    "রাস্তায়",
+    "পথে",
+    "ফুটপাত"
+   ],
+   "en": [
+    "street",
+    "road",
+    "pavement",
+    "sidewalk"
+   ]
+  },
+  "village": {
+   "bn": [
+    "গ্রাম",
+    "গ্রামে",
+    "গ্রামের"
+   ],
+   "en": [
+    "village",
+    "countryside"
+   ]
+  },
+  "school": {
+   "bn": [
+    "স্কুল",
+    "স্কুলে",
+    "ক্লাস",
+    "শ্রেণি"
+   ],
+   "en": [
+    "school",
+    "classroom",
+    "class"
+   ]
+  },
+  "market": {
+   "bn": [
+    "বাজার",
+    "বাজারে",
+    "দোকানপাট"
+   ],
+   "en": [
+    "market",
+    "bazaar",
+    "shop"
+   ]
+  },
+  "other-room": {
+   "bn": [
+    "অন্য ঘর",
+    "পাশের ঘর",
+    "ভেতরের ঘর",
+    "ওপরতলায়"
+   ],
+   "en": [
+    "other room",
+    "next room",
+    "another room",
+    "upstairs"
+   ]
+  },
+  "outside": {
+   "bn": [
+    "বাইরে",
+    "বাহিরে",
+    "বাইরের"
+   ],
+   "en": [
+    "outside",
+    "outdoors",
+    "out of the house"
+   ]
+  },
+  "cup": {
+   "bn": [
+    "কাপ",
+    "কাপে"
+   ],
+   "en": [
+    "cup",
+    "mug"
+   ]
+  },
+  "phone": {
+   "bn": [
+    "ফোন",
+    "মোবাইল",
+    "ফোনে"
+   ],
+   "en": [
+    "phone",
+    "mobile",
+    "smartphone"
+   ]
+  },
+  "letter": {
+   "bn": [
+    "চিঠি",
+    "চিঠির",
+    "চিঠিতে"
+   ],
+   "en": [
+    "letter",
+    "note",
+    "envelope"
+   ]
+  },
+  "book": {
+   "bn": [
+    "বই",
+    "বইটি",
+    "বইয়ের"
+   ],
+   "en": [
+    "book",
+    "novel",
+    "pages"
+   ]
+  },
+  "bag": {
+   "bn": [
+    "ব্যাগ",
+    "থলে"
+   ],
+   "en": [
+    "bag",
+    "backpack",
+    "satchel"
+   ]
+  },
+  "money": {
+   "bn": [
+    "টাকা",
+    "নোট",
+    "মুদ্রা"
+   ],
+   "en": [
+    "money",
+    "cash",
+    "banknote",
+    "coins",
+    "price"
+   ]
+  },
+  "clock": {
+   "bn": [
+    "ঘড়ি",
+    "সময়",
+    "মিনিট",
+    "ঘণ্টা"
+   ],
+   "en": [
+    "clock",
+    "watch",
+    "minutes",
+    "hours",
+    "time"
+   ]
+  },
+  "signal": {
+   "bn": [
+    "সিগন্যাল",
+    "নেটওয়ার্ক",
+    "তরঙ্গ",
+    "ফ্রিকোয়েন্সি"
+   ],
+   "en": [
+    "signal",
+    "network",
+    "waves",
+    "frequency"
+   ]
+  },
+  "heat": {
+   "bn": [
+    "গরম",
+    "তাপ",
+    "উত্তাপ",
+    "গরম হয়ে"
+   ],
+   "en": [
+    "hot",
+    "heat",
+    "warm",
+    "overheating"
+   ]
+  },
+  "cold-thing": {
+   "bn": [
+    "ঠান্ডা হয়ে",
+    "শীতল"
+   ],
+   "en": [
+    "cool",
+    "cold to the touch",
+    "chilled"
+   ]
+  },
+  "empty": {
+   "bn": [
+    "খালি",
+    "ফাঁকা",
+    "কেউ নেই"
+   ],
+   "en": [
+    "empty",
+    "nobody",
+    "no one",
+    "vacant"
+   ]
+  },
+  "two-people": {
+   "bn": [
+    "দুইজন",
+    "দুজন",
+    "দুই বন্ধু",
+    "দুই ভাই"
+   ],
+   "en": [
+    "two people",
+    "two friends",
+    "both of them",
+    "a pair"
+   ]
+  },
+  "crowd": {
+   "bn": [
+    "ভিড়",
+    "জনতা",
+    "অনেক মানুষ"
+   ],
+   "en": [
+    "crowd",
+    "many people",
+    "a crowd"
+   ]
+  },
+  "giant": {
+   "bn": [
+    "দৈত্য",
+    "দানব",
+    "বিশাল"
+   ],
+   "en": [
+    "giant",
+    "huge",
+    "enormous"
+   ]
+  },
+  "alone": {
+   "bn": [
+    "একা",
+    "নিঃসঙ্গ"
+   ],
+   "en": [
+    "alone",
+    "by himself",
+    "by herself",
+    "on his own"
+   ]
+  },
+  "talk": {
+   "bn": [
+    "বলল",
+    "বলে",
+    "কথা বল",
+    "জিজ্ঞেস"
+   ],
+   "en": [
+    "said",
+    "says",
+    "asked",
+    "spoke"
+   ]
+  },
+  "car": {
+   "bn": [
+    "গাড়ি",
+    "গাড়িতে",
+    "চালাচ্ছে"
+   ],
+   "en": [
+    "car",
+    "drove",
+    "driving",
+    "vehicle"
+   ]
+  },
+  "train": {
+   "bn": [
+    "ট্রেন",
+    "রেলগাড়ি"
+   ],
+   "en": [
+    "train",
+    "railway"
+   ]
+  },
+  "chart": {
+   "bn": [
+    "গ্রাফ",
+    "চার্ট",
+    "পরিসংখ্যান",
+    "তথ্য"
+   ],
+   "en": [
+    "chart",
+    "graph",
+    "data",
+    "statistics",
+    "numbers"
+   ]
+  },
+  "money-change": {
+   "bn": [
+    "দাম বাড়ল",
+    "ব্যয়",
+    "খরচ",
+    "সস্তা",
+    "দামি"
+   ],
+   "en": [
+    "expensive",
+    "cheaper",
+    "cost",
+    "spent",
+    "price rose"
+   ]
+  },
+  "discover": {
+   "bn": [
+    "আবিষ্কার",
+    "খুঁজে পেল",
+    "বুঝে গেল",
+    "শিখে গেল"
+   ],
+   "en": [
+    "discovered",
+    "found out",
+    "realized",
+    "learned",
+    "figured out"
+   ]
+  },
+  "open": {
+   "bn": [
+    "খুলল",
+    "খুলে",
+    "খোলা"
+   ],
+   "en": [
+    "opened",
+    "open"
+   ]
+  },
+  "closed": {
+   "bn": [
+    "বন্ধ করল",
+    "বন্ধ ছিল",
+    "বন্ধ হয়ে"
+   ],
+   "en": [
+    "closed",
+    "shut"
+   ]
+  },
+  "light-on": {
+   "bn": [
+    "লাইট জ্বালাল",
+    "বাতি জ্বলছে",
+    "জ্বালাল"
+   ],
+   "en": [
+    "turned on the light",
+    "lamp on",
+    "lights on"
+   ]
+  },
+  "light-off": {
+   "bn": [
+    "লাইট নিভাল",
+    "বাতি নেভানো",
+    "অন্ধকার"
+   ],
+   "en": [
+    "turned off the light",
+    "dark",
+    "lights off"
+   ]
+  },
+  "rain-stop": {
+   "bn": [
+    "বৃষ্টি থামল",
+    "বৃষ্টি নেই",
+    "রোদ উঠল"
+   ],
+   "en": [
+    "stopped raining",
+    "no rain",
+    "cleared up",
+    "sun came out"
+   ]
+  },
+  "first-time": {
+   "bn": [
+    "প্রথমবার",
+    "প্রথম"
+   ],
+   "en": [
+    "first time",
+    "for the first time",
+    "first"
+   ]
+  },
+  "years-later": {
+   "bn": [
+    "বছর পরে",
+    "অনেক বছর",
+    "দশ বছর"
+   ],
+   "en": [
+    "years later",
+    "a decade",
+    "many years"
+   ]
+  }
+ }
+}

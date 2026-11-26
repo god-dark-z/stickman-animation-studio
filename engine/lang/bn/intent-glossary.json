@@ -1,0 +1,2027 @@
+{
+ "version": 1,
+ "language": "bn",
+ "note": "Bangla commonsense intents. Same `requires` vocabulary and canonical visual requirements as data/intent-glossary.json, so qa_commonsense.ts checks both languages with one engine. Phrases include the idiomatic Bangla that is easy to misread.",
+ "entries": [
+  {
+   "id": "bn-posture-sits-chair",
+   "category": "posture",
+   "phrases": [
+    "চেয়ারে বসে আছে",
+    "চেয়ারে বসে",
+    "চেয়ারে বসেছিল",
+    "চেয়ারে বসল"
+   ],
+   "requires": {
+    "props": [
+     "chair"
+    ],
+    "actionAnyOf": [
+     "sitOn"
+    ],
+    "poseAnyOf": [
+     "sit"
+    ]
+   },
+   "good": "নিতম্ব চেয়ারের সিটে, পা মেঝেতে, শরীর চেয়ারের পিঠের সামনে",
+   "bad": "চেয়ারের পাশে মেঝেতে বসা শরীর, চেয়ারটা খালি"
+  },
+  {
+   "id": "bn-posture-sits-floor",
+   "category": "posture",
+   "phrases": [
+    "মেঝেতে বসে",
+    "মাটিতে বসে",
+    "মেঝেতে বসে আছে"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "sit"
+    ]
+   },
+   "good": "শরীর মেঝেতে, পিঠ সোজা, হাঁটু ভাঁজ",
+   "bad": "চেয়ারে বসা শরীর যখন বলা হয়েছে মেঝেতে"
+  },
+  {
+   "id": "bn-posture-stands-window",
+   "category": "posture",
+   "phrases": [
+    "জানালার পাশে দাঁড়িয়ে",
+    "জানালার ধারে দাঁড়িয়ে",
+    "জানালার কাছে দাঁড়িয়ে"
+   ],
+   "requires": {
+    "props": [
+     "window"
+    ],
+    "poseAnyOf": [
+     "stand"
+    ]
+   },
+   "good": "জানালা দৃশ্যে দেখা যাচ্ছে, শরীর জানালার দিকে মুখ করে",
+   "bad": "জানালা ছাড়া দেয়ালে দাঁড়িয়ে থাকা চরিত্র"
+  },
+  {
+   "id": "bn-posture-stands-door",
+   "category": "posture",
+   "phrases": [
+    "দরজায় দাঁড়িয়ে",
+    "দরজার সামনে দাঁড়িয়ে"
+   ],
+   "requires": {
+    "props": [
+     "door"
+    ],
+    "poseAnyOf": [
+     "stand"
+    ]
+   },
+   "good": "দরজা দৃশ্যে আছে, চরিত্র দরজার ফ্রেমে দাঁড়িয়ে",
+   "bad": "দরজা ছাড়া দেয়ালের সামনে দাঁড়ানো"
+  },
+  {
+   "id": "bn-posture-kneels",
+   "category": "posture",
+   "phrases": [
+    "হাঁটু গেড়ে বসে",
+    "হাঁটুতে ভর দিয়ে",
+    "হাঁটু গেড়েছে"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "kneel",
+     "crouch",
+     "sit"
+    ]
+   },
+   "good": "এক বা দুই হাঁটু মেঝেতে, শরীর নিচু",
+   "bad": "দাঁড়ানো শরীর যখন বলা হয়েছে হাঁটু গেড়ে"
+  },
+  {
+   "id": "bn-posture-lies-bed",
+   "category": "posture",
+   "phrases": [
+    "বিছানায় শুয়ে",
+    "বিছানায় শুয়ে আছে",
+    "বিছানায় শুল"
+   ],
+   "requires": {
+    "props": [
+     "bed"
+    ],
+    "actionAnyOf": [
+     "lieOn",
+     "sleepOn"
+    ],
+    "poseAnyOf": [
+     "lie"
+    ]
+   },
+   "good": "শরীর ম্যাট্রেসে আড়াআড়ি, মাথা বালিশে",
+   "bad": "মেঝেতে শোয়া শরীর, বিছানা শুধু সাজসজ্জা"
+  },
+  {
+   "id": "bn-posture-crouches",
+   "category": "posture",
+   "phrases": [
+    "কুঁকড়ে বসে",
+    "গুটিসুটি মেরে বসে"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "crouch",
+     "sit"
+    ]
+   },
+   "good": "শরীর ছোট হয়ে ভাঁজ করা, হাঁটু বুকের কাছে",
+   "bad": "সোজা দাঁড়িয়ে থাকা"
+  },
+  {
+   "id": "bn-posture-leans-wall",
+   "category": "posture",
+   "phrases": [
+    "দেয়ালে হেলান দিয়ে",
+    "দেয়ালে ভর দিয়ে"
+   ],
+   "requires": {
+    "props": [
+     "wall"
+    ],
+    "poseAnyOf": [
+     "stand"
+    ]
+   },
+   "good": "শরীর দেয়াল ঘেঁষে, এক কাঁধ দেয়ালে",
+   "bad": "ফাঁকা জায়গায় ঝুলে থাকা শরীর"
+  },
+  {
+   "id": "bn-location-other-room",
+   "category": "location",
+   "phrases": [
+    "অন্য ঘরে",
+    "পাশের ঘরে",
+    "ভেতরের ঘরে"
+   ],
+   "requires": {
+    "transitionAnyOf": [
+     "dissolve",
+     "fade",
+     "iris",
+     "whip",
+     "zoom",
+     "flash",
+     "slide",
+     "wipe"
+    ]
+   },
+   "good": "ভিন্ন ব্যাকগ্রাউন্ড, আর কাটটা দেখায় যে ঘর বদলেছে",
+   "bad": "একই ব্যাকগ্রাউন্ড আবার ব্যবহার করা"
+  },
+  {
+   "id": "bn-location-outside",
+   "category": "location",
+   "phrases": [
+    "বাইরে",
+    "বাইরে গেল",
+    "বাইরে বেরোল"
+   ],
+   "requires": {
+    "bgNotAnyOf": [
+     "room",
+     "bedroom",
+     "office",
+     "kitchen"
+    ]
+   },
+   "good": "বাইরের দৃশ্য: আকাশ, রাস্তা, মাঠ",
+   "bad": "ঘরের দেয়ালে দাঁড়ানো চরিত্র যখন বলা হয়েছে বাইরে"
+  },
+  {
+   "id": "bn-location-kitchen",
+   "category": "location",
+   "phrases": [
+    "রান্নাঘরে",
+    "রান্নাঘরে গেল"
+   ],
+   "requires": {
+    "propsAny": [
+     "stove",
+     "pot",
+     "pan",
+     "counter"
+    ]
+   },
+   "good": "রান্নাঘরের কাউন্টার, চুলা, হাঁড়ি দৃশ্যে",
+   "bad": "ফাঁকা ঘরে দাঁড়ানো চরিত্র"
+  },
+  {
+   "id": "bn-location-school",
+   "category": "location",
+   "phrases": [
+    "স্কুলে",
+    "ক্লাসে",
+    "শ্রেণিকক্ষে"
+   ],
+   "requires": {
+    "propsAny": [
+     "desk",
+     "chair",
+     "blackboard",
+     "board"
+    ]
+   },
+   "good": "ডেস্ক-চেয়ার বা বোর্ড, শ্রেণিকক্ষের সাজ",
+   "bad": "বাড়ির বসার ঘরে ক্লাসের দৃশ্য"
+  },
+  {
+   "id": "bn-location-market",
+   "category": "location",
+   "phrases": [
+    "বাজারে",
+    "বাজারে গেল"
+   ],
+   "requires": {
+    "bgAnyOf": [
+     "street",
+     "market",
+     "bazaar"
+    ]
+   },
+   "good": "বাজারের দৃশ্য: দোকান, পণ্য, ভিড়",
+   "bad": "ঘরের ভেতরে বাজারের কথা"
+  },
+  {
+   "id": "bn-location-street",
+   "category": "location",
+   "phrases": [
+    "রাস্তায়",
+    "রাস্তায় বেরোল",
+    "পথে"
+   ],
+   "requires": {
+    "bgAnyOf": [
+     "street",
+     "road",
+     "city"
+    ]
+   },
+   "good": "রাস্তা, ফুটপাত, যানবাহন",
+   "bad": "ঘরের ভেতরে দাঁড়িয়ে রাস্তার কথা"
+  },
+  {
+   "id": "bn-location-rooftop",
+   "category": "location",
+   "phrases": [
+    "ছাদে",
+    "ছাদে উঠল"
+   ],
+   "requires": {
+    "bgAnyOf": [
+     "rooftop",
+     "street",
+     "city"
+    ]
+   },
+   "good": "ছাদের দৃশ্য, আকাশ খোলা",
+   "bad": "ঘরের ভেতরে ছাদের কথা"
+  },
+  {
+   "id": "bn-location-village",
+   "category": "location",
+   "phrases": [
+    "গ্রামে",
+    "গ্রামের বাড়িতে"
+   ],
+   "requires": {
+    "bgAnyOf": [
+     "village",
+     "field",
+     "plains"
+    ]
+   },
+   "good": "গ্রামের দৃশ্য: মাটির ঘর, গাছ, মাঠ",
+   "bad": "শহরের উঁচু ভবনের মধ্যে গ্রামের গল্প"
+  },
+  {
+   "id": "bn-weather-raining",
+   "category": "time-weather",
+   "phrases": [
+    "বৃষ্টি পড়ছে",
+    "বৃষ্টি হচ্ছে",
+    "বৃষ্টি নামল",
+    "বৃষ্টি পড়ছিল"
+   ],
+   "requires": {
+    "fxAnyOf": [
+     "rain"
+    ]
+   },
+   "good": "বাইরে বৃষ্টি (fx), মেঝে ভেজা; ভেতরে হলে জানালায় বৃষ্টির ছাপ",
+   "bad": "ঘরের ভেতরে বৃষ্টি পড়ছে, বা বৃষ্টি ছাড়া ভেজা রাস্তা"
+  },
+  {
+   "id": "bn-weather-night",
+   "category": "time-weather",
+   "phrases": [
+    "রাতে",
+    "রাত হয়ে গেল",
+    "মাঝরাতে"
+   ],
+   "requires": {
+    "timeAnyOf": [
+     "night"
+    ]
+   },
+   "good": "রাতের গ্রেড, গাঢ় নীল-কালো, বাতির আলো",
+   "bad": "দিনের আলোয় রাতের দৃশ্য"
+  },
+  {
+   "id": "bn-weather-sunset",
+   "category": "time-weather",
+   "phrases": [
+    "সন্ধ্যায়",
+    "সন্ধ্যা হলে",
+    "সূর্য ডুবে গেল"
+   ],
+   "requires": {
+    "timeAnyOf": [
+     "sunset",
+     "dawn"
+    ]
+   },
+   "good": "কমলা-গোলাপি আকাশ, লম্বা ছায়া",
+   "bad": "দুপুরের কড়া আলোয় সন্ধ্যার দৃশ্য"
+  },
+  {
+   "id": "bn-weather-storm",
+   "category": "time-weather",
+   "phrases": [
+    "ঝড় উঠল",
+    "ঝড় বইছে",
+    "তুফান"
+   ],
+   "requires": {
+    "fxAnyOf": [
+     "rain",
+     "lightning",
+     "shake",
+     "debris"
+    ]
+   },
+   "good": "গাছ দুলছে, ধুলো, বৃষ্টি বা বিদ্যুৎ",
+   "bad": "শান্ত দৃশ্যে ঝড়ের কথা"
+  },
+  {
+   "id": "bn-weather-cold",
+   "category": "time-weather",
+   "phrases": [
+    "শীত",
+    "শীতে কাঁপছে",
+    "খুব ঠান্ডা"
+   ],
+   "requires": {
+    "fxAnyOf": [
+     "snow",
+     "shake",
+     "fog"
+    ]
+   },
+   "good": "কাঁপুনি, শ্বাসের ধোঁয়া, গরম কাপড়",
+   "bad": "গরমের দিনে শীতের দৃশ্য"
+  },
+  {
+   "id": "bn-time-morning",
+   "category": "time-weather",
+   "phrases": [
+    "সকালে",
+    "ভোরে",
+    "সকালবেলা"
+   ],
+   "requires": {
+    "timeAnyOf": [
+     "dawn",
+     "day"
+    ]
+   },
+   "good": "নরম সকালের আলো",
+   "bad": "রাতের গ্রেডে সকালের দৃশ্য"
+  },
+  {
+   "id": "bn-time-years-later",
+   "category": "time-weather",
+   "phrases": [
+    "বছর পরে",
+    "অনেক বছর পরে",
+    "দশ বছর পরে"
+   ],
+   "requires": {
+    "transitionAnyOf": [
+     "dissolve",
+     "fade",
+     "iris",
+     "flash",
+     "whip",
+     "wipe"
+    ]
+   },
+   "good": "সময় বদলের স্পষ্ট কাট বা টাইটেল",
+   "bad": "কোনো ইঙ্গিত ছাড়া হঠাৎ অন্য সময়"
+  },
+  {
+   "id": "bn-state-asleep",
+   "category": "state",
+   "phrases": [
+    "ঘুমিয়ে আছে",
+    "ঘুমাচ্ছে",
+    "ঘুমিয়ে পড়েছে"
+   ],
+   "requires": {
+    "props": [
+     "bed"
+    ],
+    "actionAnyOf": [
+     "sleepOn",
+     "lieOn"
+    ],
+    "poseAnyOf": [
+     "lie"
+    ]
+   },
+   "good": "বিছানায় শোয়া শরীর, চোখ বন্ধ, কম্বল",
+   "bad": "দাঁড়ানো চরিত্র, চোখ খোলা, বিছানা ছাড়া"
+  },
+  {
+   "id": "bn-state-awake",
+   "category": "state",
+   "phrases": [
+    "জেগে আছে",
+    "ঘুম ভেঙে গেল",
+    "জেগে উঠল"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "sit",
+     "stand",
+     "lie"
+    ],
+    "expressionAnyOf": [
+     "surprised",
+     "worried",
+     "neutral",
+     "shocked"
+    ]
+   },
+   "good": "চোখ খোলা, শরীর সচেতন",
+   "bad": "চোখ বন্ধ শোয়া শরীর"
+  },
+  {
+   "id": "bn-state-tired",
+   "category": "state",
+   "phrases": [
+    "ক্লান্ত",
+    "পরিশ্রান্ত",
+    "খুব ক্লান্ত"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "sleepy",
+     "sad",
+     "bored"
+    ]
+   },
+   "good": "ঝুলে পড়া কাঁধ, ভারী চোখ",
+   "bad": "প্রাণবন্ত হাসিমুখ"
+  },
+  {
+   "id": "bn-state-hungry",
+   "category": "state",
+   "phrases": [
+    "ক্ষুধার্ত",
+    "খিদে পেয়েছে",
+    "খিদায় কাতর"
+   ],
+   "requires": {
+    "propsAny": [
+     "plate",
+     "bowl",
+     "food",
+     "rice"
+    ],
+    "expressionAnyOf": [
+     "sad",
+     "worried",
+     "neutral"
+    ]
+   },
+   "good": "পেটে হাত, খাবারের দিকে তাকিয়ে",
+   "bad": "ভরা পেটে খুশি মুখ"
+  },
+  {
+   "id": "bn-state-happy",
+   "category": "state",
+   "phrases": [
+    "খুশি",
+    "আনন্দে",
+    "হাসছে"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "happy",
+     "laugh",
+     "grin",
+     "smug"
+    ]
+   },
+   "good": "হাসিমুখ, উঁচু ভুরু",
+   "bad": "নির্বিকারে দাঁড়ানো"
+  },
+  {
+   "id": "bn-state-sad",
+   "category": "state",
+   "phrases": [
+    "দুঃখিত",
+    "কান্না",
+    "মন খারাপ"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "sad",
+     "worried"
+    ]
+   },
+   "good": "নিচু চোখ, ঝুলে পড়া মুখ",
+   "bad": "হাসিমুখ"
+  },
+  {
+   "id": "bn-state-scared",
+   "category": "state",
+   "phrases": [
+    "ভয় পেয়েছে",
+    "ভীত",
+    "আতঙ্কিত"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "scared",
+     "shocked",
+     "surprised"
+    ]
+   },
+   "good": "বড় চোখ, পিছিয়ে যাওয়া",
+   "bad": "শান্ত হাসিমুখ"
+  },
+  {
+   "id": "bn-state-angry",
+   "category": "state",
+   "phrases": [
+    "রাগী",
+    "রেগে গেল",
+    "ক্রুদ্ধ"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "angry",
+     "furious"
+    ]
+   },
+   "good": "ভুরু কুঁচকে, থুতনি তোলা",
+   "bad": "হাসিমুখ"
+  },
+  {
+   "id": "bn-state-confused",
+   "category": "state",
+   "phrases": [
+    "বিভ্রান্ত",
+    "বুঝতে পারছে না",
+    "ঘাবড়ে গেছে"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "worried",
+     "surprised",
+     "suspicious"
+    ]
+   },
+   "good": "মাথা চুলকানো, ভুরু কুঁচকে",
+   "bad": "নিশ্চিত হাসিমুখ"
+  },
+  {
+   "id": "bn-motion-walks",
+   "category": "motion",
+   "phrases": [
+    "হেঁটে গেল",
+    "হাঁটতে লাগল",
+    "হেঁটে আসছে"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "walk",
+     "stand"
+    ],
+    "actionAnyOf": [
+     "none",
+     "face",
+     "pointAt"
+    ]
+   },
+   "good": "পা ফাঁক, শরীর এগোচ্ছে, দিক স্পষ্ট",
+   "bad": "এক জায়গায় স্থির দাঁড়ানো"
+  },
+  {
+   "id": "bn-motion-runs",
+   "category": "motion",
+   "phrases": [
+    "দৌড়ে গেল",
+    "ছুটছে",
+    "প্রাণপণে ছুটল"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "run",
+     "walk"
+    ],
+    "fxAnyOf": [
+     "speedlines"
+    ]
+   },
+   "good": "হেলে পড়া শরীর, লম্বা পা, স্পিড লাইন",
+   "bad": "শান্ত হাঁটা"
+  },
+  {
+   "id": "bn-motion-falls",
+   "category": "motion",
+   "phrases": [
+    "পড়ে গেল",
+    "হোঁচট খেল",
+    "ধপাস করে পড়ল"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "fall",
+     "lie"
+    ],
+    "fxAnyOf": [
+     "debris",
+     "smoke",
+     "dust",
+     "shake"
+    ]
+   },
+   "good": "শরীর মাটিতে, ধুলো, প্রভাবের লাইন",
+   "bad": "সোজা দাঁড়িয়ে থাকা"
+  },
+  {
+   "id": "bn-motion-jumps",
+   "category": "motion",
+   "phrases": [
+    "লাফ দিল",
+    "ঝাঁপ দিল",
+    "উঁচুতে লাফাল"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "jump",
+     "fall"
+    ]
+   },
+   "good": "দুই পা মাটি ছেড়ে, শরীর শূন্যে",
+   "bad": "মাটিতে দাঁড়ানো"
+  },
+  {
+   "id": "bn-motion-escapes",
+   "category": "motion",
+   "phrases": [
+    "পালিয়ে গেল",
+    "দৌড়ে পালাল"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "run",
+     "walk"
+    ],
+    "fxAnyOf": [
+     "speedlines",
+     "smoke"
+    ]
+   },
+   "good": "ঘুরে দাঁড়িয়ে ছুট, পেছনে ধুলো",
+   "bad": "শান্ত দাঁড়ানো"
+  },
+  {
+   "id": "bn-motion-arrives",
+   "category": "motion",
+   "phrases": [
+    "পৌঁছে গেল",
+    "এসে পৌঁছাল",
+    "হাজির হলো"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "stand",
+     "walk"
+    ]
+   },
+   "good": "নতুন জায়গায় পৌঁছানো শরীর, নতুন দৃশ্য",
+   "bad": "আগের শটের একই জায়গায় দাঁড়ানো"
+  },
+  {
+   "id": "bn-held-cup",
+   "category": "held",
+   "phrases": [
+    "কাপ হাতে",
+    "চায়ের কাপ ধরে",
+    "কাপ নিয়ে"
+   ],
+   "requires": {
+    "holding": "cup",
+    "props": [
+     "cup"
+    ]
+   },
+   "good": "কাপ হাতের তালুতে, হাত বুকের উচ্চতায়",
+   "bad": "হাতের পাশে ভাসমান কাপ"
+  },
+  {
+   "id": "bn-held-phone",
+   "category": "held",
+   "phrases": [
+    "ফোন হাতে",
+    "ফোন ধরে",
+    "হাতে ফোন"
+   ],
+   "requires": {
+    "holding": "phone",
+    "props": [
+     "phone"
+    ]
+   },
+   "good": "ফোন হাতের তালুতে, স্ক্রিন দৃশ্যমান",
+   "bad": "ফোন মেঝেতে বা হাত ছাড়া"
+  },
+  {
+   "id": "bn-held-letter",
+   "category": "held",
+   "phrases": [
+    "চিঠি হাতে",
+    "চিঠি পড়ছে",
+    "চিঠি হাতে নিয়ে"
+   ],
+   "requires": {
+    "holding": "letter",
+    "props": [
+     "letter"
+    ]
+   },
+   "good": "চিঠি দুই হাতে, চোখ কাগজে",
+   "bad": "হাতের পাশে ভাসমান কাগজ"
+  },
+  {
+   "id": "bn-held-bag",
+   "category": "held",
+   "phrases": [
+    "ব্যাগ হাতে",
+    "ব্যাগ কাঁধে"
+   ],
+   "requires": {
+    "holding": "bag",
+    "props": [
+     "bag"
+    ]
+   },
+   "good": "ব্যাগ হাত বা কাঁধে, শরীরে লাগানো",
+   "bad": "ব্যাগ মেঝেতে পড়ে"
+  },
+  {
+   "id": "bn-held-box",
+   "category": "held",
+   "phrases": [
+    "বাক্স হাতে",
+    "বাক্স বহন করছে"
+   ],
+   "requires": {
+    "holding": "box",
+    "props": [
+     "box"
+    ]
+   },
+   "good": "বাক্স দুই হাতে, শরীরের সামনে",
+   "bad": "হাতের পাশে ভাসমান বাক্স"
+  },
+  {
+   "id": "bn-held-book",
+   "category": "held",
+   "phrases": [
+    "বই হাতে",
+    "বই পড়ছে"
+   ],
+   "requires": {
+    "holding": "book",
+    "props": [
+     "book"
+    ]
+   },
+   "good": "বই খোলা হাতে, চোখ পাতায়",
+   "bad": "হাতের পাশে ভাসমান বই"
+  },
+  {
+   "id": "bn-held-key",
+   "category": "held",
+   "phrases": [
+    "চাবি হাতে",
+    "চাবি বের করল"
+   ],
+   "requires": {
+    "holding": "key",
+    "props": [
+     "key"
+    ]
+   },
+   "good": "চাবি আঙুলে, তালার দিকে",
+   "bad": "ভাসমান চাবি"
+  },
+  {
+   "id": "bn-use-cooking",
+   "category": "in-use",
+   "phrases": [
+    "রান্না করছে",
+    "রান্না করছিল",
+    "হাঁড়ি চুলায়"
+   ],
+   "requires": {
+    "propsAny": [
+     "stove",
+     "pot",
+     "pan"
+    ],
+    "poseAnyOf": [
+     "stand",
+     "sit",
+     "lean"
+    ]
+   },
+   "good": "চুলায় হাঁড়ি, হাতে হাতা, ধোঁয়া",
+   "bad": "ফাঁকা রান্নাঘরে রান্নার কথা"
+  },
+  {
+   "id": "bn-use-typing",
+   "category": "in-use",
+   "phrases": [
+    "টাইপ করছে",
+    "কীবোর্ডে টাইপ",
+    "কম্পিউটারে কাজ করছে"
+   ],
+   "requires": {
+    "propsAny": [
+     "desk",
+     "computer",
+     "laptop",
+     "keyboard"
+    ],
+    "actionAnyOf": [
+     "sitOn",
+     "standAt"
+    ]
+   },
+   "good": "হাত কীবোর্ডে, চেয়ারে বসা, স্ক্রিন জ্বলছে",
+   "bad": "শুধু একটা ল্যাপটপ হাতে"
+  },
+  {
+   "id": "bn-use-reading",
+   "category": "in-use",
+   "phrases": [
+    "বই পড়ছে",
+    "কাগজ পড়ছে",
+    "চিঠি পড়ছে",
+    "খবরের কাগজ পড়ছে",
+    "বইটি পড়ছে"
+   ],
+   "requires": {
+    "propsAny": [
+     "book",
+     "letter",
+     "paper",
+     "newspaper"
+    ],
+    "expressionAnyOf": [
+     "neutral",
+     "worried",
+     "happy",
+     "surprised"
+    ]
+   },
+   "good": "চোখ কাগজে, কাগজ হাতে বা স্পষ্টভাবে সামনে",
+   "bad": "দিকে তাকিয়ে পড়ার অভিনয়"
+  },
+  {
+   "id": "bn-use-driving",
+   "category": "in-use",
+   "phrases": [
+    "গাড়ি চালাচ্ছে",
+    "গাড়িতে চড়ে",
+    "চালিয়ে যাচ্ছে"
+   ],
+   "requires": {
+    "propsAny": [
+     "car",
+     "truck",
+     "bus"
+    ],
+    "actionAnyOf": [
+     "sitOn"
+    ]
+   },
+   "good": "শরীর গাড়ির ভেতরে, হাত চাকায়",
+   "bad": "গাড়ির পাশে দাঁড়ানো"
+  },
+  {
+   "id": "bn-use-eating",
+   "category": "in-use",
+   "phrases": [
+    "খাচ্ছে",
+    "ভাত খাচ্ছে",
+    "খেতে বসেছে"
+   ],
+   "requires": {
+    "propsAny": [
+     "plate",
+     "bowl",
+     "food",
+     "rice"
+    ],
+    "actionAnyOf": [
+     "sitOn",
+     "none"
+    ]
+   },
+   "good": "প্লেট সামনে, হাতে চামচ বা ভাত",
+   "bad": "খালি টেবিলে বসা"
+  },
+  {
+   "id": "bn-use-phone-call",
+   "category": "in-use",
+   "phrases": [
+    "ফোনে কথা বলছে",
+    "ফোন করছে",
+    "ফোন কানে"
+   ],
+   "requires": {
+    "holding": "phone",
+    "props": [
+     "phone"
+    ],
+    "expressionAnyOf": [
+     "neutral",
+     "happy",
+     "worried",
+     "angry"
+    ]
+   },
+   "good": "ফোন কানে, মুখ খোলা",
+   "bad": "ফোন টেবিলে পড়ে"
+  },
+  {
+   "id": "bn-use-washing",
+   "category": "in-use",
+   "phrases": [
+    "হাত ধুচ্ছে",
+    "থালা ধুচ্ছে",
+    "পানি ঢালছে"
+   ],
+   "requires": {
+    "propsAny": [
+     "sink",
+     "tap",
+     "bucket",
+     "water"
+    ]
+   },
+   "good": "কলের নিচে হাত, পানির ঝরনা",
+   "bad": "শুকনো হাতে দাঁড়ানো"
+  },
+  {
+   "id": "bn-people-two",
+   "category": "people",
+   "phrases": [
+    "দুইজন",
+    "দুজন মানুষ",
+    "দুই বন্ধু"
+   ],
+   "requires": {
+    "minActors": 2
+   },
+   "good": "দুইটি আলাদা শরীর, দুজনের মুখ",
+   "bad": "একজনকে দুইজন বলে দেখানো"
+  },
+  {
+   "id": "bn-people-crowd",
+   "category": "people",
+   "phrases": [
+    "ভিড়",
+    "অনেক মানুষ",
+    "জনতা"
+   ],
+   "requires": {
+    "minActors": 4
+   },
+   "good": "চার বা তার বেশি শরীর, দল বেঁধে",
+   "bad": "একজন দাঁড়িয়ে ভিড়ের কথা"
+  },
+  {
+   "id": "bn-people-giant",
+   "category": "people",
+   "phrases": [
+    "দৈত্য",
+    "বিশাল মানুষ",
+    "দানব"
+   ],
+   "requires": {
+    "minScale": 1.6
+   },
+   "good": "স্বাভাবিকের চেয়ে অনেক বড় শরীর",
+   "bad": "সাধারণ মাপের চরিত্র"
+  },
+  {
+   "id": "bn-people-alone",
+   "category": "people",
+   "phrases": [
+    "একা",
+    "কেউ নেই",
+    "নিঃসঙ্গ"
+   ],
+   "requires": {
+    "maxActors": 1
+   },
+   "good": "শুধু একা চরিত্র, ফাঁকা জায়গা",
+   "bad": "ভিড়ে ঘেরা চরিত্র"
+  },
+  {
+   "id": "bn-people-child",
+   "category": "people",
+   "phrases": [
+    "ছোট ছেলে",
+    "মেয়েটি",
+    "বাচ্চা"
+   ],
+   "requires": {
+    "minActors": 1
+   },
+   "good": "ছোট শরীর, বড় মাথা",
+   "bad": "প্রাপ্তবয়স্ক শরীর"
+  },
+  {
+   "id": "bn-people-old",
+   "category": "people",
+   "phrases": [
+    "বৃদ্ধ",
+    "বুড়ো",
+    "দাদা"
+   ],
+   "requires": {
+    "minActors": 1
+   },
+   "good": "কুঁজো শরীর, লাঠি বা সাদা চুল",
+   "bad": "তরুণ সোজা শরীর"
+  },
+  {
+   "id": "bn-emotion-cries",
+   "category": "emotion",
+   "phrases": [
+    "কাঁদছে",
+    "চোখে পানি",
+    "কেঁদে ফেলল"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "sad",
+     "worried"
+    ]
+   },
+   "good": "চোখে পানি, নিচু মুখ",
+   "bad": "হাসিমুখ"
+  },
+  {
+   "id": "bn-emotion-laughs",
+   "category": "emotion",
+   "phrases": [
+    "হেসে উঠল",
+    "হাসছে",
+    "হো হো করে হাসল"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "laugh",
+     "grin",
+     "happy"
+    ]
+   },
+   "good": "খোলা মুখ, কাঁপা কাঁধ",
+   "bad": "নির্বিকার মুখ"
+  },
+  {
+   "id": "bn-emotion-shocked",
+   "category": "emotion",
+   "phrases": [
+    "অবাক হয়ে গেল",
+    "চমকে উঠল",
+    "হতবাক"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "shocked",
+     "surprised"
+    ]
+   },
+   "good": "বড় চোখ, খোলা মুখ",
+   "bad": "শান্ত মুখ"
+  },
+  {
+   "id": "bn-emotion-embarrassed",
+   "category": "emotion",
+   "phrases": [
+    "লজ্জা পেল",
+    "বিশ্রী লাগছে"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "worried",
+     "sad",
+     "surprised"
+    ]
+   },
+   "good": "মাথা নিচু, গালে হাত",
+   "bad": "গর্বিত সোজা মুখ"
+  },
+  {
+   "id": "bn-contain-outside-house",
+   "category": "containment",
+   "phrases": [
+    "বাড়ির বাইরে",
+    "ঘরের বাইরে"
+   ],
+   "requires": {
+    "bgNotAnyOf": [
+     "room",
+     "bedroom",
+     "office",
+     "kitchen"
+    ]
+   },
+   "good": "বাইরের দৃশ্য, বাড়ির দেয়াল পেছনে",
+   "bad": "ঘরের ভেতরে দাঁড়িয়ে"
+  },
+  {
+   "id": "bn-contain-in-box",
+   "category": "containment",
+   "phrases": [
+    "বাক্সের ভেতরে",
+    "বাক্সে ভরা"
+   ],
+   "requires": {
+    "props": [
+     "box"
+    ]
+   },
+   "good": "বাক্স দৃশ্যে, ভেতরের জিনিস দেখানো",
+   "bad": "বাক্স ছাড়া ভেতরের গল্প"
+  },
+  {
+   "id": "bn-contain-in-car",
+   "category": "containment",
+   "phrases": [
+    "গাড়ির ভেতরে",
+    "গাড়িতে বসে"
+   ],
+   "requires": {
+    "propsAny": [
+     "car",
+     "truck",
+     "bus"
+    ],
+    "actionAnyOf": [
+     "sitOn"
+    ]
+   },
+   "good": "শরীর গাড়ির ভেতরে, জানালা দিয়ে দেখা",
+   "bad": "গাড়ির বাইরে দাঁড়ানো"
+  },
+  {
+   "id": "bn-neg-empty-chair",
+   "category": "negation",
+   "phrases": [
+    "চেয়ার খালি",
+    "চেয়ারে কেউ নেই",
+    "চেয়ারটা ফাঁকা"
+   ],
+   "requires": {
+    "props": [
+     "chair"
+    ]
+   },
+   "good": "চেয়ার দৃশ্যে, খালি, কেউ বসা নেই",
+   "bad": "খালি চেয়ারে কেউ বসে আছে"
+  },
+  {
+   "id": "bn-neg-no-one-home",
+   "category": "negation",
+   "phrases": [
+    "কেউ বাড়িতে নেই",
+    "ঘর খালি",
+    "কেউ নেই"
+   ],
+   "requires": {
+    "maxActors": 1
+   },
+   "good": "ফাঁকা ঘর, জিনিসপত্র থাকতে পারে",
+   "bad": "ঘরে মানুষ দাঁড়িয়ে"
+  },
+  {
+   "id": "bn-neg-nothing-moves",
+   "category": "negation",
+   "phrases": [
+    "কিছুই নড়ছে না",
+    "স্থির",
+    "নীরব"
+   ],
+   "requires": {
+    "maxActors": 1
+   },
+   "good": "স্থির দৃশ্য, কোনো গতি নেই",
+   "bad": "দৌড়াদৌড়ি, দোলা"
+  },
+  {
+   "id": "bn-neg-not-raining",
+   "category": "negation",
+   "phrases": [
+    "বৃষ্টি নেই",
+    "বৃষ্টি হচ্ছিল না"
+   ],
+   "requires": {
+    "forbidFx": [
+     "rain"
+    ]
+   },
+   "good": "শুকনো দৃশ্য, বৃষ্টি নেই",
+   "bad": "বৃষ্টির fx চালু"
+  },
+  {
+   "id": "bn-count-three",
+   "category": "count-scale",
+   "phrases": [
+    "তিনটি",
+    "তিনটা",
+    "তিন জন"
+   ],
+   "requires": {
+    "propCountAnyMin": 3
+   },
+   "good": "তিনটি আলাদা জিনিস বা তিনজন",
+   "bad": "একটি জিনিস দেখিয়ে তিনটির কথা"
+  },
+  {
+   "id": "bn-count-many",
+   "category": "count-scale",
+   "phrases": [
+    "অনেক",
+    "হাজার",
+    "হাজারো",
+    "প্রচুর"
+   ],
+   "requires": {
+    "minActors": 4
+   },
+   "good": "অনেকগুলো— ভিড়, অনেক প্রপ",
+   "bad": "একটি জিনিস দেখিয়ে 'অনেক' বলা"
+  },
+  {
+   "id": "bn-count-one",
+   "category": "count-scale",
+   "phrases": [
+    "একটি",
+    "একটা",
+    "একজন"
+   ],
+   "requires": {
+    "maxActors": 1
+   },
+   "good": "একটি জিনিস বা একজন মানুষ",
+   "bad": "দুই বা তার বেশি"
+  },
+  {
+   "id": "bn-count-half",
+   "category": "count-scale",
+   "phrases": [
+    "অর্ধেক",
+    "আধা"
+   ],
+   "requires": {
+    "insertAnyOf": [
+     "chart",
+     "counter",
+     "bigtext",
+     "list"
+    ]
+   },
+   "good": "অর্ধেক বোঝানোর জন্য গ্রাফিক বা ইনসার্ট",
+   "bad": "শুধু কথা, কোনো দৃশ্যমান ভাগ নেই"
+  },
+  {
+   "id": "bn-cause-because",
+   "category": "cause",
+   "phrases": [
+    "কারণে",
+    "তাই",
+    "এর ফলে"
+   ],
+   "requires": {
+    "insertAnyOf": [
+     "chart",
+     "list",
+     "timeline",
+     "versus",
+     "bigtext",
+     "counter"
+    ]
+   },
+   "good": "কারণ-ফল দেখানোর জন্য একটি ইনসার্ট বা স্পষ্ট চেইন",
+   "bad": "শুধু কথা বলে কারণ বলা"
+  },
+  {
+   "id": "bn-cause-clicks",
+   "category": "cause",
+   "phrases": [
+    "ক্লিক করল",
+    "বাটনে চাপ দিল"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "point",
+     "reach",
+     "stand"
+    ],
+    "propsAny": [
+     "phone",
+     "computer",
+     "button",
+     "screen"
+    ]
+   },
+   "good": "আঙুল বাটনে/স্ক্রিনে, হাতি স্পষ্ট",
+   "bad": "হাত নিচে রেখে ক্লিকের কথা"
+  },
+  {
+   "id": "bn-cause-learns",
+   "category": "cause",
+   "phrases": [
+    "শিখে গেল",
+    "বুঝে গেল",
+    "আবিষ্কার করল"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "happy",
+     "surprised",
+     "smug",
+     "grin"
+    ]
+   },
+   "good": "মুখে বোঝার ভাব, হঠাৎ খুশি",
+   "bad": "নির্বিকার মুখ"
+  },
+  {
+   "id": "bn-abstract-chart",
+   "category": "abstract",
+   "phrases": [
+    "গ্রাফ",
+    "চার্ট",
+    "পরিসংখ্যান",
+    "তথ্য বলছে"
+   ],
+   "requires": {
+    "insertAnyOf": [
+     "chart",
+     "counter",
+     "list",
+     "versus",
+     "timeline"
+    ]
+   },
+   "good": "একটি ইনসার্ট যা সংখ্যাটা দেখায়",
+   "bad": "সংখ্যা নিয়ে শুধু কথা"
+  },
+  {
+   "id": "bn-abstract-idea",
+   "category": "abstract",
+   "phrases": [
+    "ভাবনা",
+    "ধারণা",
+    "মনে হলো"
+   ],
+   "requires": {
+    "insertAnyOf": [
+     "bigtext",
+     "list",
+     "chart",
+     "timeline"
+    ]
+   },
+   "good": "ভাবটা দেখানো— একটি ইনসার্ট বা প্রতীক",
+   "bad": "শুধু দাঁড়িয়ে থাকা চরিত্র"
+  },
+  {
+   "id": "bn-abstract-money",
+   "category": "abstract",
+   "phrases": [
+    "টাকা",
+    "দাম",
+    "খরচ",
+    "বেতন"
+   ],
+   "requires": {
+    "propsAny": [
+     "money",
+     "banknote",
+     "coin",
+     "wallet",
+     "price"
+    ],
+    "insertAnyOf": [
+     "counter",
+     "chart",
+     "bigtext"
+    ]
+   },
+   "good": "নোট, মুদ্রা বা সংখ্যা ইনসার্ট",
+   "bad": "হাতে কিছু নেই, টাকার কথা"
+  },
+  {
+   "id": "bn-abstract-time",
+   "category": "abstract",
+   "phrases": [
+    "সময়",
+    "ঘণ্টা",
+    "মিনিট",
+    "সেকেন্ড"
+   ],
+   "requires": {
+    "propsAny": [
+     "clock",
+     "watch"
+    ],
+    "insertAnyOf": [
+     "counter",
+     "timeline",
+     "bigtext"
+    ]
+   },
+   "good": "ঘড়ি বা সময়ের ইনসার্ট",
+   "bad": "ঘড়ি ছাড়া সময়ের কথা"
+  },
+  {
+   "id": "bn-abstract-weather-science",
+   "category": "abstract",
+   "phrases": [
+    "বাষ্প",
+    "বাতাস",
+    "তাপমাত্রা",
+    "চাপ"
+   ],
+   "requires": {
+    "insertAnyOf": [
+     "chart",
+     "bigtext",
+     "list",
+     "counter"
+    ],
+    "fxAnyOf": [
+     "smoke",
+     "rain",
+     "fog"
+    ]
+   },
+   "good": "ইনসার্ট বা fx যা প্রক্রিয়াটা দেখায়",
+   "bad": "শুধু কথা"
+  },
+  {
+   "id": "bn-abstract-radio",
+   "category": "abstract",
+   "phrases": [
+    "তরঙ্গ",
+    "সিগন্যাল",
+    "ফ্রিকোয়েন্সি"
+   ],
+   "requires": {
+    "insertAnyOf": [
+     "chart",
+     "bigtext",
+     "list"
+    ],
+    "propsAny": [
+     "phone",
+     "tower",
+     "radio",
+     "router"
+    ]
+   },
+   "good": "তরঙ্গের ছবি বা টাওয়ার/ফোন দৃশ্যে",
+   "bad": "শুধু কথা"
+  },
+  {
+   "id": "bn-idiom-other-room-sleeping",
+   "category": "location",
+   "phrases": [
+    "অন্য ঘরে ঘুমিয়ে আছে",
+    "পাশের ঘরে ঘুমাচ্ছে"
+   ],
+   "requires": {
+    "props": [
+     "bed"
+    ],
+    "actionAnyOf": [
+     "sleepOn",
+     "lieOn"
+    ],
+    "transitionAnyOf": [
+     "dissolve",
+     "fade",
+     "iris",
+     "whip",
+     "zoom",
+     "flash",
+     "slide",
+     "wipe"
+    ]
+   },
+   "good": "ভিন্ন ঘর, তাতে বিছানা, তাতে শোয়া শরীর",
+   "bad": "একই ঘরে মেঝেতে শোয়া, অথবা বিছানা ছাড়া"
+  },
+  {
+   "id": "bn-idiom-chair-occupied",
+   "category": "posture",
+   "phrases": [
+    "চেয়ারে বসে আছে",
+    "চেয়ারটা দখল করে"
+   ],
+   "requires": {
+    "props": [
+     "chair"
+    ],
+    "actionAnyOf": [
+     "sitOn"
+    ]
+   },
+   "good": "নিতম্ব চেয়ার সিটে, চেয়ার দখল",
+   "bad": "চেয়ার খালি, শরীর পাশে"
+  },
+  {
+   "id": "bn-idiom-window-visible",
+   "category": "posture",
+   "phrases": [
+    "জানালার পাশে দাঁড়িয়ে",
+    "জানালার ধারে"
+   ],
+   "requires": {
+    "props": [
+     "window"
+    ],
+    "poseAnyOf": [
+     "stand"
+    ]
+   },
+   "good": "জানালা দৃশ্যে দেখা যাচ্ছে",
+   "bad": "জানালা ছাড়া দেয়াল"
+  },
+  {
+   "id": "bn-idiom-rain-wet",
+   "category": "time-weather",
+   "phrases": [
+    "বৃষ্টিতে ভিজে",
+    "ভিজে গেছে",
+    "কাদায়"
+   ],
+   "requires": {
+    "fxAnyOf": [
+     "rain"
+    ],
+    "propsAny": [
+     "umbrella",
+     "raincoat"
+    ]
+   },
+   "good": "বৃষ্টি, ভেজা কাপড়, ছাতা বা আশ্রয়",
+   "bad": "শুকনো পোশাকে বৃষ্টির দৃশ্য"
+  },
+  {
+   "id": "bn-idiom-cup-empty",
+   "category": "held",
+   "phrases": [
+    "কাপ খালি",
+    "কাপে কিছু নেই"
+   ],
+   "requires": {
+    "props": [
+     "cup"
+    ],
+    "maxActors": 1
+   },
+   "good": "কাপ দৃশ্যে, খালি, ঢালা নেই",
+   "bad": "ভরা কাপ"
+  },
+  {
+   "id": "bn-state-hurt",
+   "category": "state",
+   "phrases": [
+    "আহত",
+    "ব্যথা পেয়েছে",
+    "রক্ত"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "sad",
+     "worried",
+     "shocked"
+    ],
+    "fxAnyOf": [
+     "debris",
+     "dust",
+     "shake"
+    ]
+   },
+   "good": "আঘাতের চিহ্ন, কষ্টের মুখ",
+   "bad": "আনন্দে দাঁড়িয়ে"
+  },
+  {
+   "id": "bn-state-wet",
+   "category": "state",
+   "phrases": [
+    "ভিজে গেছে",
+    "কাদায় ভিজে"
+   ],
+   "requires": {
+    "fxAnyOf": [
+     "rain"
+    ],
+    "propsAny": [
+     "umbrella",
+     "raincoat"
+    ]
+   },
+   "good": "ভেজা কাপড়, পানির ছাপ",
+   "bad": "শুকনো পোশাক"
+  },
+  {
+   "id": "bn-state-cold-body",
+   "category": "state",
+   "phrases": [
+    "কাঁপছে",
+    "শীতে কাঁপছে"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "scared",
+     "worried",
+     "sad"
+    ],
+    "fxAnyOf": [
+     "snow",
+     "shake",
+     "fog"
+    ]
+   },
+   "good": "কাঁপা শরীর, হাত বুকে",
+   "bad": "শান্ত সোজা শরীর"
+  },
+  {
+   "id": "bn-state-strong",
+   "category": "state",
+   "phrases": [
+    "শক্তিশালী",
+    "শক্তি দেখাল",
+    "বল দেখাল"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "determined",
+     "smug",
+     "angry",
+     "furious"
+    ]
+   },
+   "good": "টান টান শরীর, দৃঢ় মুখ",
+   "bad": "নরম হাসিমুখ"
+  },
+  {
+   "id": "bn-state-hidden",
+   "category": "state",
+   "phrases": [
+    "লুকিয়ে আছে",
+    "লুকিয়ে গেল",
+    "আড়ালে"
+   ],
+   "requires": {
+    "propsAny": [
+     "door",
+     "wall",
+     "box",
+     "curtain"
+    ],
+    "poseAnyOf": [
+     "crouch",
+     "stand"
+    ]
+   },
+   "good": "কোনো আড়ালের পেছনে শরীর, আধা দেখা",
+   "bad": "খোলা জায়গায় দাঁড়ানো"
+  },
+  {
+   "id": "bn-state-waiting",
+   "category": "state",
+   "phrases": [
+    "অপেক্ষা করছে",
+    "প্রতীক্ষা করছে"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "stand",
+     "sit"
+    ],
+    "expressionAnyOf": [
+     "bored",
+     "worried",
+     "neutral",
+     "sleepy"
+    ]
+   },
+   "good": "স্থির শরীর, দূরে তাকিয়ে",
+   "bad": "দৌড়াদৌড়ি করছে"
+  },
+  {
+   "id": "bn-state-surprised-by",
+   "category": "state",
+   "phrases": [
+    "বিস্মিত",
+    "অবাক"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "surprised",
+     "shocked"
+    ]
+   },
+   "good": "বড় চোখ, খোলা মুখ",
+   "bad": "নির্বিকার"
+  },
+  {
+   "id": "bn-state-proud",
+   "category": "state",
+   "phrases": [
+    "গর্বিত",
+    "গর্বে বুক ফুলিয়ে"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "smug",
+     "happy",
+     "grin",
+     "determined"
+    ]
+   },
+   "good": "সোজা বুক, উঁচু থুতনি",
+   "bad": "নিচু মুখ"
+  },
+  {
+   "id": "bn-motion-drags",
+   "category": "motion",
+   "phrases": [
+    "টেনে নিয়ে",
+    "ঘষটে নিয়ে"
+   ],
+   "requires": {
+    "poseAnyOf": [
+     "walk",
+     "stand"
+    ],
+    "actionAnyOf": [
+     "hold"
+    ]
+   },
+   "good": "হাত ধরে টানা, হেলানো শরীর",
+   "bad": "সামনে কিছু নেই"
+  },
+  {
+   "id": "bn-motion-opens-door",
+   "category": "motion",
+   "phrases": [
+    "দরজা খুলল",
+    "দরজা খুলে গেল"
+   ],
+   "requires": {
+    "props": [
+     "door"
+    ],
+    "propOpen": "door"
+   },
+   "good": "দরজা খোলা দৃশ্যমান",
+   "bad": "দরজা বন্ধ"
+  },
+  {
+   "id": "bn-motion-switches-light",
+   "category": "motion",
+   "phrases": [
+    "লাইট জ্বালাল",
+    "বাতি জ্বালাল",
+    "লাইট নিভাল"
+   ],
+   "requires": {
+    "propsAny": [
+     "lamp",
+     "light",
+     "switch"
+    ],
+    "propOpen": "lamp"
+   },
+   "good": "বাতি জ্বলছে বা নিভছে",
+   "bad": "অন্ধকারে কিছু বোঝা যায় না"
+  },
+  {
+   "id": "bn-people-faces-each-other",
+   "category": "people",
+   "phrases": [
+    "মুখোমুখি",
+    "একে অপরের দিকে"
+   ],
+   "requires": {
+    "minActors": 2,
+    "facingEachOther": true
+   },
+   "good": "দুই শরীর একে অপরের দিকে মুখ করে",
+   "bad": "দুজনেই ক্যামেরার দিকে"
+  },
+  {
+   "id": "bn-people-stranger",
+   "category": "people",
+   "phrases": [
+    "অপরিচিত",
+    "অচেনা লোক"
+   ],
+   "requires": {
+    "minActors": 2,
+    "expressionAnyOf": [
+     "suspicious",
+     "worried",
+     "neutral"
+    ]
+   },
+   "good": "দুই শরীর, একজনের সন্দেহের মুখ",
+   "bad": "একা দাঁড়িয়ে"
+  },
+  {
+   "id": "bn-emotion-relieved",
+   "category": "emotion",
+   "phrases": [
+    "স্বস্তির শ্বাস",
+    "নিশ্বাস ফেলল",
+    "স্বস্তি পেল"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "happy",
+     "neutral",
+     "sleepy"
+    ]
+   },
+   "good": "লম্বা শ্বাস, নরম মুখ",
+   "bad": "টান টান ভয়"
+  },
+  {
+   "id": "bn-emotion-proud-smile",
+   "category": "emotion",
+   "phrases": [
+    "গর্বের হাসি",
+    "মুচকি হাসি"
+   ],
+   "requires": {
+    "expressionAnyOf": [
+     "smug",
+     "grin",
+     "happy"
+    ]
+   },
+   "good": "একদিকে টানা হাসি",
+   "bad": "নির্বিকার"
+  },
+  {
+   "id": "bn-contained-inside-room",
+   "category": "containment",
+   "phrases": [
+    "ঘরের ভেতরে",
+    "ঘরে ঢুকে"
+   ],
+   "requires": {
+    "bgAnyOf": [
+     "livingroom",
+     "bedroom",
+     "office",
+     "kitchen",
+     "hospital",
+     "cell",
+     "prison",
+     "classroom",
+     "lab"
+    ]
+   },
+   "good": "ঘরের ভেতরের দৃশ্য, দেয়াল, আসবাব",
+   "bad": "রাস্তায় দাঁড়িয়ে ঘরের কথা"
+  },
+  {
+   "id": "bn-contained-under-blanket",
+   "category": "containment",
+   "phrases": [
+    "কম্বলের নিচে",
+    "কম্বল মুড়ি দিয়ে"
+   ],
+   "requires": {
+    "props": [
+     "bed"
+    ],
+    "actionAnyOf": [
+     "lieOn",
+     "sleepOn"
+    ]
+   },
+   "good": "কম্বল শরীরের উপর, শুধু মাথা বাইরে",
+   "bad": "খোলা বিছানায় শোয়া"
+  },
+  {
+   "id": "bn-count-zero",
+   "category": "count-scale",
+   "phrases": [
+    "শূন্য",
+    "কিছুই নেই"
+   ],
+   "requires": {
+    "maxActors": 1
+   },
+   "good": "ফাঁকা দৃশ্য, কিছু নেই",
+   "bad": "ভরা দৃশ্য"
+  },
+  {
+   "id": "bn-cause-therefore",
+   "category": "cause",
+   "phrases": [
+    "ফলে",
+    "এর ফলে",
+    "সেজন্য"
+   ],
+   "requires": {
+    "insertAnyOf": [
+     "chart",
+     "list",
+     "timeline",
+     "versus",
+     "bigtext",
+     "counter"
+    ]
+   },
+   "good": "ফলটা দেখানো— ইনসার্ট বা দৃশ্যমান চেইন",
+   "bad": "শুধু কথা"
+  },
+  {
+   "id": "bn-abstract-compare",
+   "category": "abstract",
+   "phrases": [
+    "তুলনা",
+    "তুলনায়",
+    "আগে-পরে"
+   ],
+   "requires": {
+    "insertAnyOf": [
+     "versus",
+     "chart",
+     "list",
+     "timeline"
+    ]
+   },
+   "good": "দুই দিক পাশাপাশি দেখানো ইনসার্ট",
+   "bad": "শুধু কথা"
+  },
+  {
+   "id": "bn-abstract-result",
+   "category": "abstract",
+   "phrases": [
+    "ফলাফল",
+    "ফল",
+    "শেষ পর্যন্ত"
+   ],
+   "requires": {
+    "insertAnyOf": [
+     "counter",
+     "chart",
+     "bigtext",
+     "list"
+    ]
+   },
+   "good": "ফলাফলের সংখ্যা বা দৃশ্যমান সারাংশ",
+   "bad": "শুধু কথা"
+  }
+ ]
+}

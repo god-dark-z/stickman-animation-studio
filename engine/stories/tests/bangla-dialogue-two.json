@@ -67,8 +67,8 @@
       ]
     },
     {
-      "say": "মায়া বলল, আজ সকালে বৃষ্টি পড়েছিল।",
-      "gloss": "Maya said, it rained this morning.",
+      "say": "মায়া বলল, আজ বৃষ্টি পড়েছিল।",
+      "gloss": "Maya said, it rained today.",
       "bg": "street",
       "time": "sunset",
       "framing": "medium",

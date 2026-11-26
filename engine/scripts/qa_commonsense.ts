@@ -55,6 +55,7 @@ export function seenOf(shot: ResolvedShot): Seen {
 
 export function checkStory(file: string, specFile?: string): { findings: Finding[]; shots: number; cov: number } {
   const story = StorySchema.parse(JSON.parse(fs.readFileSync(file, "utf8")));
+  const shotLang = story.lang;
   const shots = buildTimeline(story, null, null, null).shots;
   const findings: Finding[] = [];
   let covered = 0;
@@ -65,7 +66,9 @@ export function checkStory(file: string, specFile?: string): { findings: Finding
   shots.forEach((shot, i) => {
     if (shot.say === "…") return;
     const seen = seenOf(shot);
-    for (const entry of matches(shot.say)) {
+    // For a Bangla story the sentence is Bangla: match the Bangla glossary (plus the English one,
+    // which covers loanwords and mixed phrasing). The claims run on `gloss` separately.
+    for (const entry of matches(shot.say, shotLang)) {
       const reason = exempt.get(`${i + 1}:${entry.id}`);
       if (reason) {
         findings.push({ shot: i + 1, sev: "WARN", kind: "EXEMPT", msg: `[${entry.id}] exempted in the story: ${reason}` });
@@ -73,7 +76,7 @@ export function checkStory(file: string, specFile?: string): { findings: Finding
       }
       findings.push(...checkRequirement(entry, entry.requires, seen, i + 1));
     }
-    const c = coverage(shot.say);
+    const c = coverage(shot.say, shotLang);
     covered += c.covered;
     total += c.total;
   });

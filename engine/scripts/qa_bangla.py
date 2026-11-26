@@ -102,10 +102,26 @@ def check(story_path: str, strict: bool = False) -> tuple[list[str], list[str], 
     return errors, warns, len(story.get("shots", []))
 
 
+def run_gloss_gate(path: str, engine: str) -> int:
+    """Shell to the TypeScript gloss-faithfulness gate (one implementation, one language)."""
+    import shutil
+    import subprocess
+
+    npx = shutil.which("npx") or shutil.which("npx.cmd")
+    if not npx:
+        print("WARN  npx not found — skipping the gloss-faithfulness check")
+        return 0
+    r = subprocess.run([npx, "tsx", "scripts/qa_gloss.ts", path], cwd=engine, capture_output=True, text=True, encoding="utf-8")
+    print(r.stdout.rstrip())
+    if r.returncode != 0 and r.stderr.strip():
+        print(r.stderr.rstrip())
+    return r.returncode
+
+
 def main(argv: list[str]) -> int:
     args = [a for a in argv if not a.startswith("--")]
     if not args:
-        print("usage: python scripts/qa_bangla.py stories/<file>.json [--strict] [--json]")
+        print("usage: python scripts/qa_bangla.py stories/<file>.json [--strict] [--with-gloss] [--json]")
         return 2
     path = args[0]
     if not os.path.isabs(path):
@@ -120,7 +136,15 @@ def main(argv: list[str]) -> int:
         for w in warns:
             print(f"WARN  {w}")
         print(f"\n{os.path.basename(path)}: {shots} shots — {len(errors)} error(s), {len(warns)} warning(s)")
+
+    gloss_code = 0
+    if "--with-gloss" in argv:
+        print("\n--- gloss faithfulness ---")
+        gloss_code = run_gloss_gate(path, ENGINE)
+
     if errors:
+        return 1
+    if gloss_code != 0:
         return 1
     print("PASS — Bangla text is single-script, glossed, and cast in Bangla script.")
     return 0

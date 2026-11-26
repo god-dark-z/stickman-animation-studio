@@ -1,0 +1,1688 @@
+{
+ "version": 1,
+ "language": "bn",
+ "note": "Bangla commonsense battery: one sentence a person could write, its English gloss, what a human expects to see, a storyboard plan, and the machine-checkable expectation. Run with `npx tsx scripts/battery.ts --lang bn`.",
+ "entries": [
+  {
+   "id": "bn-posture-01-chair",
+   "category": "posture",
+   "sentence": "ক্লান্ত এক কর্মী চেয়ারে বসে টাইপ করছে।",
+   "gloss": "A tired office worker sits on the chair and types.",
+   "expect": "He is on the chair — hips on the seat, hands at the desk, tired face.",
+   "plan": {
+    "bg": "office",
+    "framing": "full",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "action": "sitOn",
+      "on": "chair",
+      "pose": "sit",
+      "facing": "right",
+      "expression": "sleepy"
+     }
+    ],
+    "props": [
+     {
+      "type": "chair",
+      "x": 0.5,
+      "z": 0.55
+     },
+     {
+      "type": "desk",
+      "x": 0.62,
+      "z": 0.5
+     }
+    ]
+   },
+   "check": {
+    "props": [
+     "chair",
+     "desk"
+    ],
+    "actionAnyOf": [
+     "sitOn"
+    ]
+   }
+  },
+  {
+   "id": "bn-posture-02-bed",
+   "category": "posture",
+   "sentence": "ছেলেটি বিছানায় শুয়ে ঘুমিয়ে আছে।",
+   "gloss": "The boy is lying in bed asleep.",
+   "expect": "He lies on the mattress, head on the pillow, eyes closed, blanket over him.",
+   "plan": {
+    "bg": "bedroom",
+    "framing": "full",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "action": "sleepOn",
+      "on": "bed",
+      "underBlanket": true,
+      "pose": "lie"
+     }
+    ],
+    "props": [
+     {
+      "type": "bed",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "props": [
+     "bed"
+    ],
+    "actionAnyOf": [
+     "sleepOn"
+    ]
+   }
+  },
+  {
+   "id": "bn-posture-03-window",
+   "category": "posture",
+   "sentence": "মেয়েটি জানালার পাশে দাঁড়িয়ে বাইরে তাকিয়ে আছে।",
+   "gloss": "The girl stands beside the window, looking out.",
+   "expect": "She stands facing a visible window; the window is in frame.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "d",
+      "x": 0.42,
+      "z": 0.55,
+      "facing": "right"
+     }
+    ],
+    "props": [
+     {
+      "type": "window",
+      "x": 0.7,
+      "z": 0.35
+     }
+    ]
+   },
+   "check": {
+    "props": [
+     "window"
+    ],
+    "poseAnyOf": [
+     "stand"
+    ]
+   }
+  },
+  {
+   "id": "bn-posture-04-floor",
+   "category": "posture",
+   "sentence": "বৃদ্ধা মেঝেতে বসে চা খাচ্ছেন।",
+   "gloss": "The old woman sits on the floor drinking tea.",
+   "expect": "She is seated on the floor, cup in hand, no chair involved.",
+   "plan": {
+    "bg": "field",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "d",
+      "action": "hold",
+      "holding": "cup",
+      "pose": "sit",
+      "expression": "happy"
+     }
+    ],
+    "props": [
+     {
+      "type": "cup",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ],
+    "time": "day"
+   },
+   "check": {
+    "poseAnyOf": [
+     "sit"
+    ],
+    "holding": "cup"
+   }
+  },
+  {
+   "id": "bn-location-01-other-room",
+   "category": "location",
+   "sentence": "ছেলেটি অন্য ঘরে ঘুমিয়ে আছে।",
+   "gloss": "The boy is asleep in the other room.",
+   "expect": "A different room, with a bed, and a body asleep on it — plus a cut that shows the change.",
+   "plan": {
+    "bg": "bedroom",
+    "framing": "full",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "action": "sleepOn",
+      "on": "bed",
+      "underBlanket": true,
+      "pose": "lie"
+     }
+    ],
+    "props": [
+     {
+      "type": "bed",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ],
+    "transition": "dissolve"
+   },
+   "check": {
+    "props": [
+     "bed"
+    ],
+    "actionAnyOf": [
+     "sleepOn"
+    ],
+    "transitionAnyOf": [
+     "dissolve",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "bn-location-02-outside",
+   "category": "location",
+   "sentence": "বৃষ্টি পড়ছে, আর ছেলেটি রাস্তায় দাঁড়িয়ে আছে।",
+   "gloss": "It is raining, and the boy is standing on the street.",
+   "expect": "Outdoors: street ground, rain falling, the boy exposed to it.",
+   "plan": {
+    "bg": "street",
+    "framing": "full",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "pose": "stand",
+      "expression": "sad"
+     }
+    ],
+    "props": [],
+    "fx": [
+     "rain"
+    ]
+   },
+   "check": {
+    "bgAnyOf": [
+     "street"
+    ],
+    "fxAnyOf": [
+     "rain"
+    ],
+    "poseAnyOf": [
+     "stand"
+    ]
+   }
+  },
+  {
+   "id": "bn-location-03-kitchen",
+   "category": "location",
+   "sentence": "মা রান্নাঘরে ভাত রান্না করছেন।",
+   "gloss": "The mother is cooking rice in the kitchen.",
+   "expect": "A kitchen with a stove and a pot, the cook at the counter.",
+   "plan": {
+    "bg": "kitchen",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "d",
+      "action": "standAt",
+      "on": "counter",
+      "facing": "right"
+     }
+    ],
+    "props": [
+     {
+      "type": "counter",
+      "x": 0.55,
+      "z": 0.5
+     },
+     {
+      "type": "pot",
+      "x": 0.55,
+      "y": 230,
+      "z": 0.5
+     },
+     {
+      "type": "plate",
+      "x": 0.42,
+      "y": 230,
+      "z": 0.5
+     }
+    ]
+   },
+   "check": {
+    "propsAny": [
+     "counter",
+     "pot",
+     "stove"
+    ]
+   }
+  },
+  {
+   "id": "bn-location-04-village",
+   "category": "location",
+   "sentence": "গ্রামের মাটির বাড়ির সামনে বাচ্চারা খেলছে।",
+   "gloss": "Children are playing in front of a mud house in the village.",
+   "expect": "A village scene with a modest house, ground, children.",
+   "plan": {
+    "bg": "village_dawn",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "b",
+      "x": 0.36,
+      "z": 0.5,
+      "expression": "happy"
+     },
+     {
+      "id": "c",
+      "x": 0.62,
+      "z": 0.5,
+      "expression": "happy"
+     }
+    ],
+    "props": []
+   },
+   "check": {
+    "bgAnyOf": [
+     "village_dawn",
+     "field",
+     "field"
+    ],
+    "minActors": 2
+   }
+  },
+  {
+   "id": "bn-containment-01-inside",
+   "category": "containment",
+   "sentence": "মেয়েটি ঘরের ভেতরে বসে বই পড়ছে।",
+   "gloss": "The girl sits inside the room reading a book.",
+   "expect": "Indoors: walls, furniture, the reader with an open book.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "d",
+      "action": "sitOn",
+      "on": "chair",
+      "holding": "book",
+      "facing": "front"
+     }
+    ],
+    "props": [
+     {
+      "type": "chair",
+      "x": 0.5,
+      "z": 0.55
+     },
+     {
+      "type": "book",
+      "x": 0.5,
+      "z": 0.6
+     }
+    ]
+   },
+   "check": {
+    "bgAnyOf": [
+     "livingroom",
+     "bedroom",
+     "office"
+    ],
+    "holding": "book"
+   }
+  },
+  {
+   "id": "bn-containment-02-blanket",
+   "category": "containment",
+   "sentence": "শিশুটি কম্বলের নিচে ঘুমাচ্ছে।",
+   "gloss": "The child is sleeping under the blanket.",
+   "expect": "A bed with a blanket over the body; only the head shows.",
+   "plan": {
+    "bg": "bedroom",
+    "framing": "full",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "b",
+      "action": "sleepOn",
+      "on": "bed",
+      "underBlanket": true,
+      "pose": "lie"
+     }
+    ],
+    "props": [
+     {
+      "type": "bed",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "props": [
+     "bed"
+    ],
+    "actionAnyOf": [
+     "sleepOn"
+    ]
+   }
+  },
+  {
+   "id": "bn-containment-03-car",
+   "category": "containment",
+   "sentence": "ড্রাইভার গাড়ির ভেতরে বসে গাড়ি চালাচ্ছে।",
+   "gloss": "The driver sits inside the car driving it.",
+   "expect": "The body sits on the car seat, inside the vehicle, hands at the wheel.",
+   "plan": {
+    "bg": "street",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "e",
+      "action": "sitOn",
+      "on": "car",
+      "inside": true,
+      "facing": "right"
+     }
+    ],
+    "props": [
+     {
+      "type": "car",
+      "x": 0.55,
+      "z": 0.6
+     }
+    ]
+   },
+   "check": {
+    "props": [
+     "car"
+    ],
+    "actionAnyOf": [
+     "sitOn"
+    ]
+   }
+  },
+  {
+   "id": "bn-held-01-cup",
+   "category": "held",
+   "sentence": "ছেলেটি হাতে চায়ের কাপ ধরে আছে।",
+   "gloss": "The boy is holding a cup of tea in his hand.",
+   "expect": "The cup sits in his hand at chest height, not floating beside it.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "action": "hold",
+      "holding": "cup",
+      "facing": "front"
+     }
+    ],
+    "props": [
+     {
+      "type": "cup",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "holding": "cup",
+    "props": [
+     "cup"
+    ]
+   }
+  },
+  {
+   "id": "bn-held-02-phone",
+   "category": "held",
+   "sentence": "মেয়েটি হাতে ফোন নিয়ে স্ক্রিনের দিকে তাকিয়ে আছে।",
+   "gloss": "The girl holds a phone in her hand and looks at the screen.",
+   "expect": "The phone is in her hand, screen visible, eyes on it.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "d",
+      "action": "hold",
+      "holding": "phone",
+      "facing": "front"
+     }
+    ],
+    "props": [
+     {
+      "type": "phone",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "holding": "phone",
+    "props": [
+     "phone"
+    ]
+   }
+  },
+  {
+   "id": "bn-held-03-letter",
+   "category": "held",
+   "sentence": "বৃদ্ধ লোকটি হাতে একটি চিঠি ধরে পড়ছে।",
+   "gloss": "The old man is holding a letter and reading it.",
+   "expect": "The letter is in his hands, his eyes on the paper.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "e",
+      "action": "hold",
+      "holding": "letter",
+      "facing": "front",
+      "expression": "sad"
+     }
+    ],
+    "props": [
+     {
+      "type": "letter",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "holding": "letter",
+    "props": [
+     "letter"
+    ]
+   }
+  },
+  {
+   "id": "bn-inuse-01-typing",
+   "category": "in-use",
+   "sentence": "কর্মীটি কম্পিউটারে টাইপ করছে।",
+   "gloss": "The worker is typing on the computer.",
+   "expect": "Seated at the desk, hands on the keyboard, screen on.",
+   "plan": {
+    "bg": "office",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "action": "sitOn",
+      "on": "chair",
+      "pose": "type",
+      "facing": "right"
+     }
+    ],
+    "props": [
+     {
+      "type": "chair",
+      "x": 0.45,
+      "z": 0.55
+     },
+     {
+      "type": "desk",
+      "x": 0.62,
+      "z": 0.5
+     },
+     {
+      "type": "computer",
+      "x": 0.66,
+      "y": 230,
+      "z": 0.5
+     }
+    ]
+   },
+   "check": {
+    "propsAny": [
+     "computer",
+     "desk"
+    ],
+    "actionAnyOf": [
+     "sitOn"
+    ]
+   }
+  },
+  {
+   "id": "bn-inuse-02-phone-call",
+   "category": "in-use",
+   "sentence": "মহিলাটি ফোনে কথা বলছে।",
+   "gloss": "The woman is talking on the phone.",
+   "expect": "Phone at her ear, mouth open, eyes away.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "d",
+      "action": "hold",
+      "holding": "phone",
+      "pose": "phone",
+      "facing": "front",
+      "expression": "worried"
+     }
+    ],
+    "props": [
+     {
+      "type": "phone",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "holding": "phone",
+    "props": [
+     "phone"
+    ]
+   }
+  },
+  {
+   "id": "bn-inuse-03-eating",
+   "category": "in-use",
+   "sentence": "পরিবার একসাথে বসে ভাত খাচ্ছে।",
+   "gloss": "The family sits together eating rice.",
+   "expect": "Several people at a table, plates and rice in front of them.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "action": "sitOn",
+      "on": "chair",
+      "x": 0.38,
+      "z": 0.55
+     },
+     {
+      "id": "d",
+      "action": "sitOn",
+      "on": "chair",
+      "x": 0.62,
+      "z": 0.55
+     }
+    ],
+    "props": [
+     {
+      "type": "chair",
+      "x": 0.38,
+      "z": 0.55
+     },
+     {
+      "type": "chair",
+      "x": 0.62,
+      "z": 0.55
+     },
+     {
+      "type": "table",
+      "x": 0.5,
+      "z": 0.6
+     },
+     {
+      "type": "plate",
+      "x": 0.5,
+      "y": 230,
+      "z": 0.6
+     }
+    ]
+   },
+   "check": {
+    "propsAny": [
+     "plate",
+     "table"
+    ],
+    "minActors": 2
+   }
+  },
+  {
+   "id": "bn-state-01-asleep",
+   "category": "state",
+   "sentence": "শিশুটি বিছানায় ঘুমিয়ে আছে।",
+   "gloss": "The child is asleep in the bed.",
+   "expect": "Body on the mattress, eyes closed, in bed.",
+   "plan": {
+    "bg": "bedroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "b",
+      "action": "sleepOn",
+      "on": "bed",
+      "underBlanket": true,
+      "pose": "lie"
+     }
+    ],
+    "props": [
+     {
+      "type": "bed",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "props": [
+     "bed"
+    ],
+    "actionAnyOf": [
+     "sleepOn"
+    ]
+   }
+  },
+  {
+   "id": "bn-state-02-scared",
+   "category": "state",
+   "sentence": "ছেলেটি ভয় পেয়ে পিছিয়ে গেল।",
+   "gloss": "The boy stepped back, scared.",
+   "expect": "Wide eyes, body leaning away, a scared face.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "pose": "stand",
+      "expression": "scared",
+      "facing": "left"
+     }
+    ],
+    "props": []
+   },
+   "check": {
+    "expressionAnyOf": [
+     "scared",
+     "shocked",
+     "surprised"
+    ]
+   }
+  },
+  {
+   "id": "bn-state-03-angry",
+   "category": "state",
+   "sentence": "বাবা খুব রেগে গেলেন।",
+   "gloss": "The father got very angry.",
+   "expect": "Furious face: pulled brows, clenched jaw, tense body.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "f",
+      "pose": "stand",
+      "expression": "furious",
+      "facing": "front"
+     }
+    ],
+    "props": []
+   },
+   "check": {
+    "expressionAnyOf": [
+     "angry",
+     "furious"
+    ]
+   }
+  },
+  {
+   "id": "bn-state-04-tired",
+   "category": "state",
+   "sentence": "শ্রমিকটি খুব ক্লান্ত হয়ে বসে পড়ল।",
+   "gloss": "The worker sat down, exhausted.",
+   "expect": "Slumped body, heavy eyes, sitting because standing is too much.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "e",
+      "action": "sitOn",
+      "on": "chair",
+      "expression": "sleepy",
+      "facing": "front"
+     }
+    ],
+    "props": [
+     {
+      "type": "chair",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "expressionAnyOf": [
+     "sleepy",
+     "sad",
+     "bored"
+    ]
+   }
+  },
+  {
+   "id": "bn-weather-01-rain",
+   "category": "time-weather",
+   "sentence": "বাইরে বৃষ্টি পড়ছে।",
+   "gloss": "It is raining outside.",
+   "expect": "Outdoor scene with rain falling and wet ground or shelter.",
+   "plan": {
+    "bg": "street",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [],
+    "props": [],
+    "fx": [
+     "rain"
+    ]
+   },
+   "check": {
+    "fxAnyOf": [
+     "rain"
+    ]
+   }
+  },
+  {
+   "id": "bn-weather-02-night",
+   "category": "time-weather",
+   "sentence": "রাতে ছেলেটি জেগে বসে আছে।",
+   "gloss": "At night the boy is sitting awake.",
+   "expect": "Night grade, dark sky, a lamp for light, the boy sitting up.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "action": "sitOn",
+      "on": "chair",
+      "expression": "worried",
+      "facing": "front"
+     }
+    ],
+    "props": [
+     {
+      "type": "chair",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ],
+    "time": "night"
+   },
+   "check": {
+    "timeAnyOf": [
+     "night"
+    ],
+    "actionAnyOf": [
+     "sitOn"
+    ]
+   }
+  },
+  {
+   "id": "bn-weather-03-sunset",
+   "category": "time-weather",
+   "sentence": "সূর্য ডুবে গেল, আকাশ লাল হয়ে গেল।",
+   "gloss": "The sun went down and the sky turned red.",
+   "expect": "Sunset: orange-red sky, long shadows.",
+   "plan": {
+    "bg": "street",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [],
+    "props": [],
+    "time": "sunset"
+   },
+   "check": {
+    "timeAnyOf": [
+     "sunset",
+     "dawn"
+    ]
+   }
+  },
+  {
+   "id": "bn-weather-04-storm",
+   "category": "time-weather",
+   "sentence": "ঝড় উঠল, গাছগুলো দুলতে লাগল।",
+   "gloss": "A storm rose and the trees began to sway.",
+   "expect": "Wind, bending trees, movement in the frame.",
+   "plan": {
+    "bg": "field",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [],
+    "props": [],
+    "fx": [
+     "debris",
+     "shake"
+    ]
+   },
+   "check": {
+    "fxAnyOf": [
+     "rain",
+     "lightning",
+     "debris",
+     "shake"
+    ]
+   }
+  },
+  {
+   "id": "bn-motion-01-walk",
+   "category": "motion",
+   "sentence": "ছেলেটি রাস্তা দিয়ে হেঁটে যাচ্ছে।",
+   "gloss": "The boy is walking down the street.",
+   "expect": "Walking pose, direction clear, street underfoot.",
+   "plan": {
+    "bg": "street",
+    "framing": "full",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "pose": "walk",
+      "facing": "right",
+      "moveTo": 0.8
+     }
+    ],
+    "props": []
+   },
+   "check": {
+    "poseAnyOf": [
+     "walk",
+     "run"
+    ]
+   }
+  },
+  {
+   "id": "bn-motion-02-run",
+   "category": "motion",
+   "sentence": "মেয়েটি প্রাণপণে দৌড়ে পালাচ্ছে।",
+   "gloss": "The girl is running away as fast as she can.",
+   "expect": "Running pose, speed lines, body leaning forward.",
+   "plan": {
+    "bg": "street",
+    "framing": "full",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "d",
+      "pose": "run",
+      "facing": "right",
+      "expression": "scared"
+     }
+    ],
+    "props": [],
+    "fx": [
+     "speedlines"
+    ]
+   },
+   "check": {
+    "poseAnyOf": [
+     "run"
+    ],
+    "fxAnyOf": [
+     "speedlines"
+    ]
+   }
+  },
+  {
+   "id": "bn-motion-03-fall",
+   "category": "motion",
+   "sentence": "লোকটি হোঁচট খেয়ে মাটিতে পড়ে গেল।",
+   "gloss": "The man tripped and fell to the ground.",
+   "expect": "Body on the ground, impact dust or lines, sprawled limbs.",
+   "plan": {
+    "bg": "street",
+    "framing": "full",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "e",
+      "pose": "fall",
+      "expression": "shocked",
+      "facing": "left"
+     }
+    ],
+    "props": [],
+    "fx": [
+     "dust",
+     "shake"
+    ]
+   },
+   "check": {
+    "poseAnyOf": [
+     "fall",
+     "lie"
+    ],
+    "fxAnyOf": [
+     "dust",
+     "debris",
+     "smoke"
+    ]
+   }
+  },
+  {
+   "id": "bn-count-01-two",
+   "category": "count-scale",
+   "sentence": "দুই বন্ধু মাঠে বসে কথা বলছে।",
+   "gloss": "Two friends sit in the field talking.",
+   "expect": "Two separate bodies, facing each other, both visible.",
+   "plan": {
+    "bg": "field",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "x": 0.38,
+      "action": "sitOn",
+      "on": "bench",
+      "facing": "right"
+     },
+     {
+      "id": "b",
+      "x": 0.62,
+      "action": "sitOn",
+      "on": "bench",
+      "facing": "left"
+     }
+    ],
+    "props": [
+     {
+      "type": "bench",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "minActors": 2,
+    "facingEachOther": true
+   }
+  },
+  {
+   "id": "bn-count-02-crowd",
+   "category": "count-scale",
+   "sentence": "বাজারে 많은 মানুষের ভিড়।",
+   "gloss": "There is a crowd of many people in the market.",
+   "expect": "Four or more bodies, packed, market behind.",
+   "plan": {
+    "bg": "street",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "x": 0.2
+     },
+     {
+      "id": "b",
+      "x": 0.4
+     },
+     {
+      "id": "c",
+      "x": 0.6
+     },
+     {
+      "id": "d",
+      "x": 0.8
+     }
+    ],
+    "props": []
+   },
+   "check": {
+    "minActors": 4
+   }
+  },
+  {
+   "id": "bn-count-03-three-cups",
+   "category": "count-scale",
+   "sentence": "টেবিলে তিনটি কাপ রাখা আছে।",
+   "gloss": "Three cups are placed on the table.",
+   "expect": "Three separate cups on a table.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [],
+    "props": [
+     {
+      "type": "table",
+      "x": 0.5,
+      "z": 0.55
+     },
+     {
+      "type": "cup",
+      "x": 0.5,
+      "y": 230,
+      "z": 0.55,
+      "count": 3
+     }
+    ]
+   },
+   "check": {
+    "propCount": {
+     "type": "cup",
+     "min": 3
+    }
+   }
+  },
+  {
+   "id": "bn-people-01-alien-giant",
+   "category": "people",
+   "sentence": "দৈত্যটি শহরের মাঝখানে দাঁড়িয়ে আছে।",
+   "gloss": "The giant stands in the middle of the city.",
+   "expect": "One enormously scaled body among normal buildings.",
+   "plan": {
+    "bg": "street",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "x": 0.5,
+      "z": 0.45,
+      "scale": 2.2,
+      "facing": "front"
+     }
+    ],
+    "props": []
+   },
+   "check": {
+    "minScale": 1.6
+   }
+  },
+  {
+   "id": "bn-people-02-alone",
+   "category": "people",
+   "sentence": "ঘরে কেউ নেই, চেয়ারটা খালি।",
+   "gloss": "No one is in the room; the chair is empty.",
+   "expect": "An empty room with an empty chair, no bodies at all.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [],
+    "props": [
+     {
+      "type": "chair",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "maxActors": 1,
+    "props": [
+     "chair"
+    ]
+   }
+  },
+  {
+   "id": "bn-people-03-dialogue",
+   "category": "people",
+   "sentence": "দুজন মানুষ মুখোমুখি হয়ে কথা বলছে।",
+   "gloss": "Two people face each other and talk.",
+   "expect": "Two bodies facing each other, only the speaker's mouth moving.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "x": 0.36,
+      "facing": "right",
+      "talking": true
+     },
+     {
+      "id": "b",
+      "x": 0.64,
+      "facing": "left"
+     }
+    ],
+    "props": [],
+    "quote": "a"
+   },
+   "check": {
+    "minActors": 2,
+    "facingEachOther": true
+   }
+  },
+  {
+   "id": "bn-emotion-01-cry",
+   "category": "emotion",
+   "sentence": "মেয়েটি কাঁদছে।",
+   "gloss": "The girl is crying.",
+   "expect": "Tears, lowered face, an unmistakably sad expression.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "d",
+      "pose": "stand",
+      "expression": "sad",
+      "facing": "front"
+     }
+    ],
+    "props": []
+   },
+   "check": {
+    "expressionAnyOf": [
+     "sad",
+     "worried"
+    ]
+   }
+  },
+  {
+   "id": "bn-emotion-02-laugh",
+   "category": "emotion",
+   "sentence": "ছেলেটি হো হো করে হেসে উঠল।",
+   "gloss": "The boy burst out laughing.",
+   "expect": "Open mouth, shaking shoulders, a laugh expression.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "pose": "stand",
+      "expression": "laugh",
+      "facing": "front"
+     }
+    ],
+    "props": []
+   },
+   "check": {
+    "expressionAnyOf": [
+     "laugh",
+     "grin",
+     "happy"
+    ]
+   }
+  },
+  {
+   "id": "bn-emotion-03-shocked",
+   "category": "emotion",
+   "sentence": "মহিলাটি অবাক হয়ে চেয়ে রইল।",
+   "gloss": "The woman stared, astonished.",
+   "expect": "Wide eyes, open mouth, a startled pose.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "d",
+      "pose": "stand",
+      "expression": "shocked",
+      "facing": "front"
+     }
+    ],
+    "props": []
+   },
+   "check": {
+    "expressionAnyOf": [
+     "shocked",
+     "surprised"
+    ]
+   }
+  },
+  {
+   "id": "bn-negation-01-empty-chair",
+   "category": "negation",
+   "sentence": "চেয়ারটা খালি ছিল, কেউ বসে ছিল না।",
+   "gloss": "The chair was empty; no one was sitting there.",
+   "expect": "The chair is visible, and nobody is on it.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [],
+    "props": [
+     {
+      "type": "chair",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "props": [
+     "chair"
+    ],
+    "maxActors": 1
+   }
+  },
+  {
+   "id": "bn-negation-02-no-one-home",
+   "category": "negation",
+   "sentence": "বাড়িতে কেউ ছিল না।",
+   "gloss": "No one was home.",
+   "expect": "An empty house: furniture present, no bodies.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [],
+    "props": [
+     {
+      "type": "chair",
+      "x": 0.35,
+      "z": 0.55
+     },
+     {
+      "type": "table",
+      "x": 0.6,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "maxActors": 1
+   }
+  },
+  {
+   "id": "bn-negation-03-not-raining",
+   "category": "negation",
+   "sentence": "বৃষ্টি হচ্ছিল না, রোদ উঠেছিল।",
+   "gloss": "It was not raining; the sun had come out.",
+   "expect": "Dry, bright scene, no rain effects.",
+   "plan": {
+    "bg": "street",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [],
+    "props": [],
+    "time": "day"
+   },
+   "check": {
+    "forbidFx": [
+     "rain"
+    ]
+   }
+  },
+  {
+   "id": "bn-cause-01-because",
+   "category": "cause",
+   "sentence": "ফোন বেশি খোঁজে, তাই ব্যাটারি দ্রুত শেষ হয়।",
+   "gloss": "The phone searches harder, so the battery drains fast.",
+   "expect": "An insert that shows the cost — a counter or chart, not just words.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "pose": "stand",
+      "expression": "worried"
+     }
+    ],
+    "props": [],
+    "insert": {
+     "type": "counter",
+     "title": "ব্যাটারি",
+     "value": 15,
+     "suffix": "%"
+    }
+   },
+   "check": {
+    "insertAnyOf": [
+     "counter",
+     "chart",
+     "list"
+    ]
+   }
+  },
+  {
+   "id": "bn-cause-02-clicks",
+   "category": "cause",
+   "sentence": "ছেলেটি ফোনের স্ক্রিনে ক্লিক করল।",
+   "gloss": "The boy tapped the screen of his device.",
+   "expect": "A finger on the screen, the device in hand, the contact visible.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "action": "hold",
+      "holding": "phone",
+      "pose": "reach",
+      "facing": "front"
+     }
+    ],
+    "props": [
+     {
+      "type": "phone",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ]
+   },
+   "check": {
+    "holding": "phone",
+    "props": [
+     "phone"
+    ]
+   }
+  },
+  {
+   "id": "bn-cause-03-learns",
+   "category": "cause",
+   "sentence": "মেয়েটি বুঝে গেল আসল কারণটা কী।",
+   "gloss": "The girl realised what the real reason was.",
+   "expect": "A face that shows understanding arriving: light in the eyes, sudden stillness.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "close",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "d",
+      "expression": "surprised",
+      "facing": "front"
+     }
+    ],
+    "props": []
+   },
+   "check": {
+    "expressionAnyOf": [
+     "surprised",
+     "happy",
+     "smug",
+     "grin"
+    ]
+   }
+  },
+  {
+   "id": "bn-abstract-01-chart",
+   "category": "abstract",
+   "sentence": "গ্রাফে দেখা যাচ্ছে দাম বাড়ছে।",
+   "gloss": "The graph shows the price rising.",
+   "expect": "An insert chart with rising bars, not a talking head.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [],
+    "props": [
+     {
+      "type": "money",
+      "x": 0.8,
+      "z": 0.4
+     }
+    ],
+    "insert": {
+     "type": "chart",
+     "title": "দাম",
+     "data": [
+      3,
+      5,
+      7,
+      9
+     ],
+     "lines": [
+      "২০২০",
+      "২০২১",
+      "২০২২",
+      "২০২৩"
+     ]
+    }
+   },
+   "check": {
+    "insertAnyOf": [
+     "chart"
+    ]
+   }
+  },
+  {
+   "id": "bn-abstract-02-money",
+   "category": "abstract",
+   "sentence": "পাঁচশো টাকার একটা নোট ভাঁজ করে রেখেছে।",
+   "gloss": "A five-hundred-taka note was folded and put away.",
+   "expect": "A note or coin visible, or a counter insert showing the amount.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "action": "hold",
+      "holding": "money",
+      "facing": "front"
+     }
+    ],
+    "props": [
+     {
+      "type": "money",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ],
+    "insert": {
+     "type": "counter",
+     "title": "দাম",
+     "value": 500,
+     "suffix": " টাকা"
+    }
+   },
+   "check": {
+    "propsAny": [
+     "money",
+     "banknote",
+     "coin",
+     "wallet",
+     "price"
+    ],
+    "insertAnyOf": [
+     "counter",
+     "chart",
+     "bigtext"
+    ]
+   }
+  },
+  {
+   "id": "bn-abstract-03-signal",
+   "category": "abstract",
+   "sentence": "ফোনের সিগন্যাল দুর্বল হয়ে গেল।",
+   "gloss": "The phone signal became weak.",
+   "expect": "A signal indicator or waves drawn — an insert or a phone with bars.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "action": "hold",
+      "holding": "phone",
+      "expression": "worried"
+     }
+    ],
+    "props": [
+     {
+      "type": "phone",
+      "x": 0.5,
+      "z": 0.55
+     }
+    ],
+    "insert": {
+     "type": "chart",
+     "title": "সিগন্যাল",
+     "data": [
+      9,
+      6,
+      3,
+      1
+     ],
+     "lines": [
+      "",
+      "",
+      "",
+      ""
+     ]
+    }
+   },
+   "check": {
+    "insertAnyOf": [
+     "chart",
+     "bigtext",
+     "list"
+    ],
+    "propsAny": [
+     "phone"
+    ]
+   }
+  },
+  {
+   "id": "bn-extra-01-rain-window",
+   "category": "time-weather",
+   "sentence": "জানালার বাইরে বৃষ্টি পড়ছে, ভেতরে মেয়েটি দাঁড়িয়ে দেখছে।",
+   "gloss": "It is raining outside the window; inside the girl stands watching.",
+   "expect": "A window in frame with rain beyond it; the girl inside facing it.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "d",
+      "x": 0.4,
+      "z": 0.55,
+      "facing": "right"
+     }
+    ],
+    "props": [
+     {
+      "type": "window",
+      "x": 0.72,
+      "z": 0.35
+     }
+    ],
+    "fx": [
+     "rain"
+    ]
+   },
+   "check": {
+    "fxAnyOf": [
+     "rain"
+    ],
+    "props": [
+     "window"
+    ],
+    "poseAnyOf": [
+     "stand"
+    ]
+   }
+  },
+  {
+   "id": "bn-extra-02-years-later",
+   "category": "time-weather",
+   "sentence": "বছর পরে ছেলেটি আবার সেই চায়ের দোকানে ফিরে এল।",
+   "gloss": "Years later the boy returned to that tea stall.",
+   "expect": "A clear time jump: a transition, and the same place aged.",
+   "plan": {
+    "bg": "street",
+    "framing": "wide",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "pose": "stand",
+      "expression": "sad",
+      "facing": "front"
+     }
+    ],
+    "props": [],
+    "transition": "dissolve"
+   },
+   "check": {
+    "transitionAnyOf": [
+     "dissolve",
+     "fade",
+     "flash",
+     "whip"
+    ]
+   }
+  },
+  {
+   "id": "bn-extra-03-tired-window",
+   "category": "state",
+   "sentence": "ক্লান্ত ছেলেটি জানালার পাশে দাঁড়িয়ে বৃষ্টি দেখছে।",
+   "gloss": "The tired boy stands by the window watching the rain.",
+   "expect": "A window in frame, rain beyond it, a tired face turned toward it.",
+   "plan": {
+    "bg": "livingroom",
+    "framing": "medium",
+    "camera": "pushIn",
+    "actors": [
+     {
+      "id": "a",
+      "x": 0.4,
+      "z": 0.55,
+      "facing": "right",
+      "expression": "sleepy"
+     }
+    ],
+    "props": [
+     {
+      "type": "window",
+      "x": 0.72,
+      "z": 0.35
+     }
+    ],
+    "fx": [
+     "rain"
+    ]
+   },
+   "check": {
+    "props": [
+     "window"
+    ],
+    "fxAnyOf": [
+     "rain"
+    ],
+    "expressionAnyOf": [
+     "sleepy",
+     "sad",
+     "bored"
+    ]
+   }
+  }
+ ]
+}

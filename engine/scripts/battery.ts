@@ -28,6 +28,8 @@ type Entry = {
   id: string;
   category: string;
   sentence: string;
+  /** English gloss — required for Bangla entries; the checks read it as the meaning layer */
+  gloss?: string;
   expect: string;
   plan: Record<string, unknown>;
   check: Requirement;
@@ -46,28 +48,41 @@ const data = JSON.parse(
   fs.readFileSync(path.resolve(import.meta.dirname, "../data/commonsense-battery.json"), "utf8"),
 ) as { entries: Entry[] };
 
+// The Bangla battery: same 14 categories, Bangla sentences, English glosses, Bangla checks.
+// Read lazily so a missing/older file cannot break the English suite.
+const bnPath = path.resolve(import.meta.dirname, "../lang/bn/commonsense-battery.json");
+const bnData: { entries: Entry[] } = fs.existsSync(bnPath)
+  ? (JSON.parse(fs.readFileSync(bnPath, "utf8")) as { entries: Entry[] })
+  : { entries: [] };
+
 export type BatteryResult = {
   id: string;
   category: string;
   sentence: string;
   expect: string;
+  lang: "en" | "bn";
   pass: boolean;
   errors: string[];
   warnings: string[];
 };
 
-export function runBattery(only?: string): BatteryResult[] {
+export function runBattery(only?: string, lang: "en" | "bn" | "all" = "en"): BatteryResult[] {
   const results: BatteryResult[] = [];
-  for (const entry of data.entries) {
+  const entries: { entry: Entry; lang: "en" | "bn" }[] = [];
+  if (lang === "en" || lang === "all") for (const e of data.entries) entries.push({ entry: e, lang: "en" });
+  if (lang === "bn" || lang === "all") for (const e of bnData.entries) entries.push({ entry: e, lang: "bn" });
+
+  for (const { entry, lang: entryLang } of entries) {
     if (only && entry.category !== only) continue;
     const errors: string[] = [];
     const warnings: string[] = [];
     try {
       const story = StorySchema.parse({
         title: entry.sentence,
+        lang: entryLang,
         music: "warm",
         cast: CAST,
-        shots: [{ ...entry.plan, say: entry.sentence }],
+        shots: [{ ...entry.plan, say: entry.sentence, ...(entry.gloss ? { gloss: entry.gloss } : {}) }],
       });
       const timeline = buildTimeline(story, null, null, null);
       const shot: ResolvedShot = timeline.shots[0];
@@ -77,9 +92,18 @@ export function runBattery(only?: string): BatteryResult[] {
         (f.sev === "ERROR" ? errors : warnings).push(`[geometry ${f.kind}] ${f.msg}`);
       }
       const seen = seenOf(shot);
-      for (const g of matches(entry.sentence)) {
+      // The glossary is matched on the narration in the story's own language, and on the gloss
+      // too for Bangla (loanwords and mixed phrasing live in the English cues).
+      for (const g of matches(entry.sentence, entryLang)) {
         for (const f of checkRequirement(g, g.requires, seen, 1)) {
           (f.sev === "ERROR" ? errors : warnings).push(`[glossary ${g.id}] ${f.msg.split("\n")[0]}`);
+        }
+      }
+      if (entryLang === "bn" && entry.gloss) {
+        for (const g of matches(entry.gloss, "en")) {
+          for (const f of checkRequirement(g, g.requires, seen, 1)) {
+            (f.sev === "ERROR" ? errors : warnings).push(`[gloss ${g.id}] ${f.msg.split("\n")[0]}`);
+          }
         }
       }
       for (const f of checkRequirement(
@@ -93,7 +117,7 @@ export function runBattery(only?: string): BatteryResult[] {
     } catch (e) {
       errors.push(`[schema] ${(e as Error).message.split("\n")[0]}`);
     }
-    results.push({ ...entry, pass: errors.length === 0, errors, warnings });
+    results.push({ ...entry, lang: entryLang, pass: errors.length === 0, errors, warnings });
   }
   return results;
 }
@@ -130,7 +154,9 @@ export function report(results: BatteryResult[], asJson: boolean): string {
 if (process.argv[1] && /battery\.[tj]s$/.test(process.argv[1])) {
   const argv = process.argv.slice(2);
   const onlyIdx = argv.indexOf("--only");
-  const results = runBattery(onlyIdx >= 0 ? argv[onlyIdx + 1] : undefined);
+  const langIdx = argv.indexOf("--lang");
+  const lang = (langIdx >= 0 ? argv[langIdx + 1] : "all") as "en" | "bn" | "all";
+  const results = runBattery(onlyIdx >= 0 ? argv[onlyIdx + 1] : undefined, lang);
   const out = report(results, argv.includes("--json"));
   const dir = path.resolve(import.meta.dirname, "../out/battery");
   fs.mkdirSync(dir, { recursive: true });

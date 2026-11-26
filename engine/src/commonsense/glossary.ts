@@ -9,8 +9,13 @@
  * with a GOOD example and a BAD (literal) example for each. This module matches a shot's
  * narration against those phrases and turns every unmet requirement into a gate finding,
  * so the picture is checked against human expectation instead of the agent's intent.
+ *
+ * Bangla entries live in `lang/bn/intent-glossary.json` and use the same `requires` vocabulary,
+ * so one checker serves both languages. Phrase matching is Unicode-aware — the old ASCII-only
+ * normalizer deleted Bangla text entirely.
  */
 import GLOSSARY from "../../data/intent-glossary.json";
+import BN_GLOSSARY from "../../lang/bn/intent-glossary.json";
 
 export type Sev = "ERROR" | "WARN";
 
@@ -35,6 +40,8 @@ export type Requirement = {
   timeAnyOf?: string[];
   /** at least one of these effects must be on */
   fxAnyOf?: string[];
+  /** none of these effects may be on ("it was not raining" while rain fx is active) */
+  forbidFx?: string[];
   /** at least one of these transitions must be used (for time jumps and cuts) */
   transitionAnyOf?: string[];
   /** an insert graphic must be one of these */
@@ -49,6 +56,8 @@ export type Requirement = {
   minScale?: number;
   /** a prop repeated at least this many times ("three cups") */
   propCount?: { type: string; min: number };
+  /** ANY prop whose count reaches this ("three of something"), or this many actors */
+  propCountAnyMin?: number;
   /** a prop must be drawn open (door) or lit (lamp): field value >= 0.5 */
   propOpen?: string;
   /** at least two actors must face each other */
@@ -107,21 +116,35 @@ export type Seen = {
   facing: string[];
 };
 
-const norm = (s: string) => ` ${s.toLowerCase().replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim()} `;
+const norm = (s: string) =>
+  ` ${s
+    .toLowerCase()
+    // Unicode-aware: keep letters, digits and MARK characters of any script. Bangla vowel signs
+    // (matras) and the nukta are combining marks (\p{M}) — stripping them turns "চেয়ারে" into
+    // "চ য র" and no phrase can ever match. Only punctuation and symbols are dropped.
+    .replace(/[^\p{L}\p{N}\p{M}' ]+/gu, " ")
+    .normalize("NFC")
+    .replace(/\s+/g, " ")
+    .trim()} `;
 
 export const ENTRIES: GlossaryEntry[] = (GLOSSARY as { entries: GlossaryEntry[] }).entries;
 
-/** Glossary entries whose phrase appears in this narration text. */
-export function matches(text: string): GlossaryEntry[] {
+/** The Bangla glossary, loaded once on first use. */
+let BN_ENTRIES: GlossaryEntry[] | null = null;
+export const bnEntries = (): GlossaryEntry[] => (BN_ENTRIES ??= (BN_GLOSSARY as { entries: GlossaryEntry[] }).entries);
+
+/** Glossary entries for `lang` whose phrase appears in this narration text. */
+export function matches(text: string, lang: "en" | "bn" = "en"): GlossaryEntry[] {
   const t = norm(text);
-  return ENTRIES.filter((e) => e.phrases.some((p) => t.includes(` ${p.toLowerCase()} `)));
+  const all = lang === "bn" ? [...ENTRIES, ...bnEntries()] : ENTRIES;
+  return all.filter((e) => e.phrases.some((p) => t.includes(` ${p.toLowerCase()} `)));
 }
 
 /** Content-word coverage: how much of the narration the glossary can speak to at all. */
-export function coverage(text: string): { covered: number; total: number } {
+export function coverage(text: string, lang: "en" | "bn" = "en"): { covered: number; total: number } {
   const stop = new Set(["the", "a", "an", "and", "or", "but", "of", "to", "in", "on", "at", "is", "was", "were", "it", "he", "she", "they", "his", "her", "their", "that", "this", "with", "for", "as", "by", "from", "not", "no", "did", "does", "do", "be", "been", "has", "had", "have"]);
   const words = norm(text).trim().split(" ").filter((w) => w.length > 2 && !stop.has(w));
-  const phrases = ENTRIES.flatMap((e) => e.phrases).map((p) => ` ${p} `);
+  const phrases = (lang === "bn" ? [...ENTRIES, ...bnEntries()] : ENTRIES).flatMap((e) => e.phrases).map((p) => ` ${p} `);
   let covered = 0;
   for (const w of words) if (phrases.some((p) => p.includes(` ${w} `))) covered++;
   return { covered, total: words.length };
@@ -165,6 +188,9 @@ export function checkRequirement(entry: GlossaryEntry, req: Requirement, seen: S
   if (req.fxAnyOf && !req.fxAnyOf.some((f) => seen.fx.includes(f))) {
     fail(`the sentence describes ${req.fxAnyOf.join(" / ")}; add it to the shot's \`fx\``);
   }
+  if (req.forbidFx && req.forbidFx.some((f) => seen.fx.includes(f))) {
+    fail(`the sentence says this is NOT happening, but the shot has ${req.forbidFx.filter((f) => seen.fx.includes(f)).join(" / ")} on — remove it from \`fx\``);
+  }
   if (req.transitionAnyOf && !req.transitionAnyOf.some((t) => seen.transitions.includes(t))) {
     fail(`this beat is a change of place or time: use one of the transitions ${req.transitionAnyOf.join(" / ")} so the cut reads`);
   }
@@ -188,6 +214,12 @@ export function checkRequirement(entry: GlossaryEntry, req: Requirement, seen: S
     const n = seen.propCount[req.propCount.type] ?? 0;
     if (n < req.propCount.min) {
       fail(`the sentence counts ${req.propCount.min} \`${req.propCount.type}\`(s); the shot draws ${n} (use the prop's "count" field)`);
+    }
+  }
+  if (req.propCountAnyMin !== undefined) {
+    const best = Math.max(0, ...Object.values(seen.propCount));
+    if (best < req.propCountAnyMin && seen.actors < req.propCountAnyMin) {
+      fail(`the sentence counts ${req.propCountAnyMin} things or people; the most on screen is ${Math.max(best, seen.actors)} (use a prop's "count" field or more actors)`);
     }
   }
   if (req.propOpen) {
