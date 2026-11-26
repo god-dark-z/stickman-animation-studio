@@ -146,6 +146,18 @@ export const PROPS = [
   "bouquet", // flower offering in a glass bottle (Japanese style)
   "frog", // small golden frog figurine — the kaeru offering for a safe return
   "bulldozer", // yellow bulldozer with a front blade (the GHQ parking-lot beat)
+  // ---------------------------------------------------------------- Bangla / Bengali settings
+  // Everyday Bangladeshi places and objects. A story set at a tea stall, in a rickshaw or on a
+  // village morning should not have to borrow a generic western prop.
+  "rickshaw", // cycle rickshaw: painted hood, passenger seat, three wheels
+  "teastall", // bamboo-frame tea stall: bench, kettle, hanging bulb
+  "kettle", // aluminium cha-er kettle
+  "glass_tea", // small glass of milk tea
+  "bench_wood", // low wooden bench of a tea stall
+  "sack", // jute sack of rice or vegetables
+  "jhalmuri", // paper cone of spiced puffed rice
+  "pasteboard", // market signboard / shop hoarding
+  "rickshaw_hood", // the painted hood alone, for a close shot
 ] as const;
 
 export const FX = [

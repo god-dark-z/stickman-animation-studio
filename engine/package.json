@@ -37,7 +37,8 @@
     "choose-voice": "tsx scripts/choose_voice.ts",
     "battery:bn": "tsx scripts/battery.ts --lang bn",
     "lint:skill": "tsx scripts/skill_lint.ts",
-    "qa:skill": "python scripts/qa_bangla.py"
+    "qa:skill": "python scripts/qa_bangla.py",
+    "qa:rubric": "tsx scripts/qa_rubric.ts"
   },
   "dependencies": {
     "@react-three/fiber": "9.4.0",

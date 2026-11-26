@@ -2,7 +2,7 @@
 
 Generated 2026-11-26 by `npx tsx scripts/eval.ts`.
 
-## Summary — 314/314 checks (100 %)
+## Summary — 332/332 checks (100 %)
 
 | suite | language | pass | rate | what it proves |
 |---|---|---|---|---|
@@ -14,26 +14,27 @@ Generated 2026-11-26 by `npx tsx scripts/eval.ts`.
 | bangla normalizer | bn | 44/44 | 100 % | scripts/test_bn_normalize.py |
 | bangla timing | bn | 18/18 | 100 % | scripts/test_bn_tts.py |
 | typecheck | all | 1/1 | 100 % | tsc --noEmit clean |
-| gate stack | en | 3/3 | 100 % | why-phone-gets-hot.json |
-| gate stack | bn | 5/5 | 100 % | bangla-dialogue-two.json |
-| gate stack | bn | 5/5 | 100 % | bangla-insert-test.json |
-| gate stack | en | 3/3 | 100 % | bed-sleep.json |
-| gate stack | en | 3/3 | 100 % | chair-office.json |
-| gate stack | en | 3/3 | 100 % | chart-daynight.json |
-| gate stack | en | 3/3 | 100 % | dialogue-two.json |
-| gate stack | en | 3/3 | 100 % | drive-travel.json |
-| gate stack | en | 3/3 | 100 % | edge-short.json |
-| gate stack | en | 3/3 | 100 % | history-dialogue.json |
-| gate stack | en | 3/3 | 100 % | kitchen-cook.json |
-| gate stack | en | 3/3 | 100 % | science-explainer.json |
+| gate stack | en | 4/4 | 100 % | why-phone-gets-hot.json |
+| gate stack | bn | 6/6 | 100 % | bangla-dialogue-two.json |
+| gate stack | bn | 6/6 | 100 % | bangla-insert-test.json |
+| gate stack | bn | 6/6 | 100 % | bangla-tea-stall.json |
+| gate stack | en | 4/4 | 100 % | bed-sleep.json |
+| gate stack | en | 4/4 | 100 % | chair-office.json |
+| gate stack | en | 4/4 | 100 % | chart-daynight.json |
+| gate stack | en | 4/4 | 100 % | dialogue-two.json |
+| gate stack | en | 4/4 | 100 % | drive-travel.json |
+| gate stack | en | 4/4 | 100 % | edge-short.json |
+| gate stack | en | 4/4 | 100 % | history-dialogue.json |
+| gate stack | en | 4/4 | 100 % | kitchen-cook.json |
+| gate stack | en | 4/4 | 100 % | science-explainer.json |
 
 ## By language
 
 | language | pass | rate |
 |---|---|---|
 | all | 102/102 | 100 % |
-| bn | 121/121 | 100 % |
-| en | 91/91 | 100 % |
+| bn | 129/129 | 100 % |
+| en | 101/101 | 100 % |
 
 ## Per-category, per-language (commonsense battery)
 

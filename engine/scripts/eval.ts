@@ -142,6 +142,9 @@ for (const f of [path.join("stories", "why-phone-gets-hot.json"), ...storyFiles.
     if (run(python, ["scripts/qa_bangla.py", full, "--with-gloss"]).ok) ok++;
     if (run(python, ["scripts/qa_glyphs.py", full]).ok) ok++;
   }
+  // craft rubric: every shot at least 3/5
+  total++;
+  if (run(npx, ["tsx", "scripts/qa_rubric.ts", full]).ok) ok++;
   rows.push({ suite: "gate stack", lang, pass: ok, total, detail: path.basename(f), measured: true });
 }
 

@@ -1,0 +1,69 @@
+{
+  "title": "bangla-tea-stall-morning",
+  "lang": "bn",
+  "music": "warm",
+  "cast": {
+    "karim": { "name": "Karim", "color": "#3a6fb0", "outfit": "shirt", "hair": "short", "voice": "bn-BD-PradeepNeural", "voiceRate": "+20%" },
+    "shathi": { "name": "Shathi", "color": "#c2543a", "outfit": "dress", "hair": "long", "voice": "bn-BD-NabanitaNeural", "voiceRate": "+22%" }
+  },
+  "shots": [
+    {
+      "say": "ভোরে চায়ের দোকানে কেটলি গরম হতে থাকে।",
+      "gloss": "At dawn the kettle on the tea stall starts to heat.",
+      "bg": "village_dawn",
+      "time": "dawn",
+      "framing": "wide",
+      "props": [
+        { "type": "teastall", "x": 0.5, "z": 0.4 },
+        { "type": "kettle", "x": 0.42, "y": 340, "z": 0.42 }
+      ]
+    },
+    {
+      "say": "করিম এসে বেঞ্চে বসে এক গ্লাস চা নেয়।",
+      "gloss": "Karim arrives and sits on the bench with a glass of tea.",
+      "bg": "village_dawn",
+      "time": "dawn",
+      "framing": "full",
+      "focus": "karim",
+      "props": [
+        { "type": "teastall", "x": 0.5, "z": 0.4 },
+        { "type": "bench_wood", "x": 0.45, "z": 0.6 },
+        { "type": "glass_tea", "x": 0.45, "z": 0.58 }
+      ],
+      "actors": [
+        { "id": "karim", "x": 0.45, "z": 0.6, "action": "sitOn", "on": "bench_wood", "pose": "sit", "holding": "glass_tea", "expression": "happy", "facing": "front" }
+      ]
+    },
+    {
+      "say": "শাথী বলল, আজ সকালটা অনেক ঠান্ডা।",
+      "gloss": "Shathi said, this morning is very cold.",
+      "bg": "village_dawn",
+      "time": "dawn",
+      "framing": "full",
+      "focus": "shathi",
+      "quote": "shathi",
+      "props": [
+        { "type": "teastall", "x": 0.5, "z": 0.4 },
+        { "type": "bench_wood", "x": 0.45, "z": 0.6 },
+        { "type": "bench_wood", "x": 0.72, "z": 0.6 }
+      ],
+      "actors": [
+        { "id": "karim", "x": 0.45, "z": 0.6, "action": "sitOn", "on": "bench_wood", "pose": "sit", "facing": "right", "expression": "neutral" },
+        { "id": "shathi", "x": 0.72, "z": 0.6, "action": "sitOn", "on": "bench_wood", "pose": "sit", "facing": "left", "expression": "worried", "talking": true }
+      ],
+      "beats": [{ "at": "ঠান্ডা", "actor": "karim", "expression": "smug" }]
+    },
+    {
+      "say": "চায়ের ভাপে ঠান্ডা কমে যায়।",
+      "gloss": "The steam of the tea pushes the cold away.",
+      "bg": "village_dawn",
+      "time": "dawn",
+      "framing": "close",
+      "fx": ["smoke"],
+      "props": [
+        { "type": "kettle", "x": 0.5, "z": 0.6 },
+        { "type": "glass_tea", "x": 0.42, "z": 0.62 }
+      ]
+    }
+  ]
+}

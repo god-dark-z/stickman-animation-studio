@@ -34,7 +34,7 @@ import { chooseVoice, decisionMarkdown } from "./choose_voice";
 type Tier = "draft" | "standard" | "studio";
 // `bangla` is a no-op PASS for English stories, so it can sit in one fixed stage list: the
 // pipeline never branches, and a Bangla story cannot skip its text gate by accident.
-const STAGES = ["validate", "bangla", "glyphs", "narration", "timeline", "sync", "geometry", "commonsense", "stills", "pixels", "timing", "render", "video", "audio", "visual"] as const;
+const STAGES = ["validate", "bangla", "glyphs", "narration", "timeline", "sync", "geometry", "commonsense", "stills", "pixels", "timing", "render", "video", "audio", "visual", "rubric"] as const;
 type Stage = (typeof STAGES)[number];
 
 const args = process.argv.slice(2);
@@ -141,6 +141,7 @@ const stageCmd = (stage: Stage): { cmd: string; args: string[]; skip?: string } 
       ? { cmd: python, args: ["scripts/qa_audio.py", path.join(outDir, `${slug}${preview ? "-preview" : ""}.mp4`)] }
       : { cmd: "", args: [], skip: "--no-tts: silent render, nothing to measure" };
     case "visual": return { cmd: python, args: ["scripts/qa_visual_report.py", storyPath, path.join(outDir, "stills")] };
+    case "rubric": return { cmd: "npx", args: ["tsx", "scripts/qa_rubric.ts", storyPath, "--write", path.join(outDir, "craft-rubric.md")] };
   }
 };
 
@@ -178,6 +179,7 @@ const STAGE_DOCS: Record<Stage, string> = {
   video: "container/spec/dead-frame gate (qa_video.py)",
   audio: "loudness/peak gate (qa_audio.py)",
   visual: "per-shot claim checklist + review file (qa_visual_report.py)",
+  rubric: "per-shot craft rubric scored from gate evidence (qa_rubric.ts)",
 };
 void STAGE_DOCS;
 
@@ -197,6 +199,7 @@ const FIX: Record<Stage, string> = {
   video: "the MP4 is wrong (spec/duration/dead frames) — re-render, check the story's shot lengths",
   audio: "loudness/peak out of range — the pipeline loudnorms automatically; re-render",
   visual: "create out/<slug>/visual-review.md as the checklist asks, or rely on the geometry gate and say so",
+  rubric: "a shot scores below 3: read craft-rubric.md, the axis names the weakness (staging/framing/sync/specificity/light/sound)",
 };
 
 const from = opt("--from") as Stage | undefined;

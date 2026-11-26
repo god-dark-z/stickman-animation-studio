@@ -116,7 +116,7 @@ const TIME_JUMP_WORDS = /(later|that night|next (day|morning|week|year)|meanwhil
 // words that license a world change
 const WORLD_JUMP_WORDS = /(meanwhile|elsewhere|back (at|in|home)|inside|outside|arrives|returned|moves to)/i;
 
-const LEX: Lexicon = { place: PLACE, objects: OBJECTS, poses: POSES, time: TIME };
+export const LEX: Lexicon = { place: PLACE, objects: OBJECTS, poses: POSES, time: TIME };
 
 const norm = (w: string) => w.toLowerCase().replace(/[^a-z0-9']/g, "");
 const NEGATIONS = new Set(["not", "no", "never", "don't", "doesn't", "didn't", "can't", "cannot", "won't", "isn't", "aren't", "without", "stop"]);
@@ -133,7 +133,7 @@ function negated(say: string, word: string): boolean {
 
 type Finding = { shot: number; sev: "ERROR" | "WARN"; kind: string; msg: string };
 
-function checkShot(story: Story, s: ResolvedShot, i: number, lex: Lexicon): Finding[] {
+export function checkShot(story: Story, s: ResolvedShot, i: number, lex: Lexicon): Finding[] {
   const out: Finding[] = [];
   const say = s.say === "…" ? "" : s.say;
   const words = wordsOf(say);

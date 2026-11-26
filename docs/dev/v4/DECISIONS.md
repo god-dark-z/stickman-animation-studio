@@ -90,3 +90,15 @@ Judgement calls made without asking, with the reason. Numbering continues V3's l
 | V4-52 | The eval harness measures the **engine and skill** (batteries, gates, resolver, normalizer, lint) and accepts operator-recorded model rows separately, with their source | Per-model numbers need paid APIs, which the rules forbid. Merging unverifiable rows into measured ones would corrupt the only trustworthy table. |
 | V4-53 | `skill_lint` fails on a script named in SKILL.md that does not exist | The most common decay in a long manual is a command path that drifted. Mechanical link-checking is the only way a 374-line manual stays true. |
 | V4-54 | A bare JSON **fragment** in a doc is treated as an error | A reader (or an agent) will copy it and get a parse failure. Wrapping it in an object costs one line and makes every example executable. |
+
+## Phase H
+
+| # | Decision | Why |
+|---|---|---|
+| V4-55 | The craft rubric scores six axes from **existing gate evidence**, not from a new model call | No paid APIs. Every signal (geometry findings, sync findings, framing repetition, cue density, declared light) is already computed, so the score is reproducible and free. |
+| V4-56 | The rubric's **floor** (no shot below 3) is enforced; the **average of 4** is reported and opt-in via `--avg 4` | The shipped demo honestly scores 3.81. Making 4 the default would either block every run or tempt someone to soften the rubric — both worse than an honest number with a named gap. |
+| V4-57 | Rubric scores are conservative: 5 needs positive evidence (semantic action used, explicit focus, deliberate cues), never merely "no defect" | A rubric that rewards absence of bugs grades every clean run identically, which is useless for comparing versions. |
+| V4-58 | The `sync` axis accepts a human verdict when a person watched the shot | The automated axis proves the contract; whether the picture *reads* is a human call, and the rubric says which of the two it used. |
+| V4-59 | New Bangla props have anchors **measured from the drawing**, and the drawing moves to match when the anchor is wrong | The first `bench_wood` seat put a seated hip 38 px under the floor. Contact must come from the measured anchor, not a hopeful constant — the same principle as V3 decision #1. |
+| V4-60 | The English demo's characters were **named** (Sam, Ravi) rather than the rubric being relaxed | The rubric's specificity axis was pointing at a real weakness: a story that says "Meet Sam" had an unnamed cast. Fixing the story is the honest response to a score. |
+| V4-61 | "অনেক" is no longer a crowd cue; it needs a counted noun | "অনেক ঠান্ডা" means *very* cold. Bangla intensifiers collide with quantifiers, so the cue must be a collocation (`অনেক মানুষ`), not the bare adverb. |

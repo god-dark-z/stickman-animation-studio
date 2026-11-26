@@ -1462,6 +1462,123 @@ export const drawProp = (type: PropType, o: PropOpts): React.ReactNode => {
           </g>
         </g>
       );
+    case "rickshaw": {
+      // Cycle rickshaw: painted hood, passenger bench, three wheels. Reads as the classic
+      // Dhaka/Delhi cycle rickshaw silhouette, not a western cart.
+      const hood = o.color ?? "#1f7a4d";
+      return (
+        <g>
+          {/* hood */}
+          <path d="M -150 -300 Q -120 -392 0 -400 Q 120 -392 150 -300 L 150 -250 L -150 -250 Z" fill={hood} stroke={INK} strokeWidth={5} />
+          <path d="M -150 -300 Q 0 -330 150 -300" fill="none" stroke="#ffd86b" strokeWidth={5} opacity={0.85} />
+          {/* rear body / passenger seat */}
+          <path d="M -160 -250 L 150 -250 L 165 -140 L -175 -140 Z" fill="#c0392b" stroke={INK} strokeWidth={5} />
+          <rect x={-120} y={-236} width={250} height={34} rx={8} fill="#7a1f1a" stroke={INK} strokeWidth={3} />
+          {/* driver's saddle */}
+          <rect x={-40} y={-196} width={70} height={16} rx={6} fill="#3a2a20" stroke={INK} strokeWidth={3} />
+          <path d="M -8 -180 L -4 -150" stroke={INK} strokeWidth={4} />
+          {/* wheels */}
+          <circle cx={-110} cy={-52} r={54} fill="none" stroke="#2a2a2a" strokeWidth={10} />
+          <circle cx={120} cy={-52} r={54} fill="none" stroke="#2a2a2a" strokeWidth={10} />
+          <circle cx={-110} cy={-52} r={8} fill="#7a7a7a" stroke={INK} strokeWidth={2} />
+          <circle cx={120} cy={-52} r={8} fill="#7a7a7a" stroke={INK} strokeWidth={2} />
+          {/* handlebar + chain guard */}
+          <path d="M 90 -230 L 128 -206" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+          <rect x={-40} y={-120} width={96} height={16} rx={6} fill="#3a3a3a" />
+        </g>
+      );
+    }
+    case "rickshaw_hood":
+      return (
+        <g>
+          <path d="M -150 -120 Q -120 -212 0 -220 Q 120 -212 150 -120 L 150 -70 L -150 -70 Z" fill={o.color ?? "#1f7a4d"} stroke={INK} strokeWidth={5} />
+          <path d="M -150 -120 Q 0 -150 150 -120" fill="none" stroke="#ffd86b" strokeWidth={5} opacity={0.85} />
+          <circle cx={0} cy={-160} r={22} fill="none" stroke="#ffd86b" strokeWidth={4} opacity={0.7} />
+        </g>
+      );
+    case "teastall":
+      // Bamboo-frame tea stall: a low roof, a bench, a kettle and glasses. The default Bengali
+      // street-side gathering place, and a natural two-shot location.
+      return (
+        <g>
+          {/* posts + tin roof */}
+          <rect x={-190} y={-300} width={10} height={300} fill="#8a6a45" stroke={INK} strokeWidth={2} />
+          <rect x={180} y={-300} width={10} height={300} fill="#8a6a45" stroke={INK} strokeWidth={2} />
+          <path d="M -230 -300 L 230 -300 L 200 -340 L -200 -340 Z" fill="#7d8288" stroke={INK} strokeWidth={5} />
+          {/* counter + shelf */}
+          <rect x={-186} y={-176} width={372} height={22} rx={4} fill="#a8752f" stroke={INK} strokeWidth={4} />
+          <rect x={-186} y={-268} width={372} height={12} rx={4} fill="#8a6a45" stroke={INK} strokeWidth={3} />
+          <rect x={-70} y={-120} width={150} height={120} rx={6} fill="#b8863f" stroke={INK} strokeWidth={4} />
+          {/* hanging bulb */}
+          <line x1={40} y1={-340} x2={40} y2={-272} stroke={INK} strokeWidth={3} />
+          <circle cx={40} cy={-262} r={14} fill="#ffe9a8" stroke={INK} strokeWidth={3} />
+          {/* kettle on the counter */}
+          <g transform="translate(-120 -176)">
+            <path d="M -26 0 L -22 -44 L 22 -44 L 26 0 Z" fill="#c9ced6" stroke={INK} strokeWidth={4} />
+            <path d="M 22 -34 Q 44 -30 40 -8" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+            <path d="M -22 -40 Q 0 -54 22 -40" fill="none" stroke={INK} strokeWidth={4} />
+          </g>
+          {/* glasses on the shelf */}
+          {[-120, -70, -20, 30].map((x, i) => (
+            <g key={i} transform={`translate(${x} -252)`}>
+              <path d="M -8 0 L -6 -20 L 6 -20 L 8 0 Z" fill="#e8cf9a" stroke={INK} strokeWidth={2} opacity={0.95} />
+            </g>
+          ))}
+        </g>
+      );
+    case "kettle":
+      return (
+        <g>
+          <path d="M -40 0 L -34 -70 L 34 -70 L 40 0 Z" fill={o.color ?? "#c9ced6"} stroke={INK} strokeWidth={5} />
+          <path d="M 34 -54 Q 68 -48 62 -12" fill="none" stroke={INK} strokeWidth={6} strokeLinecap="round" />
+          <path d="M -34 -62 Q 0 -84 34 -62" fill="none" stroke={INK} strokeWidth={5} />
+          <rect x={-20} y={-84} width={40} height={10} rx={4} fill="#3a3f4a" stroke={INK} strokeWidth={3} />
+        </g>
+      );
+    case "glass_tea":
+      return (
+        <g>
+          <path d="M -16 0 L -12 -52 L 12 -52 L 16 0 Z" fill="#e8cf9a" stroke={INK} strokeWidth={4} />
+          <path d="M -14 -30 L 14 -30 L 16 0 L -16 0 Z" fill="#c99a5e" opacity={0.9} />
+          <path d="M -12 -52 L 12 -52" stroke={INK} strokeWidth={4} />
+        </g>
+      );
+    case "bench_wood":
+      // seat top at -108 so a seated body's feet reach the floor (matches the chair family)
+      return (
+        <g>
+          <rect x={-150} y={-108} width={300} height={22} rx={5} fill="#a8752f" stroke={INK} strokeWidth={5} />
+          <rect x={-150} y={-148} width={300} height={16} rx={4} fill="#96661f" stroke={INK} strokeWidth={4} />
+          <rect x={-136} y={-86} width={14} height={86} fill="#7a5220" stroke={INK} strokeWidth={3} />
+          <rect x={122} y={-86} width={14} height={86} fill="#7a5220" stroke={INK} strokeWidth={3} />
+        </g>
+      );
+    case "sack":
+      return (
+        <g>
+          <path d="M -70 0 Q -84 -70 -54 -110 Q -30 -140 0 -140 Q 30 -140 54 -110 Q 84 -70 70 0 Z" fill="#b9a273" stroke={INK} strokeWidth={5} />
+          <path d="M -36 -128 Q 0 -112 36 -128" fill="none" stroke="#8d7850" strokeWidth={4} />
+          <path d="M -60 -20 L 60 -20 M -64 -60 L 64 -60" stroke="#9c8659" strokeWidth={3} opacity={0.8} />
+          <path d="M -20 -140 Q 0 -156 20 -140" fill="none" stroke={INK} strokeWidth={4} />
+        </g>
+      );
+    case "jhalmuri":
+      return (
+        <g>
+          <path d="M -34 0 L 0 -96 L 34 0 Z" fill="#e8dcc0" stroke={INK} strokeWidth={4} />
+          <path d="M -18 -34 L 0 -66 L 18 -34 Z" fill="#c8892f" />
+          <circle cx={-6} cy={-44} r={4} fill="#8a4a1a" />
+          <circle cx={7} cy={-54} r={3} fill="#3a7a2a" />
+        </g>
+      );
+    case "pasteboard":
+      return (
+        <g>
+          <rect x={-150} y={-260} width={300} height={140} rx={8} fill={o.color ?? "#2f6fb0"} stroke={INK} strokeWidth={6} />
+          <Label x={0} y={-190} text={o.label ?? "চা"} size={40} w={270} />
+          <rect x={-8} y={-120} width={16} height={120} fill="#7a5220" stroke={INK} strokeWidth={3} />
+        </g>
+      );
   }
   return (
     <g>
@@ -1485,6 +1602,7 @@ export const HELD: Partial<Record<PropType, { s: number; dy: number }>> = {
   bomb: { s: 0.45, dy: 50 }, dynamite: { s: 0.5, dy: 60 }, syringe: { s: 0.5, dy: 60 }, scalpel: { s: 0.45, dy: 50 }, capsule: { s: 0.4, dy: 40 }, pill: { s: 0.5, dy: 20 },
   calendar: { s: 0.5, dy: 50 }, clock: { s: 0.5, dy: 50 }, piggybank: { s: 0.55, dy: 60 }, gem: { s: 0.6, dy: 40 },
   lantern: { s: 0.6, dy: 40 }, sari_cloth: { s: 0.5, dy: 30 },
+  kettle: { s: 0.7, dy: 40 }, glass_tea: { s: 0.5, dy: 30 }, jhalmuri: { s: 0.5, dy: 30 }, sack: { s: 0.8, dy: 20 },
   cards: { s: 0.5, dy: 40 }, dice: { s: 0.5, dy: 30 }, laptop: { s: 0.6, dy: 30 }, plate: { s: 0.6, dy: 20 },
   food: { s: 0.6, dy: 20 }, balloon: { s: 0.7, dy: 0 }, rope: { s: 0.4, dy: 100 }, chain: { s: 0.4, dy: 60 },
   fish: { s: 0.6, dy: 30 }, bird: { s: 0.6, dy: 20 }, lock: { s: 0.5, dy: 40 }, battery: { s: 0.5, dy: 60 },

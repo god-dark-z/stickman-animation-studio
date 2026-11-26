@@ -71,6 +71,12 @@ export const PROP_ANCHORS: Record<string, PropAnchors> = {
   car: { seat: { x: -10, y: -74, w: 150, h: 20 }, vehicle: true, extent: { w: 300, h: 180 } },
   hospital: { mattress: { x: 0, y: -108, w: 436, h: 70 } },
   bed_rail: { seat: { x: 0, y: -94, w: 200, h: 20 } },
+  // ---------------------------------------------------------------- Bangla settings
+  // Measured from the drawings above. The rickshaw is a vehicle: the driver sits inside the
+  // body and only the upper body shows, exactly like a car.
+  rickshaw: { seat: { x: -5, y: -196, w: 90, h: 18 }, vehicle: true, extent: { w: 340, h: 400 } },
+  bench_wood: { seat: { x: 0, y: -108, w: 300, h: 22 }, extent: { w: 310, h: 150 } },
+  teastall: { top: { x: 0, y: -176, w: 372, h: 22 }, extent: { w: 460, h: 340 } },
 };
 
 export const anchorsOf = (type: string): PropAnchors | undefined => PROP_ANCHORS[type];
