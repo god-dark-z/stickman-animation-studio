@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Install or agent setup
+    url: https://github.com/god-dark-z/stickman-animation-studio/blob/main/install/INSTALL.md
+    about: Which agents are supported, and how each install works
+  - name: Something does not run
+    url: https://github.com/god-dark-z/stickman-animation-studio/blob/main/docs/TROUBLESHOOTING.md
+    about: The failures people actually hit, with fixes

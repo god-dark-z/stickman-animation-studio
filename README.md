@@ -1,261 +1,254 @@
 <div align="center">
 
-<img src="docs/banner.svg" alt="Stickman Animation Studio — one prompt, a finished cartoon, every frame drawn by code" width="100%"/>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/banner-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/banner-light.svg">
+  <img src="docs/banner-dark.svg" alt="Stickman Animation Studio — one prompt in, a finished cartoon out, every frame drawn by code" width="100%">
+</picture>
+
+[English](README.md) | [বাংলা](README.bn.md)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-f5a623.svg?style=flat-square)](LICENSE)
 ![Node](https://img.shields.io/badge/Node-18%2B-3a8ad6.svg?style=flat-square)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3a8ad6.svg?style=flat-square)
-![Engine](https://img.shields.io/badge/Engine-Remotion%204%20%2B%20three.js-9fe8a8.svg?style=flat-square)
-![QA](https://img.shields.io/badge/QA-9%20executable%20gates-ff8a2a.svg?style=flat-square)
-![AI images](https://img.shields.io/badge/AI%20images-0-c9d4e8.svg?style=flat-square)
-![AI video](https://img.shields.io/badge/AI%20video-0-c9d4e8.svg?style=flat-square)
-![Paid APIs](https://img.shields.io/badge/Paid%20APIs-0-c9d4e8.svg?style=flat-square)
-[![Agents](https://img.shields.io/badge/Agents-Claude%20%7C%20ZCode%20%7C%20Cursor%20%7C%20Codex%20%7C%20Gemini%20%7C%20Copilot%20%7C%20OpenCode-7a4fd6.svg?style=flat-square)](install/INSTALL.md)
+![Engine](https://img.shields.io/badge/Engine-Remotion%20%2B%20three.js-9fe8a8.svg?style=flat-square)
+[![CI](https://github.com/god-dark-z/stickman-animation-studio/actions/workflows/ci.yml/badge.svg)](https://github.com/god-dark-z/stickman-animation-studio/actions/workflows/ci.yml)
+![AI imagery](https://img.shields.io/badge/AI%20imagery-0-c9d4e8.svg?style=flat-square)
 
-**An AI-agent skill that turns one prompt into a finished, studio-grade stickman cartoon —
-English-narrated, narration-synced, every frame and every sound produced by code.**
+**A skill for AI coding agents that turns one prompt into a finished stickman cartoon.**
+English by default, Bangla (বাংলা) on request. Every frame and every sound drawn and synthesized by
+code — no image models, no video models, no paid APIs.
 
 </div>
 
 ---
 
-## 🎬 The demo — real output from this repo
-
-The video below was rendered by the actual pipeline in this repository (v3, regenerated
-2026-11-24) — no external tools, no image or video models. It is the `draft` tier (540×960) of the
-shipped example storyboard, run through every gate; `--tier standard` renders the same thing at
-1080×1920.
-
-### Seating and sleeping, proven
-
-These are the cases that used to pass the old gates with a wrong picture — a character “sleeping”
-drawn on the floor beside the bed, a character “sitting” sunk into the chair. Now the engine
-resolves the body onto the prop's anchors and a geometry gate checks the drawing.
+## Demo
 
 <div align="center">
-<img src="docs/showcase/chair-seated.png" width="32%" alt="stickman visibly seated on a chair at a desk"/>
-<img src="docs/showcase/bed-sleeping.png" width="32%" alt="stickman lying in bed, head on the pillow, under the blanket"/>
-<img src="docs/showcase/demo-contact-sheet.png" width="32%" alt="contact sheet of every shot in the demo"/>
+<video src="docs/demo/demo.mp4" controls muted playsinline width="380"></video>
 
-*full-body seated · asleep in bed, head on pillow · every demo shot at a glance*
+**`/make-video Why Does Your Phone Get Hot When Signal Is Weak?`** — 56.5 s, 23 shots, 1080×1920, −14.7 LUFS
 </div>
 
 <div align="center">
+<img src="docs/showcase/bangla-tea-stall.png" width="46%" alt="A Bangla scene: two characters seated on wooden benches at a village tea stall at dawn, caption ভোরে চায়ের দোকানে"/>
 
-<video src="docs/demo/demo.mp4" controls muted playsinline width="400"></video>
-
-**`/make-video Why Does Your Phone Get Hot When Signal Is Weak?`** · 56.5 s · 23 shots · H.264 + AAC · −14.7 LUFS · rendered in 108 s on a CPU-only machine
-
-<br/>
-
-<img src="docs/demo/teaser-canyon.gif" alt="3D canyon scene: staging, walk cycle, captions" width="30%"/>
-<img src="docs/demo/teaser-inserts.gif" alt="Insert graphics: MAX POWER and versus boards" width="30%"/>
-
-*Left: the 3D location system with 2D characters composited in. Right: programmatic insert graphics.*
-
+**`/make-video চায়ের দোকানে এক সকাল in Bangla`** — Bangla voice, Bangla captions, Bengali settings
 </div>
 
-### Every frame of the demo, QA-checked
+Full gallery: [`docs/gallery.md`](docs/gallery.md).
 
-| | | | |
-|:---:|:---:|:---:|:---:|
-| <img src="docs/demo/01-hook.png" width="220"/> | <img src="docs/demo/02-meet-sam.png" width="220"/> | <img src="docs/demo/03-canyon-3d.png" width="220"/> | <img src="docs/demo/04-one-bar.png" width="220"/> |
-| *paradox hook, close-up* | *character reveal* | *3D location + car* | *narration-synced prop* |
-| <img src="docs/demo/05-the-mock.png" width="220"/> | <img src="docs/demo/06-turning-point.png" width="220"/> | <img src="docs/demo/07-dead-zone.png" width="220"/> | <img src="docs/demo/08-insert-maxpower.png" width="220"/> |
-| *two-shot + quote mouth* | *crash-zoom punchline* | *reaction acting* | *insert graphic* |
-| <img src="docs/demo/09-insert-versus.png" width="220"/> | <img src="docs/demo/10-heat.png" width="220"/> | <img src="docs/demo/11-night-modem.png" width="220"/> | <img src="docs/demo/12-finale.png" width="220"/> |
-| *versus board* | *fire fx on night grade* | *locked night palette* | *spotlight payoff* |
+## What it does
 
-Each still passed three checks: the **sync gate** (narration ↔ visual contract), the **pixel gate**
-(exposure/black/saturation), and offline CV structural checks.
+- **Writes the film.** Resolves the language, researches and fact-checks the topic, picks a story
+  format, and writes the script to the measured word budget of the chosen voice.
+- **Draws it by code.** A Remotion + three.js engine renders stick figures on anchored props,
+  parallax locations, procedural music and 65 synthesized sound effects.
+- **Refuses to ship a lie.** Twelve executable gates check narration-to-picture sync, body-to-prop
+  contact, commonsense expectations, timing, pixels, loudness and glyph coverage.
 
----
-
-## Why this is different
+## Why it's different
 
 | | |
-|:---|:---|
-| 🎨 **Zero generative imagery** | Characters, backgrounds, props, motion, music and SFX are all drawn and synthesized by code (SVG + three.js + numpy). The look is consistent *by construction*, not by prompt luck. |
-| 🔒 **Sync-locked storytelling** | Shots are timed to the spoken word via TTS timestamps, and a lexicon-based validator proves the visuals show what the narration says — places, times, actions, objects, dialogue. Contradictions fail the build. |
-| 🤖 **Agent-agnostic by design** | The skill probes whatever agent executes it (search? vision? background tasks?) and adapts — but the quality gates never bend. 10+ adapters, one pipeline, one quality bar. |
+|---|---|
+| **Code-only visuals** | No AI image or video generation anywhere. 160 props, 14 locations, a rig with 23 poses — all authored as code. |
+| **Commonsense-checked** | The film must show what a human would picture: "asleep in the other room" needs a bed, a body on it and a *different* room. 56 English + 108 Bangla intents enforce it. |
+| **Works in any agent** | One `SKILL.md` plus a pointer file per agent. Playbooks for 10 products, from Claude Code to a chat window. |
 
-## The pipeline
+## Quick start
+
+```bash
+# 1 — install
+git clone https://github.com/god-dark-z/stickman-animation-studio
+cd stickman-animation-studio/engine
+npm install && pip install -r requirements.txt
+
+# 2 — check the machine (PASS/WARN/FAIL with a fix for each)
+npm run doctor
+
+# 3 — render the shipped story
+npx tsx scripts/studio.ts stories/why-phone-gets-hot.json --tier standard
+```
+
+Then install the skill for your agent — see [`install/INSTALL.md`](install/INSTALL.md) — and use it:
+
+```bash
+/make-video Why does your phone get hot when signal is weak?
+/make-video Why does your phone get hot when signal is weak? in Bangla
+/make-video চায়ের দোকানে এক সকাল in Bangla
+```
+
+**Language** is resolved mechanically from your words (`npx tsx scripts/resolve_language.ts`).
+English is the default; Bangla needs an explicit request. A topic that merely *mentions* Bangla
+("a story about Bangla literature") stays English.
+
+**Voice** is chosen automatically from the topic's tone and genre, and the reason is written to
+`stories/<slug>/voice-decision.md`. Override it:
+
+```bash
+npx tsx scripts/studio.ts stories/my-story.json --voice female --tier standard
+npx tsx scripts/studio.ts stories/my-story.json --lang bn --voice bn-BD-PradeepNeural
+```
+
+## Language support
+
+| Language | Trigger | Voices | What is localized |
+|---|---|---|---|
+| **English** (default) | any request | 6 edge-tts neural voices (3 male / 3 female) | script, voice, captions, inserts, intent glossary |
+| **বাংলা** (on request) | "in Bangla", "বাংলায় বানাও", "bangla te banao", `--lang bn` | 4 neural voices (BD + IN, male + female) | script, voice, captions, **bundled Bengali fonts**, Bangla digits, 392-entry pronunciation dictionary, 108 intents, 49-story battery |
+
+One language per video. Never mixed.
+
+## Pipeline
 
 ```mermaid
 flowchart LR
-    A["💬 /make-video topic"] --> B["🧭 Probe agent capabilities"]
-    B --> C["🔎 Research + fact-check"]
-    C --> D["✍️ English script + voice direction"]
-    D --> E["🏗️ Assets — 2D props, 2D bgs, 3D locations"]
-    E --> F["🎬 Synced storyboard JSON"]
-    F --> G{"⚙️ GATE · qa_sync"}
-    G -- errors --> F
-    G -- "0 errors" --> H["🖼️ GATE · stills + pixels"]
-    H -- fail --> F
-    H -- pass --> I["🎥 Render + loudness"]
-    I --> J{"🔊 GATE · ffprobe + frames + qa_audio"}
-    J -- fail --> F
-    J -- pass --> K["📦 MP4 + script + fact-check + sync map"]
+  P["prompt"] --> L["resolve<br/>language"]
+  L --> R["research +<br/>fact-check"]
+  R --> S["script +<br/>voice"]
+  S --> A["assets"]
+  A --> SP["scene spec +<br/>storyboard"]
+  SP --> G{"gates"}
+  G -->|fail| SP
+  G -->|pass| V["render"]
+  V --> Q["verify<br/>+ deliver"]
 ```
 
-## The executable QA gates
-
-| Gate | Command | Enforces |
-|---|---|---|
-| **Validate** | `npx tsx scripts/validate.ts stories/x.json` | schema, cast ids, prop ids, 3D locations, quote actors — before anything expensive runs |
-| **Sync** | `npx tsx scripts/qa_sync.ts stories/x.json` | narration ↔ visual contract: places, time-of-day, actions as poses/beats, objects, quoted lines with animated mouths, continuity, shot-grammar repetition |
-| **Geometry** | `npx tsx scripts/qa_geometry.ts stories/x.json` | **the scene graph**: hip inside the seat, body on the mattress, head on the pillow, no sinking/floating, scale, draw order, face occlusion, framing, facing, seated→standing continuity. Runs the same placement code as the renderer |
-| **Commonsense** | `npx tsx scripts/qa_commonsense.ts stories/x.json` | what a human pictures, per sentence: 61 intents (in a bed, at the desk, in the other room, holding a cup, raining, a crowd, no one home…) and a **Scene Spec** per shot — every body's support, every implied prop, every stated relation, every negation |
-| **Spec** | `npx tsx scripts/spec_check.ts stories/x.json` | the Director's Brief alone: a body with no support, a required prop that never appears, an "empty chair" with someone in it, an "other room" with no transition, a false relation |
-| **Stills** | `npm run make -- … --stills` → `python scripts/qa_stills.py …` | exposure / dead-frame / saturation pixel gate |
-| **Timing** | `python scripts/qa_timing.py out/slug/words.json out/…mp3` | per-word timing is real (not sentence-level), monotonic, and each sampled word lands on audible speech |
-| **Video** | `python scripts/qa_video.py out/slug.mp4` | codec, fps, resolution, duration ≈ timeline, dead frames |
-| **Audio** | `python scripts/qa_audio.py out/slug.mp4` | −14 LUFS ±1.5, true peak ≤ −1.0 dBTP, voice presence |
-| **Visual** | `python scripts/qa_visual_report.py story.json out/slug/stills` | contact sheet + per-shot claim checklist; a vision agent records PASS/FAIL, a vision-less agent states that QA was geometric only |
-| **Battery** | `npx tsx scripts/battery.ts` | the regression score: 61 one-sentence micro-stories across 14 commonsense categories, each resolved and checked against what a human would expect to see |
-
-`npm run studio -- <story> --tier draft` runs them all in order and refuses to advance past a
-failure. Repairs loop per gate; nothing ships with a silently failed gate.
-
-## Install
+Every stage is one call to the orchestrator, which refuses to advance past a failed gate:
 
 ```bash
-git clone https://github.com/god-dark-z/stickman-animation-studio
-cd your-project
-../stickman-animation-studio/install/install.sh --with-engine     # Windows: install.ps1 -WithEngine
-
-cd engine
-npm ci                                   # exact versions from package-lock.json
-python -m pip install -r requirements.txt   # pinned Python deps
-npm run doctor                           # PASS/WARN/FAIL before you render anything
+npx tsx scripts/studio.ts <story.json> --tier draft|standard|studio
 ```
 
-Then one command per video:
-
-```bash
-npm run studio -- stories/tests/chair-office.json --tier draft   # fast, half-size
-npm run studio -- stories/my-story.json --tier standard          # 1080x1920
-```
-
-The installer places the skill files, `/make-video` command adapters for every supported agent,
-and pointer rules — idempotent, safe to re-run. Full details and a per-agent compatibility table:
-**[install/INSTALL.md](install/INSTALL.md)**.
-
-## Agent compatibility
-
-| Agent | Invocation | Route |
-|---|---|---|
-| Claude Code · ZCode | `/make-video` ✅ native | skill + command auto-discovered |
-| OpenCode · Cursor 1.6+ | `/make-video` | `.opencode/command/` · `.cursor/commands/` |
-| VS Code Copilot | `/make-video` in chat | `.github/prompts/make-video.prompt.md` |
-| Gemini CLI | `/make-video` | `.gemini/commands/make-video.toml` |
-| Codex CLI · DeepSeek · Antigravity · AGENTS.md readers | "make a video about X" | `AGENTS.md` pointer |
-| Windsurf · Aider | "make a video about X" | rules / conventions pointer |
-| Chat-only agents (no filesystem) | paste prompt | [`install/PASTE-THIS-PROMPT.md`](install/PASTE-THIS-PROMPT.md) — pre-production package, render handed to a coding agent |
-
-Statuses are marked honestly (verified vs. by-convention) in INSTALL.md. All routes converge on
-the same `SKILL.md` pipeline and the same gates — output quality is agent-independent by construction.
-
-## What one run delivers
-
-| Deliverable | Where |
+| Gate | What it proves |
 |---|---|
-| 🎥 Finished MP4 — 1080×1920, 30 fps, H.264 + AAC, −14 LUFS | `engine/out/<slug>/<slug>.mp4` |
-| 📝 English narration script | `engine/stories/<slug>/script.md` |
-| ✅ Fact-check table with source links | `engine/stories/<slug>/fact-check.md` |
-| 🔒 Sync map — the shot-by-shot narration↔visual contract | `engine/stories/<slug>/sync-map.md` |
-| 🧩 Reusable storyboard JSON + any new library assets | `engine/stories/` · `engine/locations/` |
+| `validate` | schema, props, cast, voices exist |
+| `bangla` | one script on screen, every shot glossed, Bangla meaning == English gloss |
+| `glyphs` | no character on screen lacks a glyph (no tofu boxes) |
+| `sync` | every spoken line is shown: place, time, action, objects, dialogue, continuity |
+| `geometry` | bodies actually touch their props; scale, layering, framing are sane |
+| `commonsense` | the shot matches what a human would picture (Scene Spec + intent glossary) |
+| `stills` / `pixels` | nothing black, blank or dead |
+| `timing` | word timings land on real speech (median ≤ 120 ms) |
+| `video` / `audio` | 1080×1920 / 30 fps / h264+aac; −14 LUFS, true peak ≤ −1.0 dBTP |
+| `rubric` | per-shot craft score; no shot below 3/5 |
 
-## Voice & sound, directed
+## Gallery
 
-| Genre | Voice | Rate | Read |
-|---|---|---|---|
-| Punchy storytelling *(default)* | `en-US-AndrewMultilingualNeural` | +22% | energetic narrator |
-| Calm documentary | `en-US-ChristopherNeural` | +6…10% | measured, grave |
-| Bright educational | `en-US-AriaNeural` | +12% | classroom-clear |
-| Dramatic recitation | `en-US-GuyNeural` | +8% | weight for history |
+<div align="center">
+<img src="docs/showcase/chair-seated.png" width="31%" alt="stickman seated on a chair at a desk"/>
+<img src="docs/showcase/bed-sleeping.png" width="31%" alt="stickman asleep in bed, head on the pillow, under a blanket"/>
+<img src="docs/showcase/demo-contact-sheet.png" width="31%" alt="contact sheet of every shot in the English demo"/>
+</div>
 
-65 SFX and 6 music beds are synthesized procedurally (numpy) — soft envelopes, normalized below
-clipping, royalty-free by construction. Music and effects duck under the voice automatically.
+## Works with
+<!-- Only the ZCode run in this repository was executed end to end; the rest follow each product's documented layout. -->
 
-## Repository layout
+| Agent | How to invoke | Status |
+|---|---|---|
+| ZCode | `/make-video <topic>` | verified (this repo's reference run) |
+| Claude Code | `/make-video <topic>` | installer writes `.claude/skills` + `.claude/commands` |
+| Google Antigravity | `AGENTS.md` pointer | by convention |
+| Codex CLI | `AGENTS.md` pointer | by convention |
+| OpenCode | `AGENTS.md` + `.opencode/command/` | by convention |
+| Cursor | `.cursor/rules/` + prompt | by convention |
+| Gemini CLI | `GEMINI.md` + `/make-video` TOML | by convention |
+| GitHub Copilot | `.github/copilot-instructions.md` + prompt file | by convention |
+| Windsurf | `.windsurf/rules/` + workflow | by convention |
+| Aider | `--read AGENTS.md` | by convention |
+| Chat only | paste `install/PASTE-THIS-PROMPT.md` | script + handoff only |
 
-```
-SKILL.md                     the agent-facing pipeline definition (/make-video)
-references/                  10 production references (principles · rig · camera · script · sync · sound · QA · assets · schema · voice)
-commands/make-video.md       slash-command body (adapted per agent by the installer)
-install/                     install.sh · install.ps1 · INSTALL.md · PASTE-THIS-PROMPT.md
-engine/                      the portable render engine (Remotion 4 + three.js)
-  scripts/                   make.ts · tts.py · gen_audio_assets.py · qa_sync.ts · qa_stills.py · qa_audio.py · test.ts
-  src/                       character rig · scenes · camera · fx · inserts · captions · 3D
-  stories/                   demo.json · why-phone-gets-hot.json (gate-passing worked example)
-  locations/                 13 starter 3D locations + shared object library
-templates/                   sync-map.md · fact-check-table.md
-docs/                        banner.svg (drawn in code) · demo/ (video, GIFs, QA stills)
-```
+<details>
+<summary>What "by convention" means</summary>
 
-## Verified — v3, measured on a CPU-only machine (2026-11-24)
+The layout follows each product's documented model of instructions and skills. It has **not** been
+executed on those products in this repository, because they are not installed here. Nothing above
+claims a verified install that was not run. Per-agent playbooks:
+[`docs/agents/`](docs/agents/README.md).
+</details>
 
-Machine: Windows 11, 16 cores, **~15 GB RAM, no discrete GPU**, CPU-only. Every number below was
-produced by a command in `docs/dev/VERIFY-*.md`; nothing here is self-reported from a build day.
+## What you get per run
 
-- [x] `tsc --noEmit` clean · **27/27** unit tests (incl. numeric contact tests for chair and bed,
-      glossary accept/reject, the relation graph and the spec's support check)
-- [x] **Commonsense battery: 61/61** micro-stories across 14 categories drawn as a human would
-      picture them (`out/battery/report.md`)
-- [x] **Scene Spec: 0 errors** on both contact fixtures (support, props, relations, negation)
-- [x] **Full 23-shot demo** (`--tier draft`, 3D locations, software WebGL via ANGLE): timeline 56.4 s,
-      **108 s wall clock**, 3.8 MB MP4, **all gates PASS**
-- [x] Sync gate **0 errors, 0 warnings** · geometry gate **0 errors, 0 warnings** on the demo
-- [x] Timing audit: 188 words, median word 205 ms, mean distance to a speech onset **55 ms**
-- [x] Video gate PASS: 540×960, 30.00 fps, h264 + aac, 56.5 s, 0 dead-frame runs ≥ 0.6 s
-- [x] Audio gate PASS: **−14.7 LUFS**, **−1.5 dBTP**
-- [x] Seating and sleeping fixtures: character **visibly and numerically** on the chair / in the bed
-      (see `docs/showcase/`)
-- [x] `npm run doctor` → **15 checks, 0 fail, 0 warn** on the reference machine (an earlier probe hit
-the provider's intermittent `NoAudioReceived`; the probe retries and narrates the hint instead of
-failing)
+| File | What it is |
+|---|---|
+| `out/<slug>/<slug>.mp4` | the verified video, 1080×1920, 30 fps, H.264 + AAC |
+| `stories/<slug>/script.md` | the script with beats (Bangla: with an English gloss column) |
+| `stories/<slug>/fact-check.md` | every claim with its source |
+| `stories/<slug>/sync-map.md` | the shot-by-shot narration↔visual contract |
+| `stories/<slug>/voice-decision.md` | which voice, and why, with the score |
+| `<title>.json` (+ `.spec.json`) | the story and the Scene Spec, reproducible |
+| `out/<slug>/craft-rubric.md` | per-shot craft scores |
+| `out/<slug>/contact-sheet.png` | every shot at a glance |
 
-### Measured render times (this machine)
+## Performance and requirements
 
-| Work | Tier | Output | Wall clock |
-|---|---|---|---|
-| 1-shot silent edge case | draft | 540×960, 1.6 s | **18 s** total (6 s encode) |
-| 4-shot bed scene, real TTS | draft | 540×960, 9.2 s | **~60 s** total (19 s after narration) |
-| 23-shot demo, 3D, real TTS | draft | 540×960, 56.5 s | **108 s** total |
-| 1080×1920 full quality | standard | — | not measured on this machine; see `docs/dev/BLOCKERS.md` |
+Measured on the reference profile: **CPU-only, Ryzen 7 5700G, 16 GB, integrated graphics**.
 
-The renderer caps concurrency by **free RAM as well as cores** (a 1080×1920 three.js frame costs
-~250–350 MB per tab) and drops to 2 workers when a shot uses a 3D location.
+| | |
+|---|---|
+| Full-quality English demo (56.5 s, 23 shots) | **2 min 4 s** at 1080×1920 |
+| Draft tier (540×960) | under a minute for the same story |
+| RAM | ~5 GB free at concurrency 2 (the engine caps by free RAM) |
+| Node / Python | Node 18+ (tested 24), Python 3.10+ (tested 3.12) |
+| Disk | ~3 GB for `node_modules` + Chromium; ~65 MB per finished video |
+| Internet | only for narration (free edge-tts) and research; `--no-tts` renders fully offline |
 
-## Requirements
+No GPU. No Blender. No API keys.
 
-Node 18+ (tested on 24.19) · Python 3.10+ (tested on 3.12) · ~3 GB disk · full FFmpeg on PATH for
-the video gate. Remotion downloads its own headless Chromium on first render. Narration uses free
-Microsoft edge-tts (needs internet; `--no-tts` works fully offline). Software WebGL is the
-supported path — **no GPU required**.
+## Docs
 
-**English-only production. No AI image/video generation, no image services, no paid APIs — ever.**
+| | |
+|---|---|
+| [INSTALL](install/INSTALL.md) | install per agent; verified vs by-convention |
+| [TROUBLESHOOTING](docs/TROUBLESHOOTING.md) | the failures you will actually hit |
+| [Agent playbooks](docs/agents/README.md) | per-product capabilities and pitfalls |
+| [References](references/) | 14 craft references: animation, characters, camera, script, sound, QA, assets, schema, intents, Bangla, formats, tiers |
+| [Eval report](evals/REPORT.md) | every measured suite and rate |
+| [Third-party notices](THIRD_PARTY.md) | fonts and dependencies, with licences |
+| [Changelog](CHANGELOG.md) | what changed in v4 |
+| [Contributing](CONTRIBUTING.md) | add a language, a prop, an intent |
 
-## What this cannot do (honest limits)
+## FAQ
 
-- **Anchor actions are 2D-only.** `sitOn` / `lieOn` / `sleepOn` resolve against 2D prop anchors. In a
-  3D location the gate raises `ANCHOR-3D` instead of misplacing a body; use a 2D background for
-  those shots.
-- **The rig is a 2D cut-out.** A seated silhouette is correct in contact and scale but the legs are
-  a single curve — there is no separate thigh, so extreme close-ups of a seated pose read less well
-  than a wide or medium shot.
-- **Anchor tables are measured by hand** from `Props.tsx` and currently cover chair, stool, bench,
-  couch, bed, desk, table and the vehicles. A new piece of furniture needs its anchors added before
-  a character can sit on it.
-- **No lip-sync phonemes.** Mouth flaps are amplitude-driven from the narration audio, not visemes.
-- **No pathological content**: crowds, crowds-of-hands, cloth, hair physics and liquid are out of
-  scope for a code-drawn stickman engine.
-- **Per-agent installs were not executed** for Claude Code / Antigravity / ZCode in this build; see
-  `install/INSTALL.md` for which routes are convention-only.
+**Does it use AI to generate images or video?** No. Every frame is drawn by code and every sound is
+synthesized. The only network call for production is free text-to-speech.
 
-## License & credits
+**Can it really make Bangla videos?** Yes — Bangla script, a Bangla voice chosen from the topic,
+Bangla captions in bundled Bengali fonts with Bangla digits, and the same gates as English. Ask
+explicitly: `/make-video <topic> in Bangla`.
 
-MIT — see [LICENSE](LICENSE). All audio is procedural; all graphics are original SVG/JSON in this repo.
-Architecture and craft extracted from the *BEANMEN ANIMATION* production system by the same author,
-adapted and hardened for public release.
+**Do I need a GPU?** No. It is tuned for a CPU-only 16 GB machine.
+
+**Why stickman?** A stick figure can be drawn reliably by code, so the craft has to live in staging,
+timing and sound — where it belongs.
+
+**Can I use my own topic?** Yes: install the skill and `/make-video <your topic>`, or write the story
+JSON yourself — the schema reference and the gates tell you what is wrong.
+
+## Roadmap
+
+- Three more English topics at full quality with published before/after scores.
+- A Bengali 3D street location (the props exist in 2D; the location does not).
+- Composed — not only automatic — sound design for at least one shot per video.
+- Per-model eval rows filled in by operators, from `engine/scripts/eval.ts`.
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Short version: run `npm test`, `npm run eval` and
+`npx tsx scripts/skill_lint.ts` before a pull request. Adding a language is a data task, not a fork.
+
+## License and credits
+
+MIT — see [LICENSE](LICENSE). Fonts (Noto Sans Bengali, Hind Siliguri, Baloo Da 2, Montserrat) are
+SIL OFL 1.1; every dependency and asset is listed in [THIRD_PARTY.md](THIRD_PARTY.md). The Bangla
+voice list was inspired by
+[parvez144/text-to-speech-with-edge-tts](https://github.com/parvez144/text-to-speech-with-edge-tts)
+(no licence there, so no code was copied — the engine re-implements the behaviour).
+
+### Honest limits
+
+- Anchor actions are 2D-only; in a 3D location the gate raises `ANCHOR-3D` rather than misplacing a body.
+- The rig is a 2D cut-out: no separate thigh, no lip-sync visemes (mouth flaps follow the audio).
+- Anchor tables are measured by hand from the drawing code; a new seat needs its anchors added.
+- Sticks cannot do crowds-of-hands, cloth physics or liquids — out of scope for a code-drawn figure.
