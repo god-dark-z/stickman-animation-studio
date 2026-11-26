@@ -6,6 +6,7 @@ import { ThreeCanvas } from "@remotion/three";
 import { Character } from "../character/Character";
 import { Fx } from "../fx/Fx";
 import { InsertGraphic } from "../fx/Insert";
+import type { LangId } from "../../lang";
 import { LightShape, resolveActors } from "../scene/Scene";
 import { drawProp, HELD, type PropType } from "../scene/props/Props";
 import type { Character as CharDef, ResolvedShot } from "../schema";
@@ -21,7 +22,7 @@ const FLAT_FLOOR = { horizon: 1000 };
 
 type Item = { depth: number; node: React.ReactNode };
 
-export const Scene3D: React.FC<{ shot: ResolvedShot; cast: Record<string, CharDef>; location: LocationData; objects: Objects; frame: number; fps: number }> = ({ shot, cast, location, objects, frame, fps }) => {
+export const Scene3D: React.FC<{ shot: ResolvedShot; cast: Record<string, CharDef>; location: LocationData; objects: Objects; frame: number; fps: number ; lang?: LangId }> = ({  shot, cast, location, objects, frame, fps , lang = "en" }) => {
   const t = frame / fps;
   const axes = axesOf(location);
   const view = shotView(shot, location, axes, frame, shot.duration);
@@ -141,7 +142,7 @@ export const Scene3D: React.FC<{ shot: ResolvedShot; cast: Record<string, CharDe
         {shot.tint && <AbsoluteFill style={{ backgroundColor: shot.tint, opacity: 0.22, mixBlendMode: "soft-light" }} />}
         <Fx shot={shot} frame={frame} fps={fps} focus={focus} head={head} zoom={charScale / 1.25} />
       </AbsoluteFill>
-      {hasInsert && <InsertGraphic insert={shot.insert!} frame={frame} fps={fps} />}
+      {hasInsert && <InsertGraphic insert={shot.insert!} frame={frame} fps={fps} lang={lang} />}
     </AbsoluteFill>
   );
 };

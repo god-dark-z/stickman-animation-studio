@@ -1,0 +1,230 @@
+{
+  "title": "bangla-insert-chart-digits",
+  "lang": "bn",
+  "voice": "bn-BD-NabanitaNeural",
+  "rate": "+22%",
+  "music": "warm",
+  "cast": {
+    "maya": {
+      "name": "Maya",
+      "color": "#c2543a",
+      "outfit": "dress",
+      "hair": "long",
+      "hairColor": "#2b1b10",
+      "voice": "bn-BD-NabanitaNeural",
+      "voiceRate": "+22%"
+    },
+    "rahim": {
+      "name": "Rahim",
+      "color": "#3a6fb0",
+      "outfit": "shirt",
+      "hair": "short",
+      "hairColor": "#2a1a10",
+      "voice": "bn-BD-PradeepNeural",
+      "voiceRate": "+18%"
+    }
+  },
+  "shots": [
+    {
+      "say": "সন্ধ্যায় চায়ের দোকানে দুই বন্ধু বসে ছিল।",
+      "gloss": "Two friends sat at a tea stall in the evening.",
+      "bg": "street",
+      "time": "sunset",
+      "framing": "wide",
+      "camera": "panRight",
+      "actors": [
+        {
+          "id": "maya",
+          "x": 0.35,
+          "z": 0.6,
+          "facing": "right",
+          "expression": "happy",
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
+        },
+        {
+          "id": "rahim",
+          "x": 0.62,
+          "z": 0.6,
+          "facing": "left",
+          "expression": "neutral",
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
+        }
+      ],
+      "props": [
+        {
+          "type": "chair",
+          "x": 0.35,
+          "z": 0.55
+        },
+        {
+          "type": "chair",
+          "x": 0.62,
+          "z": 0.55
+        },
+        {
+          "type": "table",
+          "x": 0.48,
+          "z": 0.42
+        }
+      ],
+      "focus": "maya"
+    },
+    {
+      "say": "মায়া বলল, আজ বৃষ্টি পড়েছিল।",
+      "gloss": "Maya said, it rained today.",
+      "bg": "street",
+      "time": "sunset",
+      "framing": "wide",
+      "quote": "maya",
+      "actors": [
+        {
+          "id": "maya",
+          "x": 0.35,
+          "z": 0.6,
+          "facing": "right",
+          "expression": "happy",
+          "talking": true,
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
+        },
+        {
+          "id": "rahim",
+          "x": 0.62,
+          "z": 0.6,
+          "facing": "left",
+          "expression": "neutral",
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
+        }
+      ],
+      "beats": [
+        {
+          "at": "বৃষ্টি",
+          "expression": "surprised",
+          "actor": "rahim"
+        }
+      ],
+      "props": [
+        {
+          "type": "chair",
+          "x": 0.35,
+          "z": 0.55
+        },
+        {
+          "type": "chair",
+          "x": 0.62,
+          "z": 0.55
+        },
+        {
+          "type": "table",
+          "x": 0.48,
+          "z": 0.42
+        }
+      ],
+      "focus": "maya"
+    },
+    {
+      "say": "রহিম হেসে বলল, ছাতা তো আমি ভুলে গিয়েছিলাম।",
+      "gloss": "Rahim laughed and said, I forgot my umbrella.",
+      "bg": "street",
+      "time": "sunset",
+      "framing": "wide",
+      "quote": "rahim",
+      "actors": [
+        {
+          "id": "maya",
+          "x": 0.35,
+          "z": 0.6,
+          "facing": "right",
+          "expression": "happy",
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
+        },
+        {
+          "id": "rahim",
+          "x": 0.62,
+          "z": 0.6,
+          "facing": "left",
+          "expression": "laugh",
+          "talking": true,
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
+        }
+      ],
+      "props": [
+        {
+          "type": "chair",
+          "x": 0.35,
+          "z": 0.55
+        },
+        {
+          "type": "chair",
+          "x": 0.62,
+          "z": 0.55
+        },
+        {
+          "type": "table",
+          "x": 0.48,
+          "z": 0.42
+        }
+      ],
+      "focus": "maya"
+    },
+    {
+      "say": "গত বছর প্রতি দশজনে সাতজন এই সমস্যায় ভুগেছে।",
+      "gloss": "Last year seven out of ten people suffered from this problem.",
+      "bg": "livingroom",
+      "framing": "medium",
+      "transition": "flash",
+      "actors": [],
+      "insert": {
+        "type": "chart",
+        "title": "সমস্যায় ভুগেছে",
+        "data": [
+          3,
+          5,
+          7,
+          9
+        ],
+        "lines": [
+          "২০২০",
+          "২০২১",
+          "২০২২",
+          "২০২৩"
+        ],
+        "highlight": 3
+      }
+    },
+    {
+      "say": "সমাধানটা সহজ।",
+      "gloss": "The solution is simple.",
+      "bg": "livingroom",
+      "framing": "medium",
+      "actors": [
+        {
+          "id": "maya",
+          "x": 0.5,
+          "z": 0.6,
+          "pose": "point",
+          "expression": "happy",
+          "facing": "front"
+        }
+      ],
+      "insert": {
+        "type": "bigtext",
+        "title": "সহজ",
+        "lines": [
+          "মাত্র একটা বদল"
+        ]
+      }
+    }
+  ]
+}

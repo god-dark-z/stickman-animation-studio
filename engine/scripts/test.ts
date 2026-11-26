@@ -11,15 +11,16 @@ import assert from "node:assert/strict";
 import { StorySchema } from "../src/schema";
 import { buildTimeline, tokenize } from "../src/timeline";
 import { chunkWords } from "../src/captions/Captions";
+import { H } from "../src/theme";
 import { anchorWorld } from "../src/scene/layout";
-import { poseMetrics, resolvePlacement, stageOf } from "../src/scene/layout";
+import { nearestPropIndex, poseMetrics, resolvePlacement, stageOf } from "../src/scene/layout";
 import { checkShot } from "./qa_geometry";
 import { buildEnv } from "../src/scene/backgrounds/environments";
 import { checkRequirement, matches } from "../src/commonsense/glossary";
 import { checkRelation } from "../src/commonsense/relations";
 import { SpecSchema, validateSpec } from "../src/commonsense/spec";
 import { seenOf } from "./qa_commonsense";
-import { allPacks, resolveVoice, secondsForWords, wordsForSeconds } from "../lang";
+import { allPacks, getPack, resolveVoice, secondsForWords, wordsForSeconds } from "../lang";
 import { runLanguageTests } from "./test_language";
 import { checkDistinctSpeakers, chooseVoice } from "./choose_voice";
 
@@ -475,5 +476,81 @@ test("a character voice must exist in the language pack", () => {
   });
   assert.equal(s.cast.c.voice, "bn-IN-BashkarNeural");
 });
+
+// ------------------------------------------------- two actors, two props (regression)
+// Found while staging a two-person dialogue: both actors used on:"chair" and both resolved to
+// the FIRST chair, so the second character was drawn exactly on top of the first (invisible,
+// with an empty chair beside them). `on` must mean the nearest matching prop.
+test("two actors sitting on 'chair' take two different chairs", () => {
+  const s = StorySchema.parse({
+    title: "two chairs", cast: { a: { color: "#ffffff" }, b: { color: "#ffffff" } },
+    shots: [{
+      say: "দুই বন্ধু চেয়ারে বসে আছে।",
+      bg: "livingroom",
+      actors: [
+        { id: "a", x: 0.3, action: "sitOn", on: "chair", pose: "sit" },
+        { id: "b", x: 0.7, action: "sitOn", on: "chair", pose: "sit" },
+      ],
+      props: [{ type: "chair", x: 0.3 }, { type: "chair", x: 0.7 }],
+    }],
+  });
+  const shot = buildTimeline(s, null, null, null).shots[0];
+  const env = buildEnv(shot.bg, { time: shot.time, t: 0, wallColor: shot.wall, seed: 1 });
+  const pa = resolvePlacement(shot.actors[0], shot.props, env);
+  const pb = resolvePlacement(shot.actors[1], shot.props, env);
+  assert.ok(pa && pb, "both placements resolve");
+  assert.ok(Math.abs(pa!.x - pb!.x) > 100, `the two bodies must not overlap: ${pa!.x} vs ${pb!.x}`);
+});
+
+test("an explicit prop:N index still wins over proximity", () => {
+  assert.equal(nearestPropIndex("prop:1", [{ type: "chair", x: 0.1 }, { type: "chair", x: 0.9 }], 0.1), 1);
+});
+
+// ------------------------------------------------- Bangla caption layout (Phase F)
+test("Bangla captions never letter-space (it breaks conjuncts)", () => {
+  assert.equal(getPack("bn").captions.letterSpacing, 0);
+});
+
+test("Bangla captions have a taller line height than English for matras", () => {
+  assert.ok(getPack("bn").captions.lineHeight > getPack("en").captions.lineHeight);
+});
+
+test("Bangla caption chunks allow longer words than an English 14-char limit", () => {
+  const words = [
+    { text: "সিগন্যাল", start: 0, end: 0.4 },
+    { text: "দুর্বল", start: 0.4, end: 0.7 },
+    { text: "হলে", start: 0.7, end: 0.9 },
+  ];
+  assert.equal(chunkWords(words, "bn").length, 1, JSON.stringify(chunkWords(words, "bn")));
+  assert.ok(chunkWords(words, "en").length > 1, "English should split the same three long words");
+});
+
+test("a Bangla caption chunk breaks on the Bangla danda", () => {
+  const words = [
+    { text: "আজ", start: 0, end: 0.2 },
+    { text: "বৃষ্টি", start: 0.2, end: 0.5 },
+    { text: "পড়ছে।", start: 0.5, end: 0.9 },
+    { text: "ছেলেটি", start: 1.0, end: 1.3 },
+  ];
+  assert.equal(chunkWords(words, "bn").length, 2, JSON.stringify(chunkWords(words, "bn")));
+});
+
+test("the Bangla caption band does not cover the raised insert card", () => {
+  const cardBottom = H * 0.37 + 480;
+  assert.ok(cardBottom < H * 0.64, `card bottom ${cardBottom} vs caption band ${H * 0.64}`);
+});
+
+test("every pack declares a caption font stack with its own family first", () => {
+  for (const pack of allPacks()) {
+    assert.equal(pack.captions.fontStack[0], pack.captions.fontFamily, `${pack.id} font stack order`);
+  }
+});
+
+test("the Bangla pack asks for Bangla digits and glyph coverage", () => {
+  const bn = getPack("bn");
+  assert.equal(bn.captions.digits, "bengali");
+  assert.equal(bn.qa.glyphCoverage, true);
+});
+
 
 console.log(`\n${passed} passed${process.exitCode ? " (with failures)" : ""}`);

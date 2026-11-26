@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame, useVideoConfig, interpolate } from "remotion";
+import { ensureFonts } from "./fonts";
+import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame, useVideoConfig, interpolate, delayRender, continueRender } from "remotion";
 import type { ResolvedShot, Timeline } from "./schema";
 import { Scene, PostFX } from "./scene/Scene";
 import { Scene3D } from "./location3d/Scene3D";
@@ -52,8 +53,8 @@ const ShotScene: React.FC<{ shot: ResolvedShot; timeline: Timeline }> = ({ shot,
   const { fps } = useVideoConfig();
   const cast = timeline.story.cast;
   const location = shot.location ? timeline.locations?.[shot.location] : undefined;
-  if (location) return <Scene3D shot={shot} cast={cast} location={location} objects={timeline.objects ?? {}} frame={f} fps={fps} />;
-  return <Scene shot={shot} cast={cast} frame={f} fps={fps} />;
+  if (location) return <Scene3D shot={shot} cast={cast} location={location} objects={timeline.objects ?? {}} frame={f} fps={fps} lang={timeline.story.lang} />;
+  return <Scene shot={shot} cast={cast} frame={f} fps={fps} lang={timeline.story.lang} />;
 };
 
 // an on-screen call: flickering text + whisper, appearing at the shot's callFrame
@@ -111,6 +112,30 @@ export const StoryVideo: React.FC<Timeline> = (tl) => {
   const { fps } = useVideoConfig();
   const { shots } = tl;
   const mix = tl.story.mix ?? { music: 0.14, sfx: 0.22, duck: 0.35, autoSfx: true };
+  const lang = tl.story.lang ?? "en";
+
+  // Bangla fonts must be usable BEFORE the first frame. Without this the opening frames render
+  // with a fallback face, the line breaks differ, and text visibly jumps when the real font lands.
+  const [fontsReady, setFontsReady] = React.useState(lang !== "bn");
+  const handle = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    if (lang !== "bn" || fontsReady) return;
+    handle.current = delayRender("loading Bangla fonts");
+    let cancelled = false;
+    ensureFonts(lang)
+      .then((r) => {
+        if (!r.loaded) console.warn(`[fonts] Bangla families did not all report ready: ${r.families.join(", ")}`);
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setFontsReady(true);
+          if (handle.current !== null) continueRender(handle.current);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [lang, fontsReady, delayRender, continueRender]);
 
   // Narration-aware ducking: while someone is speaking, the bed and the effects step back
   // so the voice is always the loudest thing in the mix.
@@ -143,7 +168,7 @@ export const StoryVideo: React.FC<Timeline> = (tl) => {
         </Sequence>
       ))}
       <PostFX frame={frame} />
-      <Captions words={tl.words} frame={frame} fps={fps} />
+      {fontsReady && <Captions words={tl.words} frame={frame} fps={fps} lang={lang} />}
       {tl.voiceSrc && <Audio src={staticFile(tl.voiceSrc)} />}
       {tl.musicSrc && (
         <Audio src={staticFile(tl.musicSrc)} loop volume={(f) => interpolate(f, [0, 15, tl.durationInFrames - 30, tl.durationInFrames], [0, mix.music, mix.music, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * duck(f)} />

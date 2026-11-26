@@ -68,4 +68,14 @@ Judgement calls made without asking, with the reason. Numbering continues V3's l
 
 ## Phase F
 
-_(to be filled as the phase proceeds)_
+| # | Decision | Why |
+|---|---|---|
+| V4-39 | Bangla fonts are **committed** (329 KB woff2) rather than downloaded at install | The brief forbids a CDN dependency at render time. 329 KB is negligible next to node_modules, and a fresh clone renders offline. |
+| V4-40 | `delayRender` blocks the first frame until the Bangla families report ready | Without it the opening frames use a fallback face, line breaks differ, and text visibly jumps when the real font lands — a defect a viewer notices immediately. |
+| V4-41 | Bangla caption size 74 and line-height 1.45 (English 82 / 1.05) | Bangla glyphs are wider and taller (matras above, descenders below). The English numbers overflowed or clipped at the same box. |
+| V4-42 | Caption word-highlight splits on **spaces only** | A conjunct or a vowel sign never spans a space, so a space split is grapheme-safe by construction — no segmenter needed in the hot render path. |
+| V4-43 | `on: "chair"` resolves to the **nearest** matching prop, not the first | Two actors on one chair were drawn on top of each other (one character invisible, an empty chair beside them). Found by inspecting a real frame; the gates were passing. |
+| V4-44 | Bangla insert cards sit at H·0.37 (English H·0.44) | Bangla cards are taller and their axis labels sit lower, so at the English position the caption text overlapped the year labels. Verified numerically and by frame inspection. |
+| V4-45 | Bangla digits in inserts by default, via the pack's `captions.digits` | A Bangla video with `2020` in a chart is the machine-translation look. The pack already declared it; the renderer now honours it. |
+| V4-46 | The glyph gate checks the **combined font stack**, not one file | The Bangla subset has no Latin and the Latin subset has no Bangla; the browser falls through exactly like the union. Checking one file produced false failures. |
+| V4-47 | `fonttools` + `brotli` are pinned Python deps | They read woff2 character maps, which is how the gate proves a glyph exists without a browser or a rendered image. `doctor` reports both. |

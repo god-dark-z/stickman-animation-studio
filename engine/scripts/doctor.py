@@ -171,6 +171,28 @@ def internet() -> bool:
 
 
 def edge_tts_boundaries() -> None:
+    # bundled fonts + glyph-check tooling: without these, Bangla captions can render as boxes
+    sys.path.insert(0, os.path.join(ROOT, "scripts"))
+    try:
+        from fetch_fonts import expected_files
+
+        missing = [f for f in expected_files() if not os.path.exists(os.path.join(ROOT, "public", "fonts", f))]
+        if missing:
+            record("bangla fonts", "FAIL", f"{len(missing)} bundled font file(s) missing", "python scripts/fetch_fonts.py")
+        else:
+            total = sum(os.path.getsize(os.path.join(ROOT, "public", "fonts", f)) for f in expected_files())
+            record("bangla fonts", "PASS", f"{len(expected_files())} files, {total // 1024} KB, bundled (no CDN)")
+    except Exception as e:  # noqa: BLE001
+        record("bangla fonts", "WARN", f"could not check the font bundle ({type(e).__name__})", "python scripts/fetch_fonts.py")
+
+    try:
+        import brotli  # noqa: F401
+        import fontTools  # noqa: F401
+
+        record("glyph reader", "PASS", "fontTools + brotli available (woff2 character maps readable)")
+    except ImportError as e:
+        record("glyph reader", "WARN", f"{e.name} missing — the glyph-coverage gate cannot run", "python -m pip install -r requirements.txt")
+
     try:
         import asyncio
         import edge_tts
@@ -277,6 +299,28 @@ def bangla_support() -> None:
             record("bangla voices", "PASS", f"all {len(voices)} bn voices listed")
     except Exception as e:  # noqa: BLE001
         record("bangla voices", "WARN", f"could not list voices ({type(e).__name__})", "check the network")
+
+    # bundled fonts + glyph-check tooling: without these, Bangla captions can render as boxes
+    sys.path.insert(0, os.path.join(ROOT, "scripts"))
+    try:
+        from fetch_fonts import expected_files
+
+        missing = [f for f in expected_files() if not os.path.exists(os.path.join(ROOT, "public", "fonts", f))]
+        if missing:
+            record("bangla fonts", "FAIL", f"{len(missing)} bundled font file(s) missing", "python scripts/fetch_fonts.py")
+        else:
+            total = sum(os.path.getsize(os.path.join(ROOT, "public", "fonts", f)) for f in expected_files())
+            record("bangla fonts", "PASS", f"{len(expected_files())} files, {total // 1024} KB, bundled (no CDN)")
+    except Exception as e:  # noqa: BLE001
+        record("bangla fonts", "WARN", f"could not check the font bundle ({type(e).__name__})", "python scripts/fetch_fonts.py")
+
+    try:
+        import brotli  # noqa: F401
+        import fontTools  # noqa: F401
+
+        record("glyph reader", "PASS", "fontTools + brotli available (woff2 character maps readable)")
+    except ImportError as e:
+        record("glyph reader", "WARN", f"{e.name} missing — the glyph-coverage gate cannot run", "python -m pip install -r requirements.txt")
 
     try:
         import asyncio

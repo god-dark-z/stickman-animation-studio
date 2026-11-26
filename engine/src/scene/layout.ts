@@ -173,6 +173,24 @@ export const propIndexOf = (on: string, props: Partial<PropSpec>[]): number => {
 };
 
 /**
+ * Which prop an actor's `on: "chair"` means.
+ *
+ * With two chairs in a shot, "chair" for the actor standing at x=0.62 must be the chair at
+ * x=0.62. Returning the first match puts both characters on the same seat, drawn exactly on top
+ * of one another — a real bug found while staging two people at one table (only one body was
+ * visible, with an empty chair beside it). The nearest matching prop by x wins; ties keep the
+ * earlier one.
+ */
+export const nearestPropIndex = (on: string, props: Partial<PropSpec>[], atX = 0.5): number => {
+  if (on.startsWith("prop:")) return Number.parseInt(on.slice(5), 10);
+  const candidates = props.map((p, i) => ({ p, i })).filter(({ p }) => p.type === on);
+  if (candidates.length <= 1) return candidates[0]?.i ?? -1;
+  let best = candidates[0];
+  for (const c of candidates) if (Math.abs((c.p.x ?? 0.5) - atX) < Math.abs((best.p.x ?? 0.5) - atX)) best = c;
+  return best.i;
+};
+
+/**
  * Turn a semantic action into concrete screen coordinates.
  *
  * The agent says `action: "sitOn", on: "chair"`. The engine decides the hip's position,
@@ -190,7 +208,8 @@ export const resolvePlacement = (
   pose?: Pose,
 ): Placement | null => {
   if (!a.action || a.action === "none" || !a.on) return null;
-  const index = propIndexOf(a.on, props);
+  // nearest match, so two actors sitting on "chair" take two different chairs
+  const index = nearestPropIndex(a.on, props, a.x);
   if (index < 0 || !props[index]) {
     return { x: a.x * 1080, y: 0, s: 1, z: a.z, pose: a.pose, contact: null, error: `no prop called "${a.on}" in this shot's props` };
   }

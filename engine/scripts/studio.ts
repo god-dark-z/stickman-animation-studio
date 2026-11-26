@@ -34,7 +34,7 @@ import { chooseVoice, decisionMarkdown } from "./choose_voice";
 type Tier = "draft" | "standard" | "studio";
 // `bangla` is a no-op PASS for English stories, so it can sit in one fixed stage list: the
 // pipeline never branches, and a Bangla story cannot skip its text gate by accident.
-const STAGES = ["validate", "bangla", "narration", "timeline", "sync", "geometry", "commonsense", "stills", "pixels", "timing", "render", "video", "audio", "visual"] as const;
+const STAGES = ["validate", "bangla", "glyphs", "narration", "timeline", "sync", "geometry", "commonsense", "stills", "pixels", "timing", "render", "video", "audio", "visual"] as const;
 type Stage = (typeof STAGES)[number];
 
 const args = process.argv.slice(2);
@@ -119,6 +119,12 @@ const stageCmd = (stage: Stage): { cmd: string; args: string[]; skip?: string } 
       // qa_bangla runs both checks in order (it shells to qa_gloss when the story is Bangla)
       return { cmd: python, args: ["scripts/qa_bangla.py", storyPath, "--with-gloss"] };
     }
+    case "glyphs": {
+      const l = langArg ?? (isLang(raw.lang) ? raw.lang : "en");
+      return l === "bn"
+        ? { cmd: python, args: ["scripts/qa_glyphs.py", storyPath] }
+        : { cmd: "", args: [], skip: "English story: the bundled Latin font covers it" };
+    }
     case "narration": return hasTts ? { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--narration-only", ...passthrough] } : { cmd: "", args: [], skip: "--no-tts" };
     case "timeline": return { cmd: "npx", args: ["tsx", "scripts/make.ts", storyPath, "--timeline-only", ...passthrough] };
     case "sync": return { cmd: "npx", args: ["tsx", "scripts/qa_sync.ts", storyPath] };
@@ -159,6 +165,7 @@ const runStage = (stage: Stage): Promise<number> =>
 const STAGE_DOCS: Record<Stage, string> = {
   validate: "schema + asset + cast checks",
   bangla: "Bangla text gate (single script, gloss present) — skipped for English",
+  glyphs: "glyph coverage against the bundled Bangla font — skipped for English",
   narration: "TTS -> audio + word timings (skipped by --no-tts)",
   timeline: "build the resolved timeline",
   sync: "sync gate (qa_sync.ts)",
@@ -177,6 +184,7 @@ void STAGE_DOCS;
 const FIX: Record<Stage, string> = {
   validate: "fix the story JSON (the error names the field), then re-run",
   bangla: "make the text one script: add Latin words to stories/<slug>/pronunciation.json, rewrite English lines in Bangla, and add a `gloss` to every spoken shot",
+  glyphs: "a character has no glyph in the bundled fonts — replace it, or install another Bengali font (see THIRD_PARTY.md) and add it to engine/public/fonts + src/fonts.ts",
   narration: "check the network / voice name, or run with --no-tts",
   timeline: "fix the story (see the error above)",
   sync: "change the shot's world/time/pose/props, or rephrase the narration, until 0 errors",

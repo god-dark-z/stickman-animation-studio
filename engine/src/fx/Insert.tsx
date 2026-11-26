@@ -3,32 +3,44 @@ import { AbsoluteFill } from "remotion";
 import { H, INK, W, clamp, easeOut, easeOutBack, mix, shade } from "../theme";
 import type { Insert } from "../schema";
 import { FONT } from "../scene/props/Props";
+import { displayFamilyFor } from "../fonts";
+import type { LangId } from "../../lang";
 
-const T: React.FC<{ x: number; y: number; size: number; children: React.ReactNode; color?: string; stroke?: string; anchor?: "middle" | "start" | "end"; weight?: number; maxW?: number }> = ({
-  x, y, size, children, color = INK, stroke, anchor = "middle", weight = 900, maxW,
+const T: React.FC<{ x: number; y: number; size: number; children: React.ReactNode; color?: string; stroke?: string; anchor?: "middle" | "start" | "end"; weight?: number; maxW?: number; lang?: LangId }> = ({
+  x, y, size, children, color = INK, stroke, anchor = "middle", weight = 900, maxW, lang = "en",
 }) => {
   const txt = String(children ?? "");
-  const fs = maxW ? Math.min(size, (maxW / Math.max(1, txt.length)) * 1.8) : size;
+  // Bangla glyphs are wider per character: give the box fewer characters of credit
+  const perChar = lang === "bn" ? 1.25 : 1.8;
+  const fs = maxW ? Math.min(size, (maxW / Math.max(1, txt.length)) * perChar) : size;
   return (
-    <text x={x} y={y} fontFamily={FONT} fontWeight={weight} fontSize={fs} textAnchor={anchor} dominantBaseline="central" fill={color}
-      stroke={stroke} strokeWidth={stroke ? fs * 0.14 : 0} paintOrder="stroke" style={{ letterSpacing: -1 }}>
+    <text x={x} y={y} fontFamily={displayFamilyFor(lang, FONT)} fontWeight={weight} fontSize={fs} textAnchor={anchor} dominantBaseline="central" fill={color}
+      stroke={stroke} strokeWidth={stroke ? fs * 0.14 : 0} paintOrder="stroke" style={{ letterSpacing: lang === "bn" ? 0 : -1 }}>
       {txt}
     </text>
   );
 };
 
-const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
+const BN_DIGITS = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+const toBn = (s: string) => s.replace(/\d/g, (d) => BN_DIGITS[Number(d)]);
+const fmt = (n: number, lang: LangId = "en") => {
+  const s = Math.round(n).toLocaleString("en-US");
+  return lang === "bn" ? toBn(s) : s;
+};
 
-export const InsertGraphic: React.FC<{ insert: Insert; frame: number; fps: number }> = ({ insert, frame }) => {
+export const InsertGraphic: React.FC<{ insert: Insert; frame: number; fps: number; lang?: LangId }> = ({ insert, frame, lang = "en" }) => {
   const pop = easeOutBack(clamp(frame / 12));
   const accent = insert.color ?? "#f2c230";
   const lines = insert.lines ?? [];
   const reveal = (i: number, step = 9, start = 8) => clamp((frame - start - i * step) / 8);
+  // Captions occupy a band near H*0.64..0.78. A Bangla card is taller (line height) and its axis
+  // labels sit low, so the card is raised: at H*0.44 the year labels landed under the caption text.
+  const cardY = lang === "bn" ? H * 0.37 : H * 0.44;
   const card = (children: React.ReactNode) => (
     <AbsoluteFill>
       <AbsoluteFill style={{ backgroundColor: "rgba(10,12,24,0.55)" }} />
       <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} style={{ position: "absolute" }}>
-        <g transform={`translate(${W / 2} ${H * 0.44}) scale(${pop}) rotate(${(1 - clamp(frame / 12)) * -4})`}>{children}</g>
+        <g transform={`translate(${W / 2} ${cardY}) scale(${pop}) rotate(${(1 - clamp(frame / 12)) * -4})`}>{children}</g>
       </svg>
     </AbsoluteFill>
   );
@@ -92,7 +104,7 @@ export const InsertGraphic: React.FC<{ insert: Insert; frame: number; fps: numbe
             return (
               <g key={i}>
                 <rect x={-320 + i * bw + bw * 0.15} y={330 - h} width={bw * 0.7} height={h} rx={8} fill={hl ? accent : "#9fb6d6"} stroke={INK} strokeWidth={5} />
-                <T x={-320 + i * bw + bw / 2} y={330 - h - 40} size={38} maxW={bw}>{g > 0.9 ? fmt(v) : ""}</T>
+                <T x={-320 + i * bw + bw / 2} y={330 - h - 40} size={38} maxW={bw}>{g > 0.9 ? fmt(v, lang) : ""}</T>
                 <T x={-320 + i * bw + bw / 2} y={385} size={32} weight={700} maxW={bw}>{lines[i] ?? ""}</T>
               </g>
             );
@@ -123,7 +135,7 @@ export const InsertGraphic: React.FC<{ insert: Insert; frame: number; fps: numbe
     case "counter": {
       const from = insert.from ?? 0, to = insert.value ?? 100;
       const v = from + (to - from) * easeOut(clamp((frame - 4) / 36));
-      const big = `${insert.prefix ?? ""}${fmt(v)}${insert.suffix ?? ""}`;
+      const big = `${insert.prefix ?? ""}${fmt(v, lang)}${insert.suffix ?? ""}`;
       return (
         <AbsoluteFill>
           <AbsoluteFill style={{ backgroundColor: "rgba(10,12,24,0.6)" }} />

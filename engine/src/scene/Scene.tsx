@@ -8,6 +8,7 @@ import { buildEnv, type Env, type Light } from "./backgrounds/environments";
 import { X0, X1, Y0, Y1 } from "./backgrounds/parts";
 import { Fx } from "../fx/Fx";
 import { InsertGraphic } from "../fx/Insert";
+import type { LangId } from "../../lang";
 import {
   CHAR_H,
   DOF,
@@ -83,7 +84,7 @@ export const LightShape: React.FC<{ l: Light; t: number }> = ({ l, t }) => {
   );
 };
 
-export const Scene: React.FC<{ shot: ResolvedShot; cast: Record<string, CharDef>; frame: number; fps: number }> = ({ shot, cast, frame, fps }) => {
+export const Scene: React.FC<{ shot: ResolvedShot; cast: Record<string, CharDef>; frame: number; fps: number; lang?: LangId }> = ({ shot, cast, frame, fps, lang = "en" }) => {
   const t = frame / fps;
   const seed = hashStr(shot.say + shot.index);
   const E = buildEnv(shot.bg, { time: shot.time, t, wallColor: shot.wall, seed });
@@ -236,7 +237,7 @@ export const Scene: React.FC<{ shot: ResolvedShot; cast: Record<string, CharDef>
       {shot.tint && <AbsoluteFill style={{ backgroundColor: shot.tint, opacity: 0.22, mixBlendMode: "soft-light" }} />}
       <Fx shot={shot} frame={frame} fps={fps} focus={fScreen} head={hScreen} zoom={cam.zoom} />
     </AbsoluteFill>
-      {hasInsert && <InsertGraphic insert={shot.insert!} frame={frame} fps={fps} />}
+      {hasInsert && <InsertGraphic insert={shot.insert!} frame={frame} fps={fps} lang={lang} />}
     </AbsoluteFill>
   );
 };

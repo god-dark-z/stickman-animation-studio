@@ -36,42 +36,49 @@
         {
           "id": "maya",
           "x": 0.35,
-          "z": 0.5,
+          "z": 0.6,
           "facing": "right",
-          "expression": "happy"
+          "expression": "happy",
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
         },
         {
           "id": "rahim",
           "x": 0.62,
-          "z": 0.5,
+          "z": 0.6,
           "facing": "left",
-          "expression": "neutral"
+          "expression": "neutral",
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
         }
       ],
       "props": [
         {
-          "type": "stool",
+          "type": "chair",
           "x": 0.35,
-          "z": 0.5
+          "z": 0.55
         },
         {
-          "type": "stool",
+          "type": "chair",
           "x": 0.62,
-          "z": 0.5
+          "z": 0.55
         },
         {
           "type": "table",
           "x": 0.48,
-          "z": 0.55
+          "z": 0.42
         }
-      ]
+      ],
+      "focus": "maya"
     },
     {
       "say": "মায়া বলল, আজ বৃষ্টি পড়েছিল।",
       "gloss": "Maya said, it rained today.",
       "bg": "street",
       "time": "sunset",
-      "framing": "medium",
+      "framing": "wide",
       "quote": "maya",
       "actors": [
         {
@@ -80,14 +87,20 @@
           "z": 0.6,
           "facing": "right",
           "expression": "happy",
-          "talking": true
+          "talking": true,
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
         },
         {
           "id": "rahim",
           "x": 0.62,
           "z": 0.6,
           "facing": "left",
-          "expression": "neutral"
+          "expression": "neutral",
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
         }
       ],
       "beats": [
@@ -96,14 +109,32 @@
           "expression": "surprised",
           "actor": "rahim"
         }
-      ]
+      ],
+      "props": [
+        {
+          "type": "chair",
+          "x": 0.35,
+          "z": 0.55
+        },
+        {
+          "type": "chair",
+          "x": 0.62,
+          "z": 0.55
+        },
+        {
+          "type": "table",
+          "x": 0.48,
+          "z": 0.42
+        }
+      ],
+      "focus": "maya"
     },
     {
       "say": "রহিম হেসে বলল, ছাতা তো আমি ভুলে গিয়েছিলাম।",
       "gloss": "Rahim laughed and said, I forgot my umbrella.",
       "bg": "street",
       "time": "sunset",
-      "framing": "medium",
+      "framing": "wide",
       "quote": "rahim",
       "actors": [
         {
@@ -111,7 +142,10 @@
           "x": 0.35,
           "z": 0.6,
           "facing": "right",
-          "expression": "happy"
+          "expression": "happy",
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
         },
         {
           "id": "rahim",
@@ -119,9 +153,30 @@
           "z": 0.6,
           "facing": "left",
           "expression": "laugh",
-          "talking": true
+          "talking": true,
+          "action": "sitOn",
+          "on": "chair",
+          "pose": "sit"
         }
-      ]
+      ],
+      "props": [
+        {
+          "type": "chair",
+          "x": 0.35,
+          "z": 0.55
+        },
+        {
+          "type": "chair",
+          "x": 0.62,
+          "z": 0.55
+        },
+        {
+          "type": "table",
+          "x": 0.48,
+          "z": 0.42
+        }
+      ],
+      "focus": "maya"
     }
   ]
 }
