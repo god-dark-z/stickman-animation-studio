@@ -4,10 +4,15 @@
 
 | Thing | Location |
 |---|---|
-| Skill | `.claude/skills/stickman-animation-studio/SKILL.md` (+ `references/`, `engine/`, `templates/`) |
-| Command | `.claude/commands/make-video.md` → invoked as `/make-video` |
-| Project memory | `CLAUDE.md` at the repo root (one pointer line to the skill) |
+| Skill | `.claude/skills/stickman-animation-studio/SKILL.md` (+ `references/`, `engine/`, `templates/`) — also `~/.claude/skills/` for user scope |
+| Command | `.claude/commands/make-video.md` → `/make-video` (still supported; skills are the newer path) |
+| Project memory | `CLAUDE.md` or `.claude/CLAUDE.md`; `AGENTS.md` is read **only when no CLAUDE.md exists** |
+| Path-scoped rules | `.claude/rules/*.md` with a `paths:` frontmatter glob |
+| Sub-agent definitions | `.claude/agents/*.md` (project) or `~/.claude/agents/*.md` (user) |
 | Settings/permissions | `.claude/settings.json` |
+
+Skill frontmatter is all-optional but `description` is what triggers it; `name` defaults to the
+folder name. Frontmatter is parsed **only** when `---` is the file's first line.
 
 Claude Code discovers skills by folder, so installing the repo under `.claude/skills/` is enough —
 no registration step. The command file's frontmatter carries `description` and `argument-hint`;
@@ -17,10 +22,10 @@ no registration step. The command file's frontmatter carries `description` and `
 
 | Ability | How to use it here |
 |---|---|
-| **Sub-agents / Task tool** | Run research and asset inventory in parallel: one agent per 2–3 sources, one agent running `locations.ts --list` and the glossary scan. Do **not** parallelise stages that share the story JSON (storyboard, gates) — they must be sequential. |
-| **Background bash** | Start the full render with `run_in_background: true`, then write `sync-map.md` and the delivery report while it runs. Poll the log; do not start a second heavy job concurrently. |
-| **Vision** | Read `out/<slug>/contact-sheet.png` and individual stills. This is the highest-value capability you have: fill the PASS/FAIL verdict column in `visual-review.md` yourself. |
-| **Web search** | Required for `fact-check.md`. Search per claim, not per topic; record the URL you actually opened. |
+| **Sub-agents (`Task` / `.claude/agents/`)** | Real concurrency: 20 concurrent sub-agents by default, each with its own context window, nesting to 3 layers. Run research and asset inventory in parallel — one agent per 2–3 sources. Do **not** parallelise stages that share the story JSON (storyboard, gates): two writers on one file produce conflicting shots. |
+| **Background execution** | `claude --bg` starts a background agent and returns immediately; `claude agents` monitors/dispatches parallel sessions; `claude attach <id>` reattaches. For a render, start it detached and poll `out/<slug>/run.log`. Do not run two heavy renders at once on 16 GB. |
+| **Vision** | `Read` returns PNG/JPEG/GIF/WebP as visual content with no permission needed inside the working dir. This is the highest-value capability you have: open `out/<slug>/contact-sheet.png`, fill the PASS/FAIL verdict column in `visual-review.md` yourself. |
+| **Web search** | Built-in `WebSearch` + `WebFetch`, both **permission-prompted** (interactive terminals cap at 200 searches/session). Required for `fact-check.md`: search per claim, record the URL you actually opened. |
 | **Hooks** | Optional: a PostToolUse hook on `Write` that runs `npx tsc --noEmit` after story JSON edits catches schema mistakes early. |
 | **Plan mode** | Use it for the story concept and format choice only. Do not plan the gate fixes — the gate output *is* the plan. |
 
@@ -41,6 +46,12 @@ no registration step. The command file's frontmatter carries `description` and `
 12 ffprobe + pull frames from the MP4, look at them
 13 deliver
 ```
+
+## Context hygiene
+
+`SKILL.md` should stay under ~500 lines (it is ~374). Documented guidance: keep `CLAUDE.md` under
+200 lines, and note that re-attached skills after compaction keep only the first ~5k tokens each —
+which is another reason the manual is short and the detail lives in `references/`.
 
 ## Pitfalls specific to this product
 

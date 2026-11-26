@@ -4,9 +4,10 @@
 
 | Thing | Location |
 |---|---|
-| Project rules | `.cursor/rules/*.mdc` (frontmatter with `description`, `globs`, `alwaysApply`) |
-| Legacy rules | `.cursorrules` (still read, older format) |
-| Command-style prompts | `.cursor/commands/*.md` where supported; otherwise type the prompt |
+| Project rules | **`.cursor/rules/*.mdc`** — a plain `.md` in that folder is **ignored by the rules system**. Frontmatter: `description`, `globs`, `alwaysApply` |
+| `AGENTS.md` | Supported at the repo root **and** in subdirectories, combining with parents (more specific wins) |
+| User / team rules | Customize → Rules (not in the repo); precedence Team → Project → User |
+| Sub-agents | `.cursor/agents/*.md` (frontmatter: `name`, `description`, `model`, `readonly`, `is_background`) |
 | Chat/agent modes | Agent mode in the sidebar; Cmd/Ctrl-K for inline edits |
 
 Cursor has no skill-folder concept. Install = a rule file pointing at SKILL.md + the repo.
@@ -15,11 +16,12 @@ Cursor has no skill-folder concept. Install = a rule file pointing at SKILL.md +
 
 | Ability | How to use it here |
 |---|---|
-| **Agent mode with terminal** | The pipeline is CLI: run `npm run doctor`, then the gates, then the render. Give the agent the exact commands from SKILL.md; it will iterate on real output. |
-| **Rules (`.mdc`)** | Put the non-negotiables in an `alwaysApply: true` rule (no AI imagery, one language, run the gates, never claim an unrun check) and a pointer to `SKILL.md`. Do **not** paste the whole manual into a rule — it bloats every request and drifts. |
+| **Agent mode with terminal** | The pipeline is CLI: `npm run doctor`, then the gates, then the render. Give the agent the exact commands from SKILL.md; it iterates on real output. |
+| **Sub-agents** | `.cursor/agents/*.md`; `is_background: true` returns immediately, otherwise the call blocks. Built-in `explore` and `browser` agents are auto-used. Launch several `Task` calls in one message to run them concurrently. |
+| **Rules (`.mdc`)** | Put the non-negotiables in an `alwaysApply: true` rule (no AI imagery, one language, run the gates, never claim an unrun check) and a pointer to `SKILL.md`. Note `globs` is a **list**. Do **not** paste the manual into a rule — it bloats every request and drifts. |
 | **Parallel editing** | Cursor's diff/apply flow is fast for the story JSON. Keep one file in focus; do not let it "helpfully" rewrite `engine/src`. |
-| **Vision** | Cursor chat can accept images. Drag `contact-sheet.png` into the chat, or open the file, to do the stills review. |
-| **Web search** | Available in chat where enabled; use it per claim for `fact-check.md`. |
+| **Vision** | The `Read files` tool loads `.png/.jpg/.gif/.webp/.svg` into context for vision-capable models. Open `contact-sheet.png` to do the stills review. |
+| **Web search** | The Agent `Web` tool generates queries and runs searches. Use it per claim for `fact-check.md`. |
 | **Background terminal** | Supported in recent builds: start the render in a terminal tab and keep editing docs. |
 
 ## Order of operations

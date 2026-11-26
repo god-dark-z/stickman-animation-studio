@@ -1,7 +1,7 @@
 {
   "name": "stickman-studio-engine",
-  "version": "3.1.0",
-  "description": "Procedural stickman cartoon engine: one story JSON file becomes a narrated, captioned, sound-designed vertical MP4. No AI image or video generation.",
+  "version": "4.0.0",
+  "description": "Procedural stickman cartoon engine: one story JSON becomes a narrated, captioned, sound-designed vertical MP4 in English or Bangla. No AI image or video generation.",
   "license": "MIT",
   "private": true,
   "type": "module",

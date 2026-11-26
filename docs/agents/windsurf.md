@@ -2,9 +2,13 @@
 
 ## Where things live
 
+> Verification status: **by convention.** This research pass did not confirm Windsurf's current
+> paths from an official source, so treat the paths below as the conventional layout and check your
+> build. `install/INSTALL.md` marks Windsurf convention-only for the same reason.
+
 | Thing | Location |
 |---|---|
-| Rules | `.windsurf/rules/*.md` (with activation mode: always-on / manual / glob) and the legacy `.windsurfrules` |
+| Rules | `.windsurf/rules/*.md` (activation mode: always-on / manual / glob) and the legacy `.windsurfrules` |
 | Workflows | `.windsurf/workflows/*.md` — multi-step procedures invoked by name |
 | Cascade | the agent surface, with terminal + file tools |
 

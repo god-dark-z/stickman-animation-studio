@@ -4,23 +4,27 @@
 
 | Thing | Location |
 |---|---|
-| Context file | `GEMINI.md` at the repo root (also `~/.gemini/GEMINI.md` for user scope) |
+| Context file | `GEMINI.md` — global `~/.gemini/GEMINI.md`, workspace, and JIT files as tools touch directories. Concatenated (not overridden); `context.fileName` can list several names |
+| Skills | `SKILL.md` per folder (Agent Skills standard): `~/.gemini/skills/` or `<repo>/.gemini/skills/` (`.agents/skills/` also works). Frontmatter `name` + `description`; activation asks the user for consent |
+| Custom commands | `.gemini/commands/*.toml` — **TOML with `prompt` and optional `description`, invoked as `/name`**. Subdirs join with `:` |
+| Sub-agents | `.gemini/agents/*.md` or `~/.gemini/agents/*.md` — frontmatter `name`, `description`, `kind: local`, `tools`, `model`, `max_turns`; the body is the system prompt |
 | Settings | `.gemini/settings.json` (tools, approval, MCP servers) |
-| Custom commands | `.gemini/commands/*.toml` (prompt + description; invoked as `/name`) |
-| Extensions/MCP | configured in settings; not needed for this project |
 
 Gemini CLI reads `GEMINI.md` as its instruction file and discovers commands from TOML files. This
 repo ships `install/make-gemini-toml.sh`, which writes a `/make-video` TOML command that forwards
-to SKILL.md.
+to SKILL.md. **The argument placeholder in a Gemini command is `{{args}}`, not `$ARGUMENTS`** — a
+common porting mistake.
 
 ## What this product gives you, and how to use it
 
 | Ability | How to use it here |
 |---|---|
 | **Shell tools** | Run the whole pipeline from the CLI. Gemini CLI is shell-first; give it the exact gate commands and iterate on output. |
-| **Long context** | Its large window makes it tempting to read everything. Resist: read the one reference the stage names, keep the story JSON as truth. A huge context still loses details under pressure. |
+| **Sub-agents** | "Specialists the main agent can hire": each has its own context window and a restricted tool set, invoked automatically or forced with `@name` (`@generalist`). Use `@generalist` for research, and keep the story JSON to the main thread. |
+| **Long context** | A large window makes it tempting to read everything. Resist: read the one reference the stage names and keep the story JSON as the single source of truth. |
 | **Web search / grounding** | Where enabled, use it for `fact-check.md`, one search per claim. Record the URL actually opened. |
-| **Vision** | Model-dependent. If the configured model reads images, review `contact-sheet.png`; otherwise say "visual QA was geometric only". |
+| **Vision** | The `read_file` tool loads images, audio and PDF. If the configured model understands them, review `contact-sheet.png`; otherwise say "visual QA was geometric only". |
+| **Limits are quotas, not tokens** | Documented per-day request caps (1,000/day on the individual free tier, higher on paid plans) rather than a context number. A long gate-fix loop burns them — fix the cause, do not brute-force. |
 | **Non-interactive mode** | `gemini -p "<prompt>"` is useful for a scripted run: feed it the topic and let it execute the pipeline. Keep approval prompts on for writes. |
 
 ## Order of operations

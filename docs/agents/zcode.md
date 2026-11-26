@@ -12,13 +12,28 @@
 ZCode also loads plugin skills from a marketplace; this project does **not** require one — the
 skill folder + `AGENTS.md` pointer is the whole install.
 
+**Discovery order** (earlier wins): configured roots → `~/.zcode/skills` → `~/.agents/skills` →
+`<repo>/.zcode/skills` (cwd → root) → `<repo>/.agents/skills` → plugin roots. A same-named skill
+elsewhere is discovered but shadowed, so **install one copy**. Commands: `.md` files whose *file
+name* is the command name; nested dirs join with a colon (`review/code.md` → `/review:code`);
+singular `command/` is not scanned.
+
+**Frontmatter limits that matter here:** a skill is dropped outright if it has no `name`, no
+`description`, or a description over **1024 chars**; the description is truncated to ~**250 chars**
+when the model sees it. Command frontmatter is a flat parser — single-line keys only.
+
+Our `SKILL.md` description is 998 chars, and its first ~250 characters already say "stickman
+cartoon video … English (default) or in Bangla / Bengali (বাংলা) when the user asks for it".
+If you edit it, keep the product nouns and the Bangla trigger **first** — anything after ~250 chars
+is not shown to the model for skill selection.
+
 ## What this product gives you, and how to use it
 
 | Ability | How to use it here |
 |---|---|
-| **Sub-agents (Agent tool)** | Parallelise research and asset inventory. Independent work only — never two agents editing `stories/*.json`. |
+| **Sub-agents (Agent tool)** | Yes — 68 agent definitions ship at `~/.zcode/agents/*.md`, each with `name`, `description`, `tools`. Parallelise research and asset inventory; never two agents editing `stories/*.json`. |
 | **Background bash** | `run_in_background: true` for the render; the task notifies you when it exits, so you can write docs meanwhile. |
-| **Vision** | This model can read images: open `out/<slug>/contact-sheet.png` and fill `visual-review.md` verdicts. Also pull frames from the final MP4 with ffmpeg and look at them — that is the check that catches real defects. |
+| **Vision** | If the configured model has image input, `Read` shows you the PNG: open `out/<slug>/contact-sheet.png`, fill `visual-review.md` verdicts, and pull frames from the final MP4 with ffmpeg — that is the check that catches real defects. **If this host resolves to no image input**, use `agentvision check` / raw-pixel stats / `ffprobe` and disclose exactly that instead of claiming a look. |
 | **WebFetch / WebSearch** | Fact-check per claim. Keep the URL you actually read. |
 | **TodoWrite** | Useful for the 13-stage pipeline: one todo per stage, so a long run never silently stalls. |
 | **Skills / commands** | `/make-video <topic>` is the entry point; the command file resolves the language first and then defers to SKILL.md. |

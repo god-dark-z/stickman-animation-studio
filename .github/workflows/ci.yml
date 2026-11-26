@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+    branches: [main, v4]
+  pull_request:
+  workflow_dispatch:
+
+# The whole product is "runs on a CPU-only 16 GB machine with no API keys". CI proves exactly that:
+# a clean Ubuntu runner, no GPU, no secrets. The only network call is free edge-tts, and the suite
+# is designed to pass without it (narration tests are synthetic; --no-tts covers the rest).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: tests, gates and eval (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: engine
+        # bash everywhere, including windows-latest: the gate loops are shell scripts and the
+        # product is designed to behave identically on both platforms.
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: engine/package-lock.json
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Node deps
+        run: npm ci
+
+      - name: Install Python deps
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Unit + resolver + voice + layout tests
+        run: npm test
+
+      - name: Python tests (Bangla normalizer, timing, pronunciation)
+        run: python scripts/test_all.py
+
+      - name: Skill lint (frontmatter, links, JSON examples, stray files)
+        run: npx tsx scripts/skill_lint.ts
+
+      - name: Doctor (no WebGL probe on CI)
+        run: python scripts/doctor.py --quick
+
+      - name: English commonsense battery
+        run: npx tsx scripts/battery.ts --lang en
+
+      - name: Bangla commonsense battery
+        run: npx tsx scripts/battery.ts --lang bn
+
+      - name: English demo story — all gates
+        run: |
+          npx tsx scripts/qa_sync.ts stories/why-phone-gets-hot.json
+          npx tsx scripts/qa_geometry.ts stories/why-phone-gets-hot.json
+          npx tsx scripts/qa_commonsense.ts stories/why-phone-gets-hot.json
+          npx tsx scripts/qa_rubric.ts stories/why-phone-gets-hot.json
+
+      - name: Bangla stories — text, gloss, glyph and gate stack
+        shell: bash
+        run: |
+          for f in stories/tests/bangla-dialogue-two.json stories/tests/bangla-insert-test.json stories/tests/bangla-tea-stall.json; do
+            echo "== $f"
+            python scripts/qa_bangla.py "$f" --with-gloss
+            python scripts/qa_glyphs.py "$f"
+            npx tsx scripts/qa_sync.ts "$f"
+            npx tsx scripts/qa_geometry.ts "$f"
+            npx tsx scripts/qa_commonsense.ts "$f"
+            npx tsx scripts/qa_rubric.ts "$f"
+          done
+
+      - name: Every test story — contract and geometry
+        shell: bash
+        run: |
+          for f in stories/tests/*.json; do
+            case "$f" in *_neg_*|*.spec.json) continue;; esac
+            npx tsx scripts/qa_sync.ts "$f"
+            npx tsx scripts/qa_geometry.ts "$f"
+          done
+
+      - name: Draft-tier silent render — English and Bangla
+        run: |
+          npx tsx scripts/studio.ts stories/why-phone-gets-hot.json --tier draft --no-tts
+          npx tsx scripts/studio.ts stories/tests/bangla-tea-stall.json --tier draft --no-tts
+
+      # A silent render has no voice to gate; the video/audio/loudness gates already ran inside
+      # studio.ts on the previous step, and a WARN there is visible in the log.
+
+      - name: Eval report
+        if: always()
+        run: npx tsx scripts/eval.ts
+
+      - name: Upload eval report and the rendered drafts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-${{ matrix.os }}
+          path: |
+            evals/REPORT.md
+            engine/out/battery/report.md
+            engine/out/**/craft-rubric.md
+            engine/out/**/*-preview.mp4
+          retention-days: 14
+          if-no-files-found: warn

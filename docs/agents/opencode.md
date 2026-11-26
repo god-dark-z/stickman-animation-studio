@@ -4,10 +4,10 @@
 
 | Thing | Location |
 |---|---|
-| Instructions | `AGENTS.md` at the repo root (primary), plus `~/.config/opencode/AGENTS.md` for user scope |
-| Config | `opencode.json` (project) or `~/.config/opencode/opencode.json` |
-| Commands | `.opencode/command/*.md` (frontmatter: `description`, optionally `agent`, `model`) |
-| Agents (subagents) | `.opencode/agent/*.md` — each with its own prompt, model and tools |
+| Instructions | `AGENTS.md` (discovered automatically), plus an `instructions` key for extra files/globs/URLs |
+| Config | `opencode.json(c)` (project) or `~/.config/opencode/opencode.json(c)` |
+| Commands | **`.opencode/commands/*.md`** (plural; singular `command/` is legacy-but-read). Frontmatter: `description`, `agent`, `model`, `subagent` — **no `allowed-tools`** |
+| Agents (subagents) | **`.opencode/agents/*.md`** — the markdown body becomes the agent's `system` prompt; frontmatter accepts `mode: primary|subagent|all`, `model` (`provider/model#variant`), `permissions` |
 
 OpenCode supports real subagents with their own models. That is the main lever here: give the
 cheap model the mechanical stages and the strong model the story.
@@ -16,11 +16,11 @@ cheap model the mechanical stages and the strong model the story.
 
 | Ability | How to use it here |
 |---|---|
-| **Subagents with separate models** | Configure a `fast` agent (small/cheap model) for gate runs, file reads, and log triage, and a `smart` agent for the script, the Scene Spec and the storyboard. That split is the single biggest quality-per-cost win in this pipeline. |
-| **Commands** | `.opencode/command/make-video.md` with `$ARGUMENTS`, resolving the language first, then deferring to SKILL.md. |
-| **Shell + background tool** | Start the render in a background session, keep writing `sync-map.md`; poll the log. |
+| **Subagents with separate models** | This is the standout capability here: `.opencode/agents/fast.md` on a cheap model for gate runs and log triage, `.opencode/agents/smart.md` on a strong model for the script and Scene Spec. Biggest quality-per-cost win in the pipeline. `mode: subagent` + `subagent: true` runs the child in the background and reports when it goes idle. |
+| **Commands** | `.opencode/commands/make-video.md` with `$ARGUMENTS`, resolving the language first, then deferring to SKILL.md. `$1`/`$2` are positional; no placeholder means the args are appended. |
+| **Shell + background tool** | `subagent: true` gives a background child session (fresh context, reports back). For a render, start it detached and poll `out/<slug>/run.log`. `subagent_depth` defaults to **1**, so a child cannot spawn grandchildren. |
 | **Vision** | Model-dependent. If the configured model reads images, do the contact-sheet review; otherwise state "geometric only". |
-| **Web fetch/search** | Use a tool-enabled agent for research; one search per claim. |
+| **Web search** | Native `websearch.provider: "random"` picks an available provider. One search per claim. |
 | **TUI with tabs** | Run the long render in one session and the documentation in another; they share the repo but not the JSON writer. |
 
 ## Order of operations

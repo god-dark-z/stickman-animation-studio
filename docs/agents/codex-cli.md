@@ -4,23 +4,25 @@
 
 | Thing | Location |
 |---|---|
-| Project instructions | `AGENTS.md` at the repo root (Codex reads it automatically) |
-| Extra instruction files | `AGENTS.md` in subdirectories, merged from the root down |
-| Config | `~/.codex/config.toml` (model, approval mode, sandbox) |
-| Prompts (if supported) | `~/.codex/prompts/*.md`, invoked as `/name` |
+| Project instructions | `AGENTS.md` (+ `AGENTS.override.md`, which wins) — Codex walks from the git root down to your cwd, at most one file per directory, concatenated so nearer wins. Hard cap `project_doc_max_bytes`, **32 KiB** default |
+| Global instructions | `$CODEX_HOME/AGENTS.md` (default `~/.codex/`) |
+| Skills | **`.agents/skills/<name>/SKILL.md`** — *not* `.codex/skills`. Searched from cwd up to the repo root, plus `~/.agents/skills` and `/etc/codex/skills`. Frontmatter is exactly `name` + `description` |
+| Config | `~/.codex/config.toml`; project `.codex/config.toml` loads **only when you trust the project** |
+| Sub-agents | `~/.codex/agents/*.toml` (personal) or `.codex/agents/*.toml` (project) — **TOML, not markdown**: `name`, `description`, `developer_instructions` are required |
 
-Codex has no skill-folder convention. The install is: `AGENTS.md` pointer + the repo itself —
-the agent reads SKILL.md and `references/` as ordinary files.
+Two corrections worth knowing: the skill folder is `.agents/skills`, and sub-agent files are TOML.
 
 ## What this product gives you, and how to use it
 
 | Ability | How to use it here |
 |---|---|
 | **Shell-first workflow** | The whole pipeline is CLI. Run `npm run doctor`, then the gates, then the render. Codex is strongest here: give it exact commands and it will iterate on real output. |
+| **Sub-agents (TOML)** | `codex/agents/*.toml` with their own model and instructions; concurrency via `agents.max_concurrent_threads_per_session` (excluding the primary). Use one for research, one for gate triage — never two on the story JSON. |
+| **`/goal` and worktrees** | `/goal` holds a long-running objective with a progress row; parallel chats are meant to use **git worktrees**, and the docs say "avoid letting two chats change the same files" — the one-writer rule again. |
 | **Approval modes** | Use an auto-approve/sandbox mode that permits `bash` inside the repo but not network writes. Narration needs outbound HTTPS to the TTS endpoint; everything else is local. |
 | **Background/streaming output** | Long renders: run with output redirected to a file and poll it (`npx tsx scripts/studio.ts … > out/run.log 2>&1 &`) if your build supports backgrounding; otherwise budget the minutes in the foreground. |
-| **Vision** | Depends on the configured model. If it can read images, review `contact-sheet.png`; if not, rely on `qa_geometry` + `qa_stills.py` and say so. |
-| **Web search** | If available (or via a tool), fact-check per claim. If not, write from knowledge and mark the table unverified. |
+| **Vision** | `-i screenshot.png` / `--image a.png,b.png`, or paste into the composer / Shift+drag in the IDE. Whether the configured model understands images is separate — if it does not, say "geometric only". |
+| **Web search** | `--search`, or `web_search = "live"` in `config.toml`. Fact-check per claim; record the URL you opened. |
 | **Patch-based edits** | Codex applies diffs well. Ask for one file at a time; never let it rewrite the whole engine. |
 
 ## Order of operations

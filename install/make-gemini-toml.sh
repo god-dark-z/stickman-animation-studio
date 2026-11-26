@@ -4,7 +4,7 @@
 set -euo pipefail
 IN="$1"; OUT="$2"
 {
-  printf 'description = "Produce a complete professional English stickman cartoon video (Stickman Animation Studio)"\n'
+  printf 'description = "Produce a complete professional stickman cartoon video in English (default) or Bangla (Stickman Animation Studio)"\n'
   printf 'prompt = """\n'
   # strip the YAML frontmatter (between the first two --- lines), keep the body,
   # and translate the argument placeholder to Gemini's {{args}}

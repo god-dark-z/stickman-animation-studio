@@ -5,8 +5,9 @@
 | Thing | Location |
 |---|---|
 | Conventions | `CONVENTIONS.md`, loaded with `aider --read CONVENTIONS.md` |
-| Instructions (persistent) | `aider --read AGENTS.md` or a `.aider.conf.yml` with `read:` entries |
+| Instructions (persistent) | `aider --read AGENTS.md`, or `read:` entries in `.aider.conf.yml` |
 | Chat modes | `code`, `architect` (plan then edit), `ask` |
+| Verification | **by convention.** Aider has no instruction-file auto-discovery or skill format; the files above are read only because the command line says so. |
 
 Aider has no agent loop and no subagents: it is a pair-programming editor with strong repo mapping.
 Treat it as "you drive, Aider edits".

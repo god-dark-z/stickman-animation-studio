@@ -7,23 +7,22 @@ the video must prove.
 
 | Agent | Instructions live in | Sub-agents | Background | Vision | Status |
 |---|---|---|---|---|---|
-| [Claude Code](claude-code.md) | `.claude/skills/`, `.claude/commands/`, `CLAUDE.md` | yes (Task) | yes | yes | layout exercised by `install.sh`; full pipeline run not verified here |
-| [ZCode](zcode.md) | `~/.zcode/skills/`, `~/.zcode/commands/`, `AGENTS.md` | yes (Agent) | yes | yes (this model) | **this repository's reference run** |
-| [Google Antigravity](antigravity.md) | `AGENTS.md` + agent skills folder | yes | yes | model-dependent | by convention |
-| [Codex CLI](codex-cli.md) | `AGENTS.md`, `~/.codex/config.toml` | no | shell `&` | model-dependent | by convention |
-| [OpenCode](opencode.md) | `AGENTS.md`, `opencode.json`, `.opencode/agent/` | **yes, with per-agent models** | yes | model-dependent | by convention |
-| [Cursor](cursor.md) | `.cursor/rules/*.mdc`, `.cursor/commands/` | no | terminal tabs | yes in chat | by convention |
-| [Gemini CLI](gemini-cli.md) | `GEMINI.md`, `.gemini/commands/*.toml` | no | shell `&` | model-dependent | by convention |
-| [GitHub Copilot](github-copilot.md) | `.github/copilot-instructions.md`, `.github/prompts/` | no | no | yes (attach) | by convention |
-| [Windsurf](windsurf.md) | `.windsurf/rules/`, `.windsurf/workflows/` | no | partial | model-dependent | by convention |
-| [Aider](aider.md) | `CONVENTIONS.md` / `--read AGENTS.md` | no | no | no | by convention |
+| [Claude Code](claude-code.md) | `CLAUDE.md` / `.claude/CLAUDE.md`; `.claude/skills/`; `.claude/commands/` (still supported); `.claude/agents/` | yes — 20 concurrent default, 3 nesting layers | yes (`claude --bg`, `claude agents`) | yes (`Read` on images) | layout verified against docs; pipeline not run there |
+| [ZCode](zcode.md) | `~/.zcode/skills/`, `~/.zcode/commands/`, `AGENTS.md` | yes (`~/.zcode/agents/*.md`) | yes | model-dependent | **this repository's reference run** |
+| [Google Antigravity](antigravity.md) | `AGENTS.md` **and** `GEMINI.md` (size-limited); skill folder via `/skills` | yes (tabs, `run_workflow`) | yes (Background Tasks panel) | yes | partly verified; skill root unverified |
+| [Codex CLI](codex-cli.md) | `AGENTS.md` (+`.override`, 32 KiB cap); skills in **`.agents/skills/`**; agents in `.codex/agents/*.toml` | yes (TOML agents) | yes (`/subagents`, `/goal`) | yes (`-i`, paste) | verified against docs |
+| [OpenCode](opencode.md) | `AGENTS.md` + `instructions`; `.opencode/commands/`; `.opencode/agents/` | **yes, per-agent models** | yes (`subagent: true`) | yes (`read` tool) | verified against docs |
+| [Cursor](cursor.md) | `.cursor/rules/*.mdc` (**`.md` ignored**), `AGENTS.md`, `.cursor/agents/` | yes (`.cursor/agents/`) | yes (`is_background`) | yes (`Read files`) | verified against docs |
+| [Gemini CLI](gemini-cli.md) | `GEMINI.md`; skills in `.gemini/skills/`; commands `.gemini/commands/*.toml` (`{{args}}`); agents `.gemini/agents/` | yes (`@name`) | not documented | yes (`read_file`) | verified against docs |
+| [GitHub Copilot](github-copilot.md) | `.github/copilot-instructions.md`, `.github/instructions/`, `AGENTS.md`; **no skill system** | parallel sessions; cloud agent | yes (cloud agent, 59 min) | yes (attach, model must support) | verified against docs |
+| [Windsurf](windsurf.md) | `.windsurf/rules/`, `.windsurf/workflows/` | unverified | unverified | model-dependent | by convention |
+| [Aider](aider.md) | `CONVENTIONS.md` / `--read AGENTS.md` (no auto-discovery) | no | no | no | by convention |
 | [Chat-only](chat-only.md) | the conversation | no | no | maybe | scripts + handoff only |
 
-"Status" is honest about this repository's verification: only the ZCode run in
-`docs/dev/v4/` was actually executed end to end here. "By convention" means the layout follows the
-product's documented model of instructions/skills; it has **not** been executed in this
-environment. `install/INSTALL.md` keeps that distinction visible, and the CI cannot verify a product
-it cannot install.
+"Status" is honest about verification. Only the ZCode run in `docs/dev/v4/` was executed end to end
+here. "Verified against docs" means the layouts and capabilities below were read from each
+product's official documentation in this research pass — not that an install was run.
+"By convention" / "unverified" means exactly that.
 
 ## The three things every playbook says
 
