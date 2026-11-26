@@ -97,7 +97,7 @@ A figure of speech will match a literal intent ("cool to cooking" → kitchen). 
 per shot, with a reason, in the story:
 
 ```json
-"intentExempt": [{ "shot": 8, "id": "use-cooking", "reason": "metaphor: the phone heats up" }]
+{ "intentExempt": [{ "shot": 8, "id": "use-cooking", "reason": "metaphor: the phone heats up" }] }
 ```
 
 The gate then prints `EXEMPT` as a warning naming your reason. It is never silent.

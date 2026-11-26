@@ -27,7 +27,17 @@
     "qa:spec": "tsx scripts/spec_check.ts",
     "battery": "tsx scripts/battery.ts",
     "test:py": "python scripts/test_all.py",
-    "test:all": "tsx scripts/test.ts && python scripts/test_all.py"
+    "test:all": "tsx scripts/test.ts && python scripts/test_all.py",
+    "eval": "tsx scripts/eval.ts",
+    "qa:bangla": "python scripts/qa_bangla.py",
+    "qa:gloss": "tsx scripts/qa_gloss.ts",
+    "qa:glyphs": "python scripts/qa_glyphs.py",
+    "fonts": "python scripts/fetch_fonts.py",
+    "resolve-lang": "tsx scripts/resolve_language.ts",
+    "choose-voice": "tsx scripts/choose_voice.ts",
+    "battery:bn": "tsx scripts/battery.ts --lang bn",
+    "lint:skill": "tsx scripts/skill_lint.ts",
+    "qa:skill": "python scripts/qa_bangla.py"
   },
   "dependencies": {
     "@react-three/fiber": "9.4.0",

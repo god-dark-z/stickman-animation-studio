@@ -79,3 +79,14 @@ Judgement calls made without asking, with the reason. Numbering continues V3's l
 | V4-45 | Bangla digits in inserts by default, via the pack's `captions.digits` | A Bangla video with `2020` in a chart is the machine-translation look. The pack already declared it; the renderer now honours it. |
 | V4-46 | The glyph gate checks the **combined font stack**, not one file | The Bangla subset has no Latin and the Latin subset has no Bangla; the browser falls through exactly like the union. Checking one file produced false failures. |
 | V4-47 | `fonttools` + `brotli` are pinned Python deps | They read woff2 character maps, which is how the gate proves a glyph exists without a browser or a rendered image. `doctor` reports both. |
+## Phase G
+
+| # | Decision | Why |
+|---|---|---|
+| V4-48 | SKILL.md is a **director's manual**: hard rules first, then one section per stage with command/self-check/pitfalls, then a failure playbook | A model follows direction literally; vague prose produces improvisation, which is exactly what breaks sync. Numbers and exact commands are checkable; adjectives are not. |
+| V4-49 | The format library and hook bank are **data in a reference**, not prose in SKILL.md | SKILL.md must stay readable in one pass. Formats are reference material the agent consults per stage — and the repetition guard needs them comparable side by side. |
+| V4-50 | Model tiers change **ambition**, never the gates or the render tier | A weaker model should attempt less and still ship a verified 1080×1920 MP4 — downgrading the output to compensate would ship a worse product. |
+| V4-51 | Each agent playbook is explicit about what its product **cannot** do, and the index marks only the executed run as verified | The brief forbids claiming untested installs. "By convention" is honest; a green check that was never run is a lie the reader will discover. |
+| V4-52 | The eval harness measures the **engine and skill** (batteries, gates, resolver, normalizer, lint) and accepts operator-recorded model rows separately, with their source | Per-model numbers need paid APIs, which the rules forbid. Merging unverifiable rows into measured ones would corrupt the only trustworthy table. |
+| V4-53 | `skill_lint` fails on a script named in SKILL.md that does not exist | The most common decay in a long manual is a command path that drifted. Mechanical link-checking is the only way a 374-line manual stays true. |
+| V4-54 | A bare JSON **fragment** in a doc is treated as an error | A reader (or an agent) will copy it and get a parse failure. Wrapping it in an object costs one line and makes every example executable. |

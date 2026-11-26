@@ -14,352 +14,361 @@ description: |
   no paid APIs: every frame and every sound is produced by code.
 ---
 
-# Stickman Animation Studio — /make-video
+# Stickman Animation Studio — the director's manual
 
-Turn one prompt into a finished, studio-quality vertical cartoon (1080×1920, 30 fps,
-H.264 + AAC) using nothing but code. You write the story, storyboard it with an explicit
-narration-to-visual sync contract, run the bundled engine through its QA gates, and hand back the
-verified MP4 with its sources.
+One prompt becomes a verified vertical cartoon (1080×1920, 30 fps, H.264 + AAC). You write the
+story, storyboard it with an explicit narration-to-visual contract, and drive the bundled engine
+through every gate. The engine draws, speaks, scores and measures; **you decide what the film is
+about and what each shot proves.**
 
-**Operate autonomously.** No confirmation questions, no progress narration, no stopping halfway.
-If a step is blocked, treat it as a routing problem: try the next tool, the next asset, or build
-it yourself. Only stop when the video is rendered, verified, and delivered.
+Read this file in one pass. Then read only the reference for the stage you are in — the table at
+the end names them.
 
-**Production language: English by default, Bangla on request.** Narration, dialogue, on-screen
-text, captions, labels, and insert copy are all in the video's single production language. Never
-mix languages inside one video. English direction: `references/10-english-voice-direction.md`;
-Bangla direction: `references/12-bangla-voice-and-script.md`.
+---
 
-## 0.1 Resolve the language before anything else
+## 0. Hard rules (apply to every run, no exceptions)
 
-Language is a **mechanical decision**, not a judgement call. Run the resolver on the user's exact
-words; it is unit-tested (59 cases) and knows English, Bangla script and Banglish phrasings,
-negations, and topic false positives.
+1. **No AI imagery.** No image generation, no video generation, no stock footage, no paid APIs, no
+   API keys. Every frame and every sound is code. Free edge-tts narration is the one accepted
+   network dependency.
+2. **One language per video.** `en` (default) or `bn` (only on an explicit request). Narration,
+   dialogue, captions, labels, inserts — all of it in that language. Never mix.
+3. **English does not regress.** `en` behaviour, numbers and defaults are frozen by tests.
+4. **Gates are not optional.** Every `ERROR` is fixed at the cause. Never weaken a gate, never
+   exempt an intent without a written reason.
+5. **Never claim a check you did not run.** If you could not see an image, say "visual QA was
+   geometric only". If you skipped a stage, name it and why.
+6. **Runs on a CPU-only 16 GB machine.** No GPU, no Blender, no browser extension.
+7. **Deliver even when imperfect.** After the repair budget, ship with an explicit note about what
+   remains. Never ship a silent known failure; never stop without a video.
+
+## 1. Probe yourself, then choose a tier
+
+Before anything else, answer these honestly. The answers pick your **model tier**
+(`references/14-model-tiers.md`); the gates are identical in every tier.
+
+| Probe | How | If missing → adapt |
+|---|---|---|
+| Shell + files | `node --version` | no shell → hand off via `install/PASTE-THIS-PROMPT.md` |
+| Web search | is a search tool available? | no search → write from knowledge, mark every claim unverified in `fact-check.md`, prefer evergreen topics |
+| Vision on images | can you open an image file? | no vision → rely on `qa_geometry`, `qa_stills.py` and say "geometric only" in the report |
+| Background execution | can you run long commands async? | no → render `--tier draft` first, then the final in the foreground |
+| Context budget | how many files can you hold? | tight → read one reference per stage, keep the story JSON as the single source of truth |
+
+Tier in one line, in your working notes and the final report:
+`tier: standard (probe: follows references literally; planning across 4 files is reliable)`.
+
+## 2. The pipeline (13 stages, one command)
+
+```bash
+npx tsx scripts/studio.ts <story.json|slug> \
+  --tier draft|standard|studio \
+  [--lang en|bn] [--voice auto|male|female|<voice-id>] \
+  [--no-tts] [--resume] [--from <stage>]
+```
+
+Stages run in this order and **stop at the first failure**, printing the exact command to resume:
+
+| # | Stage | Proves |
+|---|---|---|
+| 1 | `validate` | schema, props, cast, voices exist in the pack |
+| 2 | `bangla` | one script, every spoken shot glossed, Bangla claims == gloss claims (skipped for en) |
+| 3 | `glyphs` | every on-screen character has a glyph in the bundled font (skipped for en) |
+| 4 | `narration` | audio + per-word timings (skipped with `--no-tts`) |
+| 5 | `timeline` | shots resolve, words align, beats land on spoken words |
+| 6 | `sync` | narration ↔ visual contract (place, time, action, objects, dialogue, continuity) |
+| 7 | `geometry` | the picture actually contains the claim (contact, layering, framing, scale) |
+| 8 | `commonsense` | the Scene Spec + intent glossary: what a human pictures |
+| 9 | `stills` | one still per shot rendered |
+| 10 | `pixels` | exposure / dead-frame / blank gates |
+| 11 | `timing` | word timings are real speech, inside the audit limits |
+| 12 | `render` → `video` | the MP4 exists and is inside spec |
+| 13 | `audio` → `visual` | loudness/peak/voice-presence; per-shot review file |
+
+State: `stories/<slug>/.state.json`. Full log: `out/<slug>/run.log`.
+
+**Before the first run on a machine:** `npm run doctor` → PASS/WARN/FAIL with a fix per line.
+Do not render until it is green or you have read and accepted every WARN.
+
+---
+
+## 3. Stage direction
+
+### Stage 0 — Resolve the language (mechanical, never a judgement call)
 
 ```bash
 npx tsx scripts/resolve_language.ts --text "<the user's exact request>" --json
-# → { lang: "en" | "bn", voice_pref: "auto"|"male"|"female"|<voice-id>, evidence: [...], note? }
+# → { lang, voice_pref, evidence[], note? }
 ```
-
-Rules it enforces (do not re-implement them by hand):
 
 - `en` is the default. `bn` only on an explicit request.
-- `--lang en|bn` beats any wording; a negation ("not in Bangla", "English only", "ইংরেজিতে")
-  forces `en`.
-- A topic that merely mentions Bangla — "a story about Bangla literature", "the Bengal tiger",
-  "the language movement" — stays `en`.
-- If the topic itself is Bangla script with no language request, the resolver keeps `en` and adds
-  a `note`; print that one line in the final report.
-- If it returns a note or all of the request is Bangla script with a directive verb ("বাংলায়
-  বলো"), the `lang` decides everything downstream: voice, normalizer, fonts, captions, inserts.
+- `--lang` beats any wording; a negation ("not in Bangla", "English only", "ইংরেজিতে") forces en.
+- A topic that merely *mentions* Bangla ("a story about Bangla literature", "the Bengal tiger")
+  stays English. The resolver is unit-tested on exactly these (59 cases).
+- If it returns a `note`, print that line in the final report.
 
-Then pass it through **flags, not edits**: `--lang <id>` `--voice auto|male|female|<voice-id>` on
-`studio.ts` / `make.ts`. The story JSON records it as `"lang": "bn"` so the run is reproducible.
-Voice choice (when `voice_pref` is `auto`) is Phase-D logic: `scripts/choose_voice.ts` scores the
-topic and writes `stories/<slug>/voice-decision.md` — never pick a voice silently.
+**Self-check:** did I pass the user's words verbatim, or my paraphrase? Verbatim.
 
-## 0.2 Probe your capabilities, then adapt
+### Stage 1 — Research and fact-check
 
-Before producing, inspect what THIS agent/model can actually do, and adapt the workflow. Do not
-assume; check. One minute here saves a broken render later.
+- Input is a topic, a title, or a TXT concept file (read the file if given).
+- Research before writing. Build `stories/<slug>/fact-check.md`: **claim | what the source says |
+  URL**. One row per factual claim you will narrate.
+- Prefer the weirdest **true** detail over a smoother invented one. If something is legend, say so
+  in-narration ("legend has it…") or cut it.
+- Bangla videos: research in any language, narrate in Bangla, and write each claim in both English
+  and Bangla in the fact-check table.
 
-| Probe | How | If missing → adaptation |
-|---|---|---|
-| Shell + file access | run `node --version` | No shell at all → this skill cannot render; fall back to `install/PASTE-THIS-PROMPT.md` handoff to a coding agent |
-| Web research | a web-search tool available? | No search → write from internal knowledge, mark every claim "unverified" in `fact-check.md`, prefer evergreen physics/history topics |
-| Vision on images | can you read image files? | No vision → rely on `qa_geometry.ts` (contact/framing), `qa_commonsense.ts` (intent + spec), `qa_stills.py` and say so in the delivery report |
-| Background execution | can you run long commands in the background? | No → run renders in the foreground and use `--preview` first; budget for several minutes |
-| Context budget | very large context? | Tight context → read only the `references/` files the current stage names, one at a time; keep the story JSON as the single source of truth |
-| Reasoning depth | strong model → push craft further: richer staging, more beats, deeper research | Weaker model → follow the reference defaults literally; they are calibrated to produce good results without improvisation |
+**Quality bar:** every number, date, name and causal claim has a source, or is marked unverified.
+**Common mistake:** researching to fill 60 seconds. Research to find the one fact that makes the
+video worth watching; the length follows.
 
-Whatever the environment, the quality gates (steps 4, 5, 7) are **not optional** — a weaker
-workflow must still pass the same executable checks.
+### Stage 2 — Story concept and format
 
-## 0.4 The Director's Brief — write what a human would picture, first
+Choose a format from `references/13-format-library.md` by what the material supports. Ten formats
+are documented with beat structure, shot grammar, endings and worked examples in English and
+Bangla.
 
-Every sentence quietly implies a picture. "He is asleep in the other room" means a bed, a
-mattress, a pillow, a blanket, a body lying on it, dim light, and a *different room* — not a man
-on the floor beside a bed. Before you write one line of story JSON, write one **Scene Spec block
-per shot** using `templates/scene-spec.md`. It is a form, not an essay: where, who, what supports
-each body, which props the sentence implies, which relations hold, the world state, the emotion,
-what the camera must make unmissable, and what must be absent.
+Default when nothing clearly fits: **explainer with mystery**.
 
-**The rule for the whole film:** if a human would assume it, the film must show it; if a human
-would never draw it, the film must not contain it.
+Before writing shots, record in `script.md`:
 
-Then the engine argues with you:
-
-```bash
-npx tsx scripts/qa_commonsense.ts stories/<slug>.json   # glossary + spec
-npx tsx scripts/spec_check.ts stories/<slug>.json       # spec only
+```
+format: explainer with mystery
+arc: curiosity → understanding
+hook pattern: observable oddity
+first three seconds: <what is on screen while the hook line plays>
+ending move: protective irony
 ```
 
-### Decision table — the assumptions agents get wrong
+**Self-check:** would two of my last three videos share the same format, hook pattern and ending
+move? If yes, change three of the five axes (format, hook, opening framing, insert type, ending).
 
-| If the sentence says… | Then the shot must have | Never |
+### Stage 3 — Write the script
+
+Word budget **from the language pack**, never from habit:
+
+| Length | English | Bangla |
 |---|---|---|
-| sits at a desk / on a sofa / on a chair | that furniture declared + `action: "sitOn"` + `on` | a body at floor level beside an empty chair |
-| sleeps / lies in bed | `action: "sleepOn"`/`"lieOn"` on a declared `bed`, `underBlanket: true` | a body on the floor, bed as decoration |
-| stands by the window | the `window` prop in frame, the actor turned toward it | a windowless wall |
-| holds a cup / box / letter | `holding` on the actor + the prop at hand height | a prop floating beside the palm |
-| is in the other room / upstairs | a **different** `bg`/`location`, plus a transition that shows the change | the same background reused |
+| 45 s | 150 words | 120 words |
+| 60 s | 200 words | 165 words |
+| 75 s | 250 words | 205 words |
+
+(Bangla reads 2.75 words/s at `+22 %`; English 3.9. Measured, not estimated.)
+
+English craft: `references/04-script-craft.md`. Bangla craft — register, address level, loanwords,
+22 good/bad sentence pairs: `references/12-bangla-voice-and-script.md`.
+
+Rules that apply to both:
+
+- **Line 1 is a fact, not a greeting.** No "Did you know", "In this video", "আজ আমরা জানব".
+- Short sentences. One idea each. The mechanism sentence is the calmest and slowest line.
+- Numbers written the way they are spoken; the Bangla normalizer converts digits, currency and
+  years automatically (৪০% → চল্লিশ শতাংশ, ১৯৯০ → উনিশশো নব্বই).
+- Quotes ≤ 12 words so the mouth animation reads.
+- The twist is the last line. End hard; no moral, no sign-off.
+
+Save `stories/<slug>/script.md`. For Bangla, a two-column table: Bangla line | English gloss.
+
+### Stage 4 — Choose and direct the voice
+
+If the user named a voice, use it. Otherwise:
+
+```bash
+npx tsx scripts/choose_voice.ts --text "<topic>" --lang <en|bn> --write stories/<slug>/voice-decision.md
+```
+
+It scores tone and genre from the topic, records the reason and the breakdown, and writes the
+decision file. Precedence: user preference → first-person narrator match → genre score → pack
+default. **Read the reason line** — if it looks wrong for the material, override with
+`--voice male|female|<id>` and say why in the report.
+
+Dialogue: give each character their own `voice`/`voiceRate` in the cast. Two speakers on the same
+voice at the same rate are rejected (they sound like one person talking to themselves). The engine
+builds one multi-voice track and every downstream stage reads it unchanged.
+
+**Quality bar:** hook line synthesized and listened to (or measured) before committing the voice.
+
+### Stage 5 — Check assets
+
+```bash
+npx tsx scripts/locations.ts --list
+```
+
+Reuse before building. Never make a near-duplicate. Missing asset → build it **before**
+storyboarding (`references/08-extending-assets.md`), and verify 3D with
+`locations.ts --stills --only=<name>`.
+
+Bangla stories: check the setting is culturally plausible (tea stall, rickshaw, village house,
+bazaar, rain on a window). Never force it — a phone-overheating story is a phone story.
+
+### Stage 6 — The Scene Spec (write this before the shot JSON)
+
+One block per shot using `templates/scene-spec.md`. It is a form, not an essay: where, who, what
+holds each body up, which props the sentence implies, which relations hold, world state, emotion,
+what the camera must make unmissable, and what must be absent.
+
+**The rule for the whole film:** if a human would assume it, the film must show it; if a human would
+never draw it, the film must not contain it.
+
+For Bangla, write the spec **from the gloss**, not from the Bangla text — the gloss is the meaning
+layer the checks read.
+
+The assumptions agents get wrong (each is a gate ERROR):
+
+| If the sentence says… | The shot must have | Never |
+|---|---|---|
+| sits at a desk / on a sofa / on a chair | the furniture declared + `action: "sitOn"` + `on` | a body at floor level beside an empty chair |
+| sleeps / lies in bed | `action: "sleepOn"` / `"lieOn"` on a declared `bed`, `underBlanket: true` | a body on the floor, bed as decoration |
+| stands by the window | the `window` prop in frame, actor turned toward it | a windowless wall |
+| holds a cup / box / letter | `holding` on the actor + the prop visible | a prop floating beside the palm |
+| is in the other room / upstairs | a **different** `bg`/`location` + a transition that shows the change | the same background reused |
 | it is raining | `fx: ["rain"]` outdoors, or a `window` with rain on it indoors | rain falling inside a room |
-| at night | `time: "night"` | a daylight grade |
+| at night / at sunset | `time: "night"` / `"sunset"` | a daylight grade |
 | two people / a crowd / a giant | 2 / 4+ actors, or `scale` ≥ 1.6 | one figure described as many |
-| they talk / argue / shake hands | two actors facing each other, only the speaker's mouth moving | both facing camera |
+| they talk / argue | two actors facing each other, only the speaker's mouth moving | both facing camera |
 | no one was home / the chair was empty | no actors, or the empty prop framed and unoccupied | a character standing in the "empty" room |
 | imagine / the chart / a diagram | an `insert` that draws the abstraction | a talking head over "the numbers" |
 
-Full intent table (61 intents, every phrase with a GOOD and a BAD rendering):
-`references/11-commonsense-intents.md`. It is checked automatically — a matching phrase whose
-picture is missing is an **ERROR**, not a suggestion.
+### Stage 7 — Storyboard
 
-### Self-check before storyboarding (answer all six)
+Write `stories/<title>.json`. Schema: `references/09-schema-reference.md`; ids:
+`engine/src/catalog.ts`; shot grammar: `references/05-storyboard-craft.md`.
 
-1. For **every actor**: what holds the body up? (floor, chair seat, mattress, ground, wall, car seat)
-2. For **every object the sentence names**: is it in `props` and visible?
-3. For **every place word**: does the background change, and does the cut show it?
-4. Is **anyone on screen the sentence did not put there**?
-5. Does **every relation** you wrote survive a stranger looking at one frame?
-6. **Sound off**: could a viewer still understand the shot?
-
-### Ambiguity and metaphors
-
-When a sentence can be read two ways, take the **most physically natural, most common human
-interpretation**, write it in the spec's `note`, continue. Never choose the odd reading unless the
-prompt says so.
-
-A figure of speech can trip the glossary ("his phone goes from cool to cooking" matches the
-kitchen intent). Do **not** weaken the gate — exempt that intent in that shot, with a reason:
-
-```json
-"intentExempt": [{ "shot": 8, "id": "use-cooking", "reason": "metaphor: the phone heats up" }]
-```
-
-## 0.5 Use the orchestrator, not eight commands
-
-The pipeline is a state machine. Call it once; it runs every stage, refuses to advance when
-a gate fails, and tells you the exact command to resume.
-
-```bash
-npx tsx scripts/studio.ts <story.json|slug> --tier draft        # fast half-size pass
-npx tsx scripts/studio.ts <story.json> --tier standard          # 1080x1920 delivery
-npx tsx scripts/studio.ts <story.json> --tier studio            # highest bitrate
-npx tsx scripts/studio.ts <story.json> --from geometry --resume  # continue after a fix
-```
-
-State is written to `stories/<slug>/.state.json`, the full log to `out/<slug>/run.log`.
-Stages: `validate → narration → timeline → sync → geometry → commonsense → stills → pixels →
-timing → render → video → audio → visual`. `--no-tts` skips narration/timing/audio and renders silent.
-
-Before the first run on a new machine: `npm run doctor` (prints PASS/WARN/FAIL and the fix
-for each). Do not render until it is green or you understand every WARN.
-
-## 0.5 Resolve the engine
-
-The engine is a self-contained Remotion project. Find it in this order:
-
-1. A directory in the current project whose `package.json` is named `stickman-studio-engine` — use it.
-2. The `engine/` folder that ships next to this file — copy it into the workspace
-   (`cp -r <skill-dir>/engine ./engine`) and run `npm install` inside it (first time only).
-3. If neither exists, the skill was installed without its engine — clone the skill repository
-   and take `engine/` from there.
-
-One-time setup inside the engine directory:
-
-```bash
-npm install                      # Remotion + three + zod
-pip install edge-tts imageio-ffmpeg numpy scipy pillow   # narration + procedural audio + QA
-```
-
-The 65 SFX, 6 music beds and film grain are generated procedurally on first render (no downloads,
-no licenses, no third-party audio). Narration needs internet for edge-tts (free, no key);
-`--no-tts` works fully offline for staging work. Voices come from the language pack
-(`engine/lang/en/pack.json`, `engine/lang/bn/pack.json`) — English direction in
-`references/10-english-voice-direction.md`, Bangla in `references/12-bangla-voice-and-script.md`.
-
-## 1. Research the topic (English)
-
-- Input is a topic, a title, or a path to a TXT file (read it if given).
-- Research with web search before writing. Build a fact-check table (claim | what the source says
-  | source URL) for **every** factual claim you will narrate → `stories/<slug>/fact-check.md`.
-- If something is only rumored or folklore, either drop it or mark it in-narration ("legend has it…").
-- Prefer the weirdest *true* detail over a smoother invented one.
-
-## 2. Write the script + choose the voice
-
-Measured speech rate on the reference machine (edge-tts, `+22%`, `en-US-AndrewMultilingualNeural`):
-**≈3.8–4.0 words per second of audio**, so **190–210 words ≈ 50–57 s**. Do not estimate from a
-fixed 60–75 s: the real duration comes from the synthesized audio. Slower presets (`+6…10%`)
-read at ≈3.2–3.4 w/s; `AriaNeural @ +12%` ≈3.6 w/s.
-
-Structure (follow it exactly):
-
-1. **Line 1: paradox hook stated as plain fact.** No greetings, no "Did you know".
-2. **Setup and stakes** — hero, place, want.
-3. **Escalation + a short quoted line where someone mocks the hero.**
-4. **Turning point / rhetorical question.**
-5. **"You see," + the mechanism**, with an everyday analogy and an insert graphic.
-6. **Twist on the last line.** End hard.
-
-Full craft rules: `references/04-script-craft.md`. Save the script to `stories/<slug>/script.md`.
-
-Then **direct the voice** before rendering: pick provider/voice/rate for the genre from
-`references/10-english-voice-direction.md` (default: `en-US-AndrewMultilingualNeural` @ `+22%`;
-calm documentary reads slower). Test the hook line with a quick synthesis if unsure.
-
-## 3. Check and build assets
-
-- List what the story needs: places, standing objects, held items.
-- Check what exists: `npx tsx scripts/locations.ts --list`. Reuse before building; never make a
-  near-duplicate; name assets for what they are.
-- Build missing assets **before storyboarding** — recipes in `references/08-extending-assets.md`
-  (3D location / 3D object / 2D prop / 2D background / outfit).
-- Verify new 3D assets with `npx tsx scripts/locations.ts --stills --only=<name>`.
-
-## 4. Storyboard WITH a sync contract (the sync gate)
-
-Write `stories/<kebab-title>.json`. Schema + ids: `references/09-schema-reference.md`,
-`engine/src/catalog.ts`. Craft rules: `references/05-storyboard-craft.md`.
-
-**Say WHAT happens; let the engine decide WHERE the body goes.** Use the semantic action layer
-first — it is what keeps quality independent of the agent writing the JSON:
+**Say what happens; let the engine place the body.** Use the semantic action layer:
 
 ```json
 { "id": "worker", "action": "sitOn", "on": "chair", "facing": "right" }
 ```
 
-The engine looks up the chair's `seat` anchor, puts the hip joint on it, chooses the pose,
-draws the body in front of the chair back and reports the contact to the geometry gate. You do
-not write `x`, `z`, `pose` or a `y` lift for this.
+`on` resolves to the **nearest** prop of that type to the actor, so two people on "chair" get two
+chairs. Hand-written `x`/`z`/`pose` still work and the geometry gate flags a `sit` drawn at floor
+level.
 
-| action | needs a prop with | example |
-|---|---|---|
-| `sitOn` | `seat` anchor | chair, stool, bench, couch, bed edge, car |
-| `lieOn` / `sleepOn` | `mattress` anchor | bed, hospital bed |
-| `standAt` | `top` anchor | desk, table, counter |
-
-Hand-written `x`/`z`/`pose` still work (advanced override) but the geometry gate will flag a
-`pose: "sit"` that is drawn at floor level next to a chair.
-
-**Declare the prop you interact with in that shot's `props`.** If the background already has
-the same furniture at the same x/z, the shot's declaration replaces it (no double bed).
-
-**Narration-to-visual synchronization is mandatory and machine-checked.** Every narration segment
-(a shot's `say`) must visibly show what it says: right place, right time of day, the described
-action as a pose/beat/prop, mentioned objects on screen, quoted lines bound to a `quote` actor,
-and continuity across shots. Word-level timing inside a shot is bound with `beats` (`at` = a
-spoken word).
-
-Run the executable gate and iterate to zero errors:
+Every shot's `say` must visibly show what it says, and word-level beats bind with `at: "<a spoken
+word>"`.
 
 ```bash
-npx tsx scripts/qa_sync.ts stories/<file>.json            # place/time/action/object/dialogue/continuity checks
-npx tsx scripts/qa_sync.ts stories/<file>.json --map      # print the shot-by-shot sync contract table
-npx tsx scripts/qa_geometry.ts stories/<file>.json        # the scene-graph gate (see below)
+npx tsx scripts/qa_sync.ts  stories/<file>.json            # contract
+npx tsx scripts/qa_sync.ts  stories/<file>.json --map      # the shot-by-shot table
+npx tsx scripts/qa_geometry.ts stories/<file>.json         # scene graph
+npx tsx scripts/qa_commonsense.ts stories/<file>.json      # spec + intents
 ```
 
-- All ERRORs must be fixed (change the shot's world/time/pose/props, or rephrase the narration).
-- Review every WARN; either fix it or record why it is acceptable in `stories/<slug>/sync-map.md`
-  (generate the table with `--map`; template: `templates/sync-map.md`).
-- A story-specific lexicon (idioms, invented nouns) goes in `stories/<slug>/sync-lexicon.json` —
-  see the template.
+Zero ERRORs. Every WARN either fixed or explained in `stories/<slug>/sync-map.md`.
 
-## 4.5 Geometry gate — does the picture actually contain the claim?
+**Bangla shots** also carry `"gloss": "<the meaning in plain English>"`:
 
-The sync gate reads text. This one reads the scene graph: contact (hip inside the seat, body on
-the mattress, head on the pillow), no sinking/floating, character-vs-prop scale, draw order,
-face occlusion by props drawn in front, framing, facing in dialogue, and seated→standing
-continuity. It runs the **same placement code as the renderer**, so a pass means the drawn
-scene really touches the surface.
-
-```bash
-npx tsx scripts/qa_geometry.ts stories/<file>.json
+```json
+{ "say": "ছেলেটি অন্য ঘরে বিঘ্নায় ঘুমিয়ে আছে।", "gloss": "The boy is asleep in bed in the other room." }
 ```
 
-Every ERROR names the shot and the fix. Typical repairs: add the semantic action, declare the
-prop in that shot, move a desk/monitor aside in x, or widen the framing.
-
-## 5. Stills gate (never skip)
+### Stage 8 — Stills, and actually look
 
 ```bash
-npm run make -- stories/<file>.json --stills        # one QA still per shot → out/<slug>/stills/
-python scripts/qa_stills.py out/<slug>/stills       # exposure/dead-frame gate (exit 1 on fail)
+npm run make -- stories/<file>.json --stills
+python scripts/qa_stills.py out/<slug>/stills
 python scripts/qa_visual_report.py stories/<file>.json out/<slug>/stills
 ```
 
-The last command writes `out/<slug>/contact-sheet.png` and `out/<slug>/visual-review.md`: a
-per-shot checklist of what the narration claims, next to what the scene declares and the offline
-CV measurements.
+This writes `out/<slug>/contact-sheet.png` and `visual-review.md` — per shot, what the narration
+claims next to what the scene declares and the offline CV numbers.
 
-- **If you can see images:** open the contact sheet, compare each still to its claim column, and
-  write `PASS` or `FAIL` in the verdict column. Re-running the script reads your verdicts and
-exits 1 on any FAIL.
-- **If you cannot see images:** rely on `qa_geometry` plus the CV numbers, and say
-  "visual QA was geometric only" in the delivery report. Never claim you looked at a frame you
-  did not look at.
+- **If you can see images:** open the contact sheet, compare each still to its claim, write PASS or
+  FAIL in the verdict column. Re-running the script reads your verdicts and exits 1 on any FAIL.
+- **If you cannot:** use `qa_geometry` + the CV numbers and write "visual QA was geometric only" in
+  the delivery report.
 
-Fix and re-run until clean. **Never render video before this gate passes.**
+**Never render video before this gate passes.**
 
-## 6. Render
+### Stage 9 — Render and verify
 
 ```bash
-npm run make -- stories/<file>.json            # full quality → out/<slug>/<slug>.mp4
-npm run make -- stories/<file>.json --preview  # half-size draft first when unsure
+npm run make -- stories/<file>.json            # full quality
+npm run make -- stories/<file>.json --preview  # half-size draft first
 ```
 
-Run in the background when possible; do not start unrelated heavy jobs concurrently. Narration is
-cached per slug and re-synthesizes only when script/voice/rate change.
-
-## 7. Verify (ffprobe + frames + audio gate)
+Then verify the file, not the intention:
 
 ```bash
 ffprobe -v error -select_streams v:0 -show_entries stream=width,height,r_frame_rate,codec_name -of csv=p=0 out/<slug>/<slug>.mp4
-ffmpeg -i out/<slug>/<slug>.mp4 -vf fps=1/5 qa_%03d.jpg     # pull frames across the video
-python scripts/qa_audio.py out/<slug>/<slug>.mp4            # loudness/clipping/voice-presence gate
+ffmpeg -i out/<slug>/<slug>.mp4 -vf fps=1/5 qa_%03d.jpg
+python scripts/qa_audio.py out/<slug>/<slug>.mp4
 ```
 
-- Specs: 1080×1920 (540×960 for `--preview`), 30 fps, h264 + aac; duration ≈ narration + 0.6 s.
-- Frames: first/middle/last not black; captions legible; no stuck shot.
-- Audio gate must PASS: −14 LUFS ±1.5, true peak ≤ −1.0 dBTP, voice energy present.
+Specs: 1080×1920, 30 fps, h264 + aac, duration ≈ narration + 0.6 s. Audio: −14 LUFS ±1.5, true peak
+≤ −1.0 dBTP, voice present.
 
-## 8. Repair loop, then deliver
+### Stage 10 — Repair, then deliver
 
-Loop stages 4→7 until every gate passes. Budget: up to **3 repair rounds per gate**; if a gate
-still fails after that, deliver with an explicit note about what remains (never silently ship a
-known failure, never stop without a delivery).
+Loop stages 6→9. Budget: **3 rounds per gate**. Still failing after that → deliver with an explicit
+note about what remains.
 
-Deliver as a set: the MP4, `script.md`, `fact-check.md`, `sync-map.md`, the story JSON, any new
-library assets, and honest limits (verified fact vs. dramatized; which gates ran and how they
-were checked).
+Deliver as a set: the MP4, `script.md`, `fact-check.md`, `sync-map.md`, `voice-decision.md` (when
+the pipeline chose), the story JSON, any new assets, and honest limits (verified vs dramatised;
+which gates ran; how visual QA was done).
 
-## Quality bar (non-negotiable)
+---
 
-- **Sync:** the visuals show exactly what the narration communicates — zero contradictions, zero
-  dead shots. When narration and animation would tell two different stories, rewrite the storyboard.
-- **Expressive characters:** reactions on beats, poses that read in silhouette, one consistent
-  light source per scene; idle life (breathing/blink/walk) is automatic — intentional motion on top.
-- **Cinematography:** framing ladder per scene, camera variety (the sync gate flags ≥3 identical
-  framing+camera shots in a row), one clear visual purpose per shot.
-- **Sound never fights the voice:** ducking is automatic; manual `sfx` only for specific moments;
-  the audio gate enforces loudness and no clipping.
-- **No repetition, no slop:** vary framings, transitions and reactions; ≤ 2 fx per shot; ≤ 1
-  insert per 8–10 shots.
-- **No AI-generated images or video, no image-generation services, no paid APIs. Ever.**
-- **One language per video** — English (default) or Bangla (on request): narration, dialogue,
-  on-screen text, captions, labels all follow the resolved `lang`.
+## 4. Failure playbook
 
-## Deep reference material (read per stage, not all at once)
+| Symptom | Cause | Fix |
+|---|---|---|
+| `sync` ERROR: object/place/action missing | the shot does not draw what the sentence says | change the shot's world/props/action, or rephrase the narration. Never exempt unless it is a metaphor, and then write the reason |
+| `geometry` ERROR: contact | body drawn at floor level, or on the wrong prop | use `action` + `on`; declare the prop in that shot |
+| `geometry` WARN: two bodies overlap | both actors took the same prop | expected for `on: "chair"` with two chairs — check the chairs exist; the engine picks the nearest |
+| `commonsense` ERROR: intent | the phrase implies a picture that is missing | the error prints GOOD and BAD — fix props/action/time/bg |
+| `bangla` ERROR: gloss drift | the English gloss says something the Bangla does not (or less) | rewrite the gloss to match the meaning exactly |
+| `bangla` ERROR: mostly Latin | an English line in a Bangla story | write the line in Bangla |
+| `glyphs` ERROR: U+XXXX | a character no bundled font has | replace the character, or add a Bengali font (see THIRD_PARTY.md) |
+| `timing` FAIL | estimated timings used, or words misaligned | delete `out/<slug>/narration.key` and re-render to force real synthesis |
+| `pixels` FAIL | black/blank/near-uniform still | check that shot's bg/location/lighting; a dark grade needs a light source |
+| `audio` FAIL: loudness | manual audio, or a silent render | the pipeline loudnorms automatically — do not hand-edit audio |
+| narration fails: `WSServerHandshakeError 403` / `NoAudioReceived` | the TTS endpoint rate-limits | the engine retries with backoff and falls back to another same-gender voice; if all fail, wait a minute and re-run |
+| render OOM / very slow | concurrency too high for free RAM | `--concurrency 2`; the engine already caps by free RAM |
+| captions show boxes | missing glyph in the bundled font | `npm run doctor` → `bangla fonts`; `python scripts/fetch_fonts.py` |
+
+## 5. Quality bar (the bar, not a wish list)
+
+- **Sync:** the picture shows exactly what the narration says — zero contradictions, zero dead shots.
+- **Characters:** one rig per character, consistent across shots; reactions land on the spoken word;
+  idle life (breathing, blink, walk) is automatic, intentional motion on top.
+- **Camera:** a framing ladder per scene; no three consecutive shots with the same framing+camera
+  (the sync gate flags it); one visual purpose per shot.
+- **Sound:** the voice is always the loudest thing; ducking is automatic; manual `sfx` only for
+  specific moments.
+- **Restraint:** ≤ 2 fx per shot, ≤ 1 insert per 8–10 shots, no repeated shot shapes.
+- **Language:** one script on screen; Bangla never letter-spaced or uppercased.
+- **Honesty:** the delivery report lists what ran, what passed, and what you could not check.
+
+## 6. If you are a particular agent
+
+`docs/agents/` has a playbook per product: Claude Code, Google Antigravity, ZCode, Codex CLI,
+OpenCode, Cursor, Gemini CLI, GitHub Copilot, Windsurf, Aider, and chat-only agents. Each states
+where instructions/skills live, what the product can parallelise, and how to use that for speed
+(parallel research, parallel stills, background renders, vision for the stills review).
+
+Read the one that matches you, then follow this manual unchanged. The playbook changes how you run
+the work, never what the work must prove.
+
+## 7. Reference map (read per stage, not all at once)
 
 | File | Read it for |
 |---|---|
 | `references/01-animation-principles.md` | motion, easing, anticipation, secondary action — as the engine implements them |
-| `references/02-character-system.md` | the stickman rig: proportions, builds, poses, faces, consistency |
-| `references/03-scenes-camera-light.md` | parallax layers, framing, camera moves, lighting, locked palettes |
-| `references/04-script-craft.md` | script structure, hooks, analogies, word budgets |
+| `references/02-character-system.md` | the rig: proportions, builds, poses, faces, consistency |
+| `references/03-scenes-camera-light.md` | parallax, framing, camera moves, lighting, locked palettes |
+| `references/04-script-craft.md` | English script structure, hooks, analogies, budgets |
 | `references/05-storyboard-craft.md` | shot grammar, beats, transitions, the sync contract |
-| `references/06-sound-design.md` | ducking, auto-SFX map, music moods, comfort rules, audio gates |
-| `references/07-rendering-qa.md` | all QA gates, pixel checks, ffprobe, repair loops |
+| `references/06-sound-design.md` | ducking, auto-SFX map, music moods, audio gates |
+| `references/07-rendering-qa.md` | every gate, pixel checks, ffprobe, repair loops |
 | `references/08-extending-assets.md` | recipes: 3D location/object, 2D prop/background, outfit, sfx |
-| `references/09-schema-reference.md` | every story JSON field, with defaults and constraints |
-| `references/10-english-voice-direction.md` | the English voice catalog, direction, pacing, offline fallback |
+| `references/09-schema-reference.md` | every story JSON field with defaults and constraints |
+| `references/10-english-voice-direction.md` | English voice catalog, direction, pacing, offline fallback |
+| `references/11-commonsense-intents.md` | the intent table with GOOD and BAD pictures |
+| `references/12-bangla-voice-and-script.md` | Bangla register, budgets, 22 sentence pairs, voices, screen rules |
+| `references/13-format-library.md` | 10 story formats, hook bank, arcs, repetition guard |
+| `references/14-model-tiers.md` | small / standard / max — what each attempts |
+| `templates/scene-spec.md` | the Director's Brief form |
+| `templates/sync-map.md` | the shot-by-shot contract table |
+| `templates/fact-check-table.md` | the claim/source table |
